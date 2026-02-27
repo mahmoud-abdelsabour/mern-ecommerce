@@ -24,7 +24,7 @@ const productSchema = mongoose.Schema({
         ]
     },
     description: {
-        trype: String,
+        type: String,
         required: true
     },
     category: {
@@ -49,7 +49,9 @@ const productSchema = mongoose.Schema({
             {
                 rating: {
                     type: Number,
-                    required: true
+                    required: true,
+                    min: 1,
+                    max: 5
                 },
                 comment: {
                     type: String,
@@ -57,6 +59,7 @@ const productSchema = mongoose.Schema({
                 },
                 userId: {
                     type: mongoose.Schema.Types.ObjectId,
+                    ref: "User",
                     required: true
                 },
                 username: {
@@ -77,12 +80,9 @@ const productSchema = mongoose.Schema({
         ref: "Brand",
         required: true
     },
-    timestamps: true,
-    isActive: {
-        type: Boolean
-    }
+    isActive: Boolean
     
-})
+},{timestamps: true})
 
 productSchema.set('toJSON', {
   transform: (document, returnedObject) => {

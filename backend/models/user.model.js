@@ -17,7 +17,7 @@ const userSchema = mongoose.Schema({
         lowercase: true,
         trim: true,
         match: [
-            /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
             "Please enter a valid email address"
         ]
     },
@@ -48,15 +48,19 @@ const userSchema = mongoose.Schema({
             type: String,
             required: true
         },
+        postalcode: {
+            type: String,
+            required: true
+        },
         street: {
-            type: Number,
+            type: String,
             required: true
         },
         building: {
-            type: Number,
+            type: String,
             required: true
         },
-        flour: {
+        floor: {
             type: Number,
             required: true
         },
@@ -108,7 +112,7 @@ userSchema.set('toJSON', {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
     delete returnedObject.__v
-    // the passwordHash should not be revealed
+    // the password should not be revealed
     delete returnedObject.password
   }
 })

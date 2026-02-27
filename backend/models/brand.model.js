@@ -9,8 +9,7 @@ const brandSchema = mongoose.Schema({
     },
     slug: {
         type: String,
-        required: false,
-        unique: true
+        required: false
     },
     logo: {
         type: String,
@@ -21,6 +20,11 @@ const brandSchema = mongoose.Schema({
         }
     }
 })
+
+brandSchema.index(
+    { slug: 1 },
+    { unique: true, partialFilterExpression: { slug: { $exists: true, $type: 'string' } } }
+)
 
 brandSchema.set('toJSON', {
   transform: (document, returnedObject) => {

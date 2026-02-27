@@ -9,10 +9,14 @@ const categorySchema = mongoose.Schema({
     },
     slug: {
         type: String,
-        required: false,
-        unique: true
+        required: false
     }
 })
+
+categorySchema.index(
+    { slug: 1 },
+    { unique: true, partialFilterExpression: { slug: { $exists: true, $type: 'string' } } }
+)
 
 categorySchema.set('toJSON', {
   transform: (document, returnedObject) => {
