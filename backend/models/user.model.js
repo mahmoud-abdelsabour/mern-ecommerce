@@ -15,7 +15,8 @@ const userSchema = mongoose.Schema({
         type:String,
         required: [true, "username is required"],
         unique: true,
-        minlength: 3
+        minlength: 3,
+        maxlength: 30
     },
     email: {
         type: String,
@@ -45,35 +46,46 @@ const userSchema = mongoose.Schema({
             "Please enter a valid Egyptian phone number"
         ]
     },
-    address: {
-        country: {
-            type: String,
-            required: true
-        },
-        city: {
-            type: String,
-            required: true
-        },
-        postalcode: {
-            type: String,
-            required: true
-        },
-        street: {
-            type: String,
-            required: true
-        },
-        building: {
-            type: String,
-            required: true
-        },
-        floor: {
-            type: Number,
-            required: true
-        },
-        special_mark: {
-            type: String,
-            required: false
-        }
+    addresses: {
+        type: [
+            {
+                country: {
+                    type: String,
+                    trim: true,
+                    required: true
+                },
+                city: {
+                    type: String,
+                    trim: true,
+                    required: true
+                },
+                postalcode: {
+                    type: String,
+                    trim: true,
+                    required: true
+                },
+                street: {
+                    type: String,
+                    trim: true,
+                    required: true
+                },
+                building: {
+                    type: String,
+                    trim: true,
+                    required: true
+                },
+                floor: {
+                    type: Number,
+                    required: true
+                },
+                special_mark: {
+                    type: String,
+                    trim: true,
+                    required: false
+                }
+            }
+        ],
+        default: []
     },
     cart: {
         type: [
@@ -96,7 +108,8 @@ const userSchema = mongoose.Schema({
         type: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "Product"
+                ref: "Product",
+                required: true
             }
         ],
         default: []
