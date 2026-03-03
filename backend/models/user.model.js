@@ -22,13 +22,14 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, "Email is required"],
         lowercase: true,
+        unique: true,
         trim: true,
         match: [
             /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
             "Please enter a valid email address"
         ]
     },
-    password: {
+    passwordHash: {
         type: String,
         required: [true, "Password is required"],
         minlength: [8, "Password must be at least 8 characters"],
@@ -40,6 +41,7 @@ const userSchema = mongoose.Schema({
     phone: {
         type: String,
         required: [true, "Phone number is required"],
+        unique: true,
         minlength: [11, "valid phone number must be at least 11 characters"],
         match: [
             /^01[0125][0-9]{8}$/,
@@ -132,7 +134,7 @@ userSchema.set('toJSON', {
     delete returnedObject._id
     delete returnedObject.__v
     // the password should not be revealed
-    delete returnedObject.password
+    delete returnedObject.passwordHash
   }
 })
 

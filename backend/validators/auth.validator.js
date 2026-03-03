@@ -33,6 +33,16 @@ const updateProfileSchema = Joi.object({
     profilePhoto: Joi.string().trim().allow(null, "")
 }).min(1);
 
+const updatePasswordSchema = Joi.object({
+    currentPassword: Joi.string().required(),
+    newPassword: Joi
+    .string()
+    .min(8)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .required(),
+
+})
+
 const createAddressSchema = Joi.object({
     country: Joi.string().trim().required(),
     city: Joi.string().trim().required(),
@@ -52,6 +62,6 @@ const updateAddressSchema = Joi.object({
     floor: Joi.number(),
     special_mark: Joi.string().trim().allow("")
 
-})
+}).min(1)
 
 module.exports = { registerSchema, loginSchema, updateProfileSchema, createAddressSchema, updateAddressSchema };

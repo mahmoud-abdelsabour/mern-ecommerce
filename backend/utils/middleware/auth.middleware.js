@@ -14,14 +14,14 @@ const auth = async (request, response, next) => {
 
     try {
         const decodedToken = jwt.verify(token, config.JWT_SECRET)
-        if (!decodedToken.id) {
+        if (!decodedToken.id ) {
             return response.status(401).json({ error: 'token invalid' })
         }
 
         const user = await User.findById(decodedToken.id)
 
-        if (!user) {
-            return response.status(401).json({ error: 'user not found' })
+        if (!user || user.tokenVersion !== decoded.tokenVersion) {
+            return response.status(401).json({ error: 'user not found or token invalid' })
         }
 
         request.user = user
