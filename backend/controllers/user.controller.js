@@ -1,20 +1,6 @@
-const bcrypt = require('bcrypt')
 const User = require('../backend/models/user.model')
-const jwt = require('jsonwebtoken')
-const config = require('../utils/config/config')
-const authService = require('./services/auth.service')
 
-const register = async (request, response) => {
-  const user = await authService.register(request.body)
-  response.status(201).json(user)
-}
 
-const login = async (request, response) => {
-  const {token, user} = authService.login(request.body)
-  response
-  .status(200)
-  .send({ token, username: user.username, firstName: user.firstName, lastName: user.lastName })
-}
 
 const updateProfile = async (request, response) => {
     const userId = request.user?.id || request.user?._id;
@@ -83,10 +69,7 @@ const updateProfile = async (request, response) => {
     return response.status(200).json(updatedUser);
 }
 
-const updatePassword = async (request, response) => {
-  const updatedUser = authService.updatePassword(request.body)
-  return response.status(200).json(updatedUser);
-}
+
 
 const createAddress = async (request, response) => {
     const {country, city, postalcode, street, building, floor, special_mark} = request.body
