@@ -2,23 +2,25 @@ const bcrypt = require('bcrypt')
 const User = require('../backend/models/user.model')
 const config = require('../utils/config/config')
 
-const isExistedUser = async (data) => {
+const isExistedUser = async (data, excludeUserId = null) => {
+    const exclude = excludeUserId ? {_id: {$ne: excludeUserId}} : {}
+
     if(data.username){
-        const usernameTaken = await User.findOne({username: data.username})
+        const usernameTaken = await User.findOne({username: data.username, ...exclude})
         if(usernameTaken) return {user: usernameTaken, message:'username already exits'}
     }
 
     if(data.email){
-        const emailTaken = await User.findOne({email: data.email})
+        const emailTaken = await User.findOne({email: data.email, ...exclude})
         if(emailTaken) return {user:emailTaken, message:'email already exist'}
     }
 
     if(data.phone) {
-        const phoneTaken = await User.findOne({phone: data.phone})
+        const phoneTaken = await User.findOne({phone: data.phone, ...exclude})
         if(phoneTaken) return {user:phoneTaken, message:'phone already exist'}
     }
 
-    return ''
+    return {user: null, message: ''}
 }
 
 const hashingValue = async (password, saltRounds) => await bcrypt.hash(password, saltRounds)
@@ -49,7 +51,7 @@ const incrementTokenVersion = (user) => user.tokenVersion += 1
 const register = async (data) => {
     const {firstName, lastName, username, phone, email, password} = data
 
-    const {_, message} = isExistedUser(username, email, phone)
+    const {_, message} = await isExistedUser(username, email, phone)
     if(message !== '') throw Object.assign(new Error(message), { statusCode: 409 })
 
     const hashedPassword = hashingValue(password, 10)
@@ -101,5 +103,6 @@ const updatePassword = async (data) => {
 module.exports = {
     register,
     login,
-    updatePassword
+    updatePassword,
+    isExistedUser
 }
