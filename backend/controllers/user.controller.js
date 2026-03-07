@@ -2,71 +2,18 @@ const bcrypt = require('bcrypt')
 const User = require('../backend/models/user.model')
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config/config')
+const authService = require('./services/auth.service')
 
 const register = async (request, response) => {
-    const {firstName, lastName, username, phone, email, password} = request.body
-
-    const usernameTaken = await User.findOne({username: username})
-
-    const emailTaken = await User.findOne({email: email})
-
-    const phoneTaken = await User.findOne({phone: phone})
-
-    if (usernameTaken) {
-        return response.status(409).json({ error: "username already exists" });
-    }
-    if (emailTaken) {
-        return response.status(409).json({ error: "email already exists" });
-    }
-    if (phoneTaken) {
-        return response.status(409).json({ error: "phone already exists" });
-    }
-
-    const saltRounds = 10
-    const passwordHash = await bcrypt.hash(password, saltRounds)
-
-    const newUser = new User({
-        firstName,
-        lastName,
-        username,
-        phone,
-        email,
-        passwordHash
-    })
-
-    const savedUser = await newUser.save()
-    response.status(201).json(savedUser)
+  const user = await authService.register(request.body)
+  response.status(201).json(user)
 }
 
 const login = async (request, response) => {
-    const {email, password} = request.body
-
-    const user = await User.findOne({email: email})
-    
-    const passwordIsCorrect = user === null ? false : await bcrypt.compare(password, user.passwordHash)
-    
-    if(!(user && passwordIsCorrect)){
-        return response.status(401).json({
-            error: 'invalid email or password'
-        })
-    }
-
-    const userForToken = {
-        username: user.username,
-        id: user._id,
-        tokenVersion: user.tokenVersion
-    }
-
-    const token = jwt.sign(
-        userForToken, 
-        config.JWT_SECRET,
-        {expiresIn: config.JWT_EXPIRES_IN}
-    )
-
-    response
-    .status(200)
-    .send({ token, username: user.username, firstName: user.firstName, lastName: user.lastName })
-
+  const {token, user} = authService.login(request.body)
+  response
+  .status(200)
+  .send({ token, username: user.username, firstName: user.firstName, lastName: user.lastName })
 }
 
 const updateProfile = async (request, response) => {
@@ -137,32 +84,8 @@ const updateProfile = async (request, response) => {
 }
 
 const updatePassword = async (request, response) => {
-    const {currentPassword, newPassword} = request.body
-    const user = request.user
-
-    const passwordIsCorrect = user === null ? false : await bcrypt.compare(currentPassword, user.passwordHash)
-    
-    if(!(user && passwordIsCorrect)){
-        return response.status(401).json({
-            error: 'invalid current password'
-        })
-    }
-
-    const saltRounds = 10
-
-    const newPasswordHash = await bcrypt.hash(newPassword, saltRounds) 
-    const updatedTokenVersion = user.tokenVersion += 1
-    const updatedUser = await User.findByIdAndUpdate(
-    user.id,
-    { $set: {passwordHash: newPasswordHash, tokenVersion: updatedTokenVersion} },
-    { new: true, runValidators: true, context: "query" }
-    ).select("-passwordHash");
-
-    if (!updatedUser) {
-      return response.status(404).json({ error: "user not found" });
-    }
-
-    return response.status(200).json(updatedUser);
+  const updatedUser = authService.updatePassword(request.body)
+  return response.status(200).json(updatedUser);
 }
 
 const createAddress = async (request, response) => {

@@ -20,7 +20,7 @@ const auth = async (request, response, next) => {
 
         const user = await User.findById(decodedToken.id)
 
-        if (!user || user.tokenVersion !== decoded.tokenVersion) {
+        if (!user || user.tokenVersion !== decodedToken.tokenVersion) {
             return response.status(401).json({ error: 'user not found or token invalid' })
         }
 
