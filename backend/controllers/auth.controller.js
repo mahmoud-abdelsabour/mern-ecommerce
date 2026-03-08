@@ -6,19 +6,24 @@ const register = async (request, response) => {
 }
 
 const login = async (request, response) => {
-  const {token, user} = authService.login(request.body)
-  response
-  .status(200)
-  .send({ token, username: user.username, firstName: user.firstName, lastName: user.lastName })
+  const {token, user} = await authService.login(request.body)
+  response.status(200).send({ 
+    token,
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName 
+  })
 }
 
 const updatePassword = async (request, response) => {
-  const updatedUser = authService.updatePassword(request.body)
+  const {userId} = request.params
+  const user = request.user
+  const updatedUser = await authService.updatePassword(...request.body, userId, user)
   return response.status(200).json(updatedUser);
 }
 
 module.exports = {
-    register,
-    login,
-    updatePassword
+  register,
+  login,
+  updatePassword
 }

@@ -1,4 +1,5 @@
-const { isExistedUser } = require('./auth.service');
+const { isExistedUser, isUserAuthorized } = require('./auth.service')
+const User = require('../models/user.model')
 
 const userProfileAllowedFields = [
     "firstName",
@@ -19,7 +20,7 @@ const addressAllowedFields = [
     "floor"
 ]
 
-const updating = (props) => {
+const pickAllowedFields = (props) => {
     const updates = {};
     for (const field of props.allowedFields) {
         if (props.requestFields[field] !== undefined) {
@@ -31,13 +32,18 @@ const updating = (props) => {
 
     const {_, message} = isExistedUser(updates, data.user.id)
     if(message) throw Object.assign(new Error(message), { statusCode: 409 })
-  
+
+    if(updates.email){
+        updateOps.$inc = { tokenVersion: 1 }
+    }
 
     return updateOps
 }
 
 const updateProfile = async (data) => {
-    const updateOps = updating(userProfileAllowedFields, data.fields)
+    if(!isUserAuthorized(data.userId, data.user)) throw Object.assign(new error("user is unauthorized"), {statusCode: 401})
+        
+    const updateOps = pickAllowedFields(userProfileAllowedFields, data.fields)
 
     const updatedUser = await User.findByIdAndUpdate(
         data.user.id,
@@ -50,6 +56,8 @@ const updateProfile = async (data) => {
 }
 
 const createAddress = async (data) => {
+    if(!isUserAuthorized(data.userId, data.user)) throw Object.assign(new error("user is unauthorized"), {statusCode: 401})
+
     const updatedUser = await User.findByIdAndUpdate(
       data.user.id,
       { $push: { addresses: data.newAddress } },
@@ -61,9 +69,10 @@ const createAddress = async (data) => {
 }
 
 const updateAddress = async (data) => {
-    const updateOps = updating(addressAllowedFields, data.fields)
+    if(!isUserAuthorized(data.userId, data.user)) throw Object.assign(new error("user is unauthorized"), {statusCode: 401})
+    const updateOps = pickAllowedFields(addressAllowedFields, data.fields)
 
-    const updatedUser = await User.findByIdAndUpdate(
+    const updatedUser = await User.findOneAndUpdate(
       {_id: data.user.id, "addresses._id": data.addressId},
       updateOps,
       { new: true, runValidators: true, context: "query" }
@@ -73,8 +82,16 @@ const updateAddress = async (data) => {
     return updatedUser
 }
 
+const getUser = async (data) => {
+    if(!isUserAuthorized(data.userId, data.user)) throw Object.assign(new error("user is unauthorized"), {statusCode: 401})
+    const user = await User.findById(data.user.id)
+    if(!user) throw Object.assign(new error("user not found"), {statusCode: 404})
+    return user
+}
+
 module.exports = {
     updateProfile,
     createAddress,
-    updateAddress
+    updateAddress,
+    getUser
 }

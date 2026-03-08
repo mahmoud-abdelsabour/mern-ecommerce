@@ -1,13 +1,15 @@
 const bcrypt = require('bcrypt')
-const User = require('../backend/models/user.model')
+const jwt = require('jsonwebtoken')
+const User = require('../models/user.model')
 const config = require('../utils/config/config')
+const {hashingValue, passwordCompare} = require('../utils/auth/password.util')
 
 const isExistedUser = async (data, excludeUserId = null) => {
     const exclude = excludeUserId ? {_id: {$ne: excludeUserId}} : {}
 
     if(data.username){
         const usernameTaken = await User.findOne({username: data.username, ...exclude})
-        if(usernameTaken) return {user: usernameTaken, message:'username already exits'}
+        if(usernameTaken) return {user: usernameTaken, message:'username already exists'}
     }
 
     if(data.email){
@@ -21,14 +23,6 @@ const isExistedUser = async (data, excludeUserId = null) => {
     }
 
     return {user: null, message: ''}
-}
-
-const hashingValue = async (password, saltRounds) => await bcrypt.hash(password, saltRounds)
-
-const passwordCompare = async (inputPassword, userPassword) => {
-   const isCorrect = await bcrypt.compare(inputPassword, userPassword)
-   if(!isCorrect) throw Object.assign(new Error('invalid credentials'), { statusCode: 401 })
-    return true
 }
 
 const createToken = (user) => {
@@ -46,15 +40,18 @@ const createToken = (user) => {
     return token
 }
 
-const incrementTokenVersion = (user) => user.tokenVersion += 1
+const incrementTokenVersion = (user) => user.tokenVersion + 1
+
+const isUserAuthorized = (data) => String(data.user.id) === String(data.userId)
+
 
 const register = async (data) => {
     const {firstName, lastName, username, phone, email, password} = data
 
-    const {_, message} = await isExistedUser(username, email, phone)
+    const { message } = await isExistedUser({username, email, phone})
     if(message !== '') throw Object.assign(new Error(message), { statusCode: 409 })
 
-    const hashedPassword = hashingValue(password, 10)
+    const passwordHash = await hashingValue(password, 10)
 
     const newUser = new User({
         firstName,
@@ -62,39 +59,43 @@ const register = async (data) => {
         username,
         phone,
         email,
-        hashedPassword
+        passwordHash
     })
     
     const savedUser = await newUser.save()
     return savedUser
 }
 
-const login = (data) => {
+const login = async (data) => {
     const {email, password} = data
-    const {user, _} = isExistedUser(email)
+    const { user } = await isExistedUser({ email })
+    if (!user) throw Object.assign(new Error('invalid credentials'), { statusCode: 401 });
 
-    const isCorrect = passwordCompare(password, user.passwordHash)
-
+    await passwordCompare(password, user.passwordHash)
     const token = createToken(user)
 
     return {token, user}
 }
 
 const updatePassword = async (data) => {
-    const {currentPassword, newPassword} = data
-    const user = request.user
+    const {currentPassword, newPassword, userId, user} = data
 
-    passwordCompare(currentPassword, user.passwordHash)
+    if(!isUserAuthorized(userId, user)) 
+    {
+        throw Object.assign(new Error("user is unauthorized"), {statusCode: 401})
+    }
 
-    const hashedPassword = hashingValue(newPassword, 10)
+    await passwordCompare(currentPassword, user.passwordHash)
+
+    const passwordHash = await hashingValue(newPassword, 10)
 
     const updatedUser = await User.findByIdAndUpdate(
         user.id,
-        { $set: {passwordHash: hashedPassword, tokenVersion: incrementTokenVersion(user)} },
+        { $set: {passwordHash: passwordHash, tokenVersion: incrementTokenVersion(user)} },
         { new: true, runValidators: true, context: "query" }
     ).select("-passwordHash");
 
-    if (!updatedUser) throw Object.assign(new error("user not found"), {statusCode: 404})
+    if (!updatedUser) throw Object.assign(new Error("user not found"), {statusCode: 404})
     
     return updatedUser
 
@@ -104,5 +105,6 @@ module.exports = {
     register,
     login,
     updatePassword,
-    isExistedUser
+    isExistedUser,
+    isUserAuthorized
 }
