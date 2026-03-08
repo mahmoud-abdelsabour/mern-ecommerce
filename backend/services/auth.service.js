@@ -1,8 +1,6 @@
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
 const User = require('../models/user.model')
-const config = require('../utils/config/config')
-const {hashingValue, passwordCompare} = require('../utils/auth/password.util')
+const { hashingValue, passwordCompare } = require('../utils/auth/password.util')
+const { createToken, incrementTokenVersion } = require('../utils/auth/token.util')
 
 const isExistedUser = async (data, excludeUserId = null) => {
     const exclude = excludeUserId ? {_id: {$ne: excludeUserId}} : {}
@@ -25,25 +23,7 @@ const isExistedUser = async (data, excludeUserId = null) => {
     return {user: null, message: ''}
 }
 
-const createToken = (user) => {
-
-    const token = jwt.sign(
-        {
-            username: user.username,
-            id: user._id,
-            tokenVersion: user.tokenVersion
-        }, 
-        config.JWT_SECRET,
-        {expiresIn: config.JWT_EXPIRES_IN}
-    )
-
-    return token
-}
-
-const incrementTokenVersion = (user) => user.tokenVersion + 1
-
 const isUserAuthorized = (data) => String(data.user.id) === String(data.userId)
-
 
 const register = async (data) => {
     const {firstName, lastName, username, phone, email, password} = data
