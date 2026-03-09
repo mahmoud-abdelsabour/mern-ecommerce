@@ -2,8 +2,6 @@ const User = require('../models/user.model')
 const { hashingValue, passwordCompare } = require('../utils/auth/password.util')
 const { createToken, incrementTokenVersion } = require('../utils/auth/token.util')
 
-const isUserAuthorized = (data) => String(data.user.id) === String(data.userId)
-
 const register = async (data) => {
     const {firstName, lastName, username, phone, email, password} = data
 
@@ -39,11 +37,6 @@ const login = async (data) => {
 const updatePassword = async (data) => {
     const {currentPassword, newPassword, userId, user} = data
 
-    if(!isUserAuthorized(userId, user)) 
-    {
-        throw Object.assign(new Error("user is unauthorized"), {statusCode: 401})
-    }
-
     await passwordCompare(currentPassword, user.passwordHash)
 
     const passwordHash = await hashingValue(newPassword, 10)
@@ -64,5 +57,4 @@ module.exports = {
     register,
     login,
     updatePassword,
-    isUserAuthorized
 }
