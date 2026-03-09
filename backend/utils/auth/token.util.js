@@ -7,7 +7,8 @@ const createToken = (user) => {
         {
             username: user.username,
             id: user._id,
-            tokenVersion: user.tokenVersion
+            tokenVersion: user.tokenVersion,
+            role: user.role
         }, 
         config.JWT_SECRET,
         {expiresIn: config.JWT_EXPIRES_IN}
