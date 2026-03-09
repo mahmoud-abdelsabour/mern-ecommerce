@@ -1,8 +1,8 @@
 const express = require("express")
-const securityMiddleware = require("./utils/middleware/security.middleware")
+const {security} = require("./utils/middleware/index")
 
 const app = express()
 
-securityMiddleware(app)
+security(app)
 
 app.use(express.json())

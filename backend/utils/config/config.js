@@ -9,5 +9,5 @@ module.exports = {
   MONGODB_URI,
   PORT,
   JWT_SECRET,
-  JWT_EXPIRES_ON
+  JWT_EXPIRES_IN
 }
