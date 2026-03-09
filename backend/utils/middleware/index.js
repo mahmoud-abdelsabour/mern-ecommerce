@@ -5,6 +5,8 @@ const requestLogger = require('./requestLogger.middleware')
 const unknownEndpoint = require('./unknownEndpoint.middleware')
 const logger = require('./logger.middleware')
 const validate = require('./validate.middleware')
+const role = require('./authorization/role.middleware')
+const ownership = require('./authorization/ownership.middleware')
 
 module.exports = {
     errorHandler,
@@ -13,5 +15,7 @@ module.exports = {
     requestLogger,
     unknownEndpoint,
     logger,
-    validate
+    validate,
+    role,
+    ownership
 }
