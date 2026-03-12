@@ -8,6 +8,7 @@ const validate = require('./validate.middleware')
 const role = require('./authorization/role.middleware')
 const ownership = require('./authorization/ownership.middleware')
 const security = require('./security.middleware')
+const orderOwnership = require('./authorization/orderOwnership.middleware')
 
 module.exports = {
     errorHandler,
@@ -19,5 +20,6 @@ module.exports = {
     validate,
     role,
     ownership,
-    security
+    security,
+    orderOwnership
 }
