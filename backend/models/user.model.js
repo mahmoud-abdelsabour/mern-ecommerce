@@ -1,4 +1,4 @@
-const { string } = require('joi')
+const { string, required } = require('joi')
 const mongoose = require('mongoose')
 
 const userSchema = mongoose.Schema({
@@ -52,6 +52,11 @@ const userSchema = mongoose.Schema({
     addresses: {
         type: [
             {
+                address_name: {
+                    type: String,
+                    trim: true,
+                    required: true
+                },
                 country: {
                     type: String,
                     trim: true,

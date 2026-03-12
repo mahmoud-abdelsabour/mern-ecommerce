@@ -16,9 +16,8 @@ const login = async (request, response) => {
 }
 
 const updatePassword = async (request, response) => {
-  const {userId} = request.params
   const user = request.user
-  const updatedUser = await authService.updatePassword(...request.body, userId, user)
+  const updatedUser = await authService.updatePassword(...request.body, user)
   return response.status(200).json(updatedUser);
 }
 

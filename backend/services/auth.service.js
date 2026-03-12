@@ -1,6 +1,7 @@
 const User = require('../models/user.model')
 const { hashingValue, passwordCompare } = require('../utils/auth/password.util')
 const { createToken, incrementTokenVersion } = require('../utils/auth/token.util')
+const { isExistedUser } = require('../utils/user/user-check.util')
 
 const register = async (data) => {
     const {firstName, lastName, username, phone, email, password} = data
@@ -35,7 +36,7 @@ const login = async (data) => {
 }
 
 const updatePassword = async (data) => {
-    const {currentPassword, newPassword, userId, user} = data
+    const {currentPassword, newPassword, user} = data
 
     await passwordCompare(currentPassword, user.passwordHash)
 

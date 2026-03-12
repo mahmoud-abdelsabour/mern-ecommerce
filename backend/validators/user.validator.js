@@ -11,6 +11,7 @@ const updateProfileSchema = Joi.object({
 
 const createAddressSchema = Joi.object({
     country: Joi.string().trim().required(),
+    address_name: Joi.string().trim().required(),
     city: Joi.string().trim().required(),
     postalcode: Joi.string().trim().required(),
     street: Joi.string().trim().required(),
@@ -21,6 +22,7 @@ const createAddressSchema = Joi.object({
 
 const updateAddressSchema = Joi.object({
     country: Joi.string().trim(),
+    address_name: Joi.string().trim(),
     city: Joi.string().trim(),
     postalcode: Joi.string().trim(),
     street: Joi.string().trim(),

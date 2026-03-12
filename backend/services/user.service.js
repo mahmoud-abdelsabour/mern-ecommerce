@@ -11,6 +11,7 @@ const userProfileAllowedFields = [
 ]
 
 const addressAllowedFields = [
+    "address_name",
     "country",
     "city",
     "street",
@@ -20,10 +21,9 @@ const addressAllowedFields = [
     "floor"
 ]
 
-const updateProfile = async (data) => {
-    if(!isUserAuthorized(data.userId, data.user)) throw Object.assign(new Error("user is unauthorized"), {statusCode: 401})
-        
-    const updateOps = pickAllowedFields(userProfileAllowedFields, data.fields)
+const updateProfile = async (data) => {    
+    const {fields} = data    
+    const updateOps = await pickAllowedFields({userProfileAllowedFields, fields})
 
     const updatedUser = await User.findByIdAndUpdate(
         data.user.id,
@@ -36,8 +36,6 @@ const updateProfile = async (data) => {
 }
 
 const createAddress = async (data) => {
-    if(!isUserAuthorized(data.userId, data.user)) throw Object.assign(new Error("user is unauthorized"), {statusCode: 401})
-
     const updatedUser = await User.findByIdAndUpdate(
       data.user.id,
       { $push: { addresses: data.newAddress } },
@@ -49,8 +47,8 @@ const createAddress = async (data) => {
 }
 
 const updateAddress = async (data) => {
-    if(!isUserAuthorized(data.userId, data.user)) throw Object.assign(new Error("user is unauthorized"), {statusCode: 401})
-    const updateOps = pickAllowedFields(addressAllowedFields, data.fields)
+    const {fields} = data
+    const updateOps = await pickAllowedFields({addressAllowedFields, fields})
 
     const updatedUser = await User.findOneAndUpdate(
       {_id: data.user.id, "addresses._id": data.addressId},
@@ -63,7 +61,6 @@ const updateAddress = async (data) => {
 }
 
 const getUser = async (data) => {
-    if(!isUserAuthorized(data.userId, data.user)) throw Object.assign(new Error("user is unauthorized"), {statusCode: 401})
     const user = await User.findById(data.user.id)
     if(!user) throw Object.assign(new Error("user not found"), {statusCode: 404})
     return user

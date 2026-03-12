@@ -10,7 +10,7 @@ const pickAllowedFields = async (props) => {
 
     const updateOps = {$set: updates}
 
-    const {_, message} = await isExistedUser(updates, data.user.id)
+    const {_, message} = await isExistedUser(updates, props.user.id)
     if(message) throw Object.assign(new Error(message), { statusCode: 409 })
 
     if(updates.email){

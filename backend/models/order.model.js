@@ -55,7 +55,11 @@ const orderSchema = mongoose.Schema({
         required: true
     },
     shippingInfo: {
-        name: {
+        firstName: {
+            type: String,
+            required: true
+        },
+        lastName: {
             type: String,
             required: true
         },
@@ -121,9 +125,9 @@ const orderSchema = mongoose.Schema({
         type: String,
         enum: ["pending", "shipped", "delivered", "cancelled", "return requested", "returned", "refunded"],
         default: "pending",
-        deliveredAt: Date,
-        shippedAt: Date
-    }
+    },
+    deliveredAt: Date,
+    shippedAt: Date
 }, { timestamps: true })
 
 orderSchema.set('toJSON', {
