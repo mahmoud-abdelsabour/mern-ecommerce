@@ -25,3 +25,5 @@ router.patch(
     validate(authValidator.updatePasswordSchema),
     asyncWrapper(authController.updatePassword)
 )
+
+module.exports = router
