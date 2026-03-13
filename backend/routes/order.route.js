@@ -1,6 +1,7 @@
 const orderController = require('../controllers/order.controller')
-const { asyncWrapper, auth, validate, orderOwnership } = require('../utils/middleware/index')
+const { asyncWrapper, auth, validate, ownership } = require('../utils/middleware/index')
 const orderValidator = require('../validators/order.validator')
+const Order = require('../models/order.model')
 const express = require('express')
 const router = express.Router()
 
@@ -20,21 +21,21 @@ router.get(
 router.get(
     '/:orderId',
     auth,
-    orderOwnership,
+    ownership(Order, 'orderId'),
     asyncWrapper(orderController.getOrderById)
 )
 
 router.patch(
     '/:orderId/cancel',
     auth,
-    orderOwnership,
+    ownership(Order, 'orderId'),
     asyncWrapper(orderController.cancelOrder)
 )
 
 router.post(
     '/:orderId/return',
     auth,
-    orderOwnership,
+    ownership(Order, 'orderId'),
     validate(orderValidator.returnRequestSchema),
     asyncWrapper(orderController.returnRequest)
 )

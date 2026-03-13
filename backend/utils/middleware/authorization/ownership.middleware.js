@@ -1,11 +1,18 @@
-const requireOwnership = (getResourceUserId) => async (req, res, next) => {
-  const resourceUserId = await getResourceUserId(req)
-  if (!resourceUserId) return res.status(404).json({ error: 'resource not found' })
+const ownership = (Model, paramName, ownerField = 'userId') => {
+  return async (req, res, next) => {
 
-  if (String(req.user.id) !== String(resourceUserId)) {
-    return res.status(403).json({ error: 'forbidden' })
+    const resource = await Model.findById(req.params[paramName]).select(ownerField)
+
+    if (!resource) {
+      return res.status(404).json({ error: 'resource not found' })
+    }
+
+    if (String(resource[ownerField]) !== String(req.user.id)) {
+      return res.status(403).json({ error: 'forbidden' })
+    }
+
+    next()
   }
-  next()
 }
 
-module.exports = requireOwnership
+module.exports = ownership

@@ -7,6 +7,7 @@ const getProducts = async (data) => {
         category,
         minPrice,
         maxPrice,
+        minRating,
         page = 1,
         limit = 12,
         sort = 'createdAt'
@@ -21,6 +22,10 @@ const getProducts = async (data) => {
         filter.price = {}
         if (minPrice) filter.price.$gte = Number(minPrice)
         if (maxPrice) filter.price.$lte = Number(maxPrice)
+    }
+
+    if(minRating){
+        filter.rating = { $gte: Number(minRating) }
     }
 
     const skip = (page - 1) * limit
