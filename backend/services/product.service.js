@@ -1,5 +1,7 @@
 const Product = require('../models/product.model')
-
+const Category = require('../models/category.model')
+const Brand = require('../models/brand.model')
+const Review = require('../models/review.model')
 
 const getProducts = async (data) => {
     const {
@@ -15,8 +17,17 @@ const getProducts = async (data) => {
 
     const filter = {}
 
-    if (brand) filter.brand = brand
-    if (category) filter.category = category
+    if (brand) {
+        const brandDoc = await Brand.findOne({ name: brand });
+        if (!brandDoc) return { products: [], pagination: { totalProducts: 0, totalPages: 0, currentPage: Number(page), limit: Number(limit) } };
+        filter.brand = brandDoc._id;
+    }
+
+    if (category) {
+        const categoryDoc = await Category.findOne({ name: category });
+        if (!categoryDoc) return { products: [], pagination: { totalProducts: 0, totalPages: 0, currentPage: Number(page), limit: Number(limit) } };
+        filter.category = categoryDoc._id;
+    }
 
     if (minPrice || maxPrice) {
         filter.price = {}
@@ -32,6 +43,8 @@ const getProducts = async (data) => {
 
     const [products, totalProducts] = await Promise.all([
         Product.find(filter)
+        .populate('category')
+        .populate('brand')
         .sort(sort)
         .skip(skip)
         .limit(Number(limit)),
@@ -64,7 +77,42 @@ const getProductById = async (data) => {
   return product
 }
 
+const updateProductRating = async (data) => {
+    const { productId, session } = data
+    const stats = await Review.aggregate([
+        { $match: { product: productId } },
+        {
+            $group: {
+                _id: '$product',
+                avgRating: { $avg: '$rating' },
+                voters: { $sum: 1 }
+            }
+        }
+    ]).session(session)
+
+    if (stats.length === 0) {
+        await Product.findByIdAndUpdate(
+            productId, 
+            { rating: { score: 0, voters: 0 } },
+            { session }
+        )
+        return
+    }
+
+    await Product.findByIdAndUpdate(
+        productId, 
+        { 
+            rating: {
+                score: stats[0].avgRating,
+                voters: stats[0].voters
+            } 
+        },
+        { session }
+    )
+}
+
 module.exports = {
   getProducts,
-  getProductById
+  getProductById, 
+  updateProductRating
 }

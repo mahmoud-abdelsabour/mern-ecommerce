@@ -17,7 +17,7 @@ const reviewSchema = mongoose.Schema({
     },
     comment: {
         type: String,
-        required: true
+        default: ''
     },
     name: {
         type: String,
@@ -26,6 +26,7 @@ const reviewSchema = mongoose.Schema({
 }, { timestamps: true })
 
 reviewSchema.index({ user: 1, product: 1 }, { unique: true })
+reviewSchema.index({ product: 1 })
 
 reviewSchema.set('toJSON', {
   transform: (document, returnedObject) => {

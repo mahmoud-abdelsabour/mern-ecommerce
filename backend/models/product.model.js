@@ -33,15 +33,13 @@ const productSchema = mongoose.Schema({
         required: true
     },
     rating: {
-        type: {
-            score: {
-                type: Number,
-                default: 0
-            },
-            voters: {
-                type: Number,
-                default: 0
-            }
+        score: {
+            type: Number,
+            default: 0
+        },
+        voters: {
+            type: Number,
+            default: 0
         }
     },
     stock: {

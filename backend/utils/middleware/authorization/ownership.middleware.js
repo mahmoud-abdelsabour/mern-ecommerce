@@ -11,6 +11,8 @@ const ownership = (Model, paramName, ownerField = 'userId') => {
       return res.status(403).json({ error: 'forbidden' })
     }
 
+    req.resource = resource
+
     next()
   }
 }
