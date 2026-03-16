@@ -3,6 +3,7 @@ const {security} = require("./utils/middleware/index")
 const orderRoutes = require("./routes/order.route")
 const productRoutes = require("./routes/product.route")
 const userRoutes = require("./routes/user.route")
+const cartRoutes = require("./routes/cart.route")
 
 const app = express()
 
@@ -10,4 +11,5 @@ security(app)
 app.use('/api/orders', orderRoutes)
 app.use('/api/products', productRoutes)
 app.use('api/users', userRoutes)
+app.use('api/user', cartRoutes)
 app.use(express.json())
