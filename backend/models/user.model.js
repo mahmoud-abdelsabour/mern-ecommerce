@@ -115,9 +115,11 @@ const userSchema = mongoose.Schema({
     wishlist: {
         type: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Product",
-                required: true
+                product: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Product",
+                    required: true
+                }
             }
         ],
         default: []
