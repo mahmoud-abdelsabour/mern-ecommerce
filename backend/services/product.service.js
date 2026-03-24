@@ -174,9 +174,51 @@ const getProductUserStatus = async ({ productId, user }) => {
     }
 }
 
+// Admin
+
+const createProduct = async (data) => {
+    try {
+        const {
+            name,
+            price,
+            photos,
+            description,
+            category,
+            stock,
+            brand,
+            isActive
+        } = data
+
+        const DbBrand = await Brand.findById(brand)
+        const DbCategory = await Brand.findById(brand)
+
+        if(!DbBrand || DbCategory){
+            throw Object.assign(new Error('Bad Request'), { statusCode: 400 })
+        }
+
+        const product = new Product({
+            name,
+            price,
+            photos,
+            description,
+            category,
+            stock,
+            brand,
+            isActive
+        })
+
+        const savedProduct = await product.save()
+        return savedProduct
+    } catch (error) {
+        throw error
+    }
+}
+
+
 module.exports = {
   getProducts,
   getProductById, 
   updateProductRating,
-  getProductUserStatus
+  getProductUserStatus,
+  createProduct
 }

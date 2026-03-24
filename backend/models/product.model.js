@@ -52,7 +52,10 @@ const productSchema = mongoose.Schema({
         ref: "Brand",
         required: true
     },
-    isActive: Boolean
+    isActive: {
+        type: Boolean,
+        default: true
+    }
     
 },{timestamps: true})
 
