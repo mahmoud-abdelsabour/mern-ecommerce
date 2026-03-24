@@ -38,10 +38,32 @@ const returnRequest = async (request, response) => {
     })
 }
 
+// Admin
+
+const getAllOrders = async (request, response) => {
+    const result = await orderService.getAllOrders({ ...request.query })
+    return response.status(200).json(result)
+}
+
+const updateOrderDeliveryStatus = async (request, response) => {
+    const { orderId } = request.params
+    const { deliveryStatus } = request.body
+
+    const updatedOrder = await orderService.updateOrderDeliveryStatus({
+        orderId,
+        deliveryStatus
+    })
+
+    return response.status(200).json(updatedOrder)
+}
+
+
 module.exports = {
     createOrder,
     getOrders,
     getOrderById,
     cancelOrder,
-    returnRequest
+    returnRequest,
+    getAllOrders,
+    updateOrderDeliveryStatus
 }

@@ -188,11 +188,136 @@ const requestReturn = async (data) => {
     }
 }
 
+const getAllOrders = async (data) => {
+    try {
+        const {
+            page = 1,
+            limit = 10,
+            deliveryStatus,
+            userId,
+            minTotal,
+            maxTotal,
+            startDate,
+            endDate,
+            sort = { createdAt: -1 }
+        } = data
+
+        const pageNumber = Math.max(Number(page) || 1, 1)
+        const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
+        const skip = (pageNumber - 1) * pageSize
+
+        const filter = {}
+
+        if (deliveryStatus) filter.deliveryStatus = deliveryStatus
+        if (userId) filter.userId = userId
+
+        if (minTotal || maxTotal) {
+            filter.totalPrice = {}
+            if (minTotal) filter.totalPrice.$gte = Number(minTotal)
+            if (maxTotal) filter.totalPrice.$lte = Number(maxTotal)
+        }
+
+        if (startDate || endDate) {
+            filter.createdAt = {}
+            if (startDate) filter.createdAt.$gte = new Date(startDate)
+            if (endDate) filter.createdAt.$lte = new Date(endDate)
+        }
+
+        let sortObj = { createdAt: -1 }
+        if (sort) {
+            if (typeof sort === 'object') {
+                sortObj = sort
+            } else if (typeof sort === 'string') {
+                try {
+                    sortObj = JSON.parse(sort)
+                } catch (e) {
+                    sortObj = { createdAt: -1 }
+                }
+            }
+        }
+
+
+        const [orders, totalOrders] = await Promise.all([
+            Order.find(filter)
+                .select('createdAt deliveryStatus totalPrice products.0.photos')
+                .sort(sortObj)
+                .skip(skip)
+                .limit(pageSize),
+            Order.countDocuments(filter)
+        ])
+
+        return {
+            orders,
+            pagination: {
+                totalOrders,
+                totalPages: Math.ceil(totalOrders / pageSize),
+                currentPage: pageNumber,
+                limit: pageSize,
+                hasMore: skip + orders.length < totalOrders
+            }
+        }
+    } catch (error) {
+        throw error
+    }
+}
+
+const updateOrderDeliveryStatus = async ({ orderId, deliveryStatus }) => {
+    try {
+        const order = await Order.findById(orderId)
+        if (!order) {
+            throw Object.assign(new Error('order not found'), { statusCode: 404 })
+        }
+
+        const allowedTransitions = {
+            pending: ['shipped'],           // admin can ship
+            shipped: ['delivered'],         // admin can deliver
+            delivered: [],                  // admin cannot initiate return
+            'return requested': ['returned'], // admin can confirm return
+            returned: ['refunded'],         // admin can refund
+            refunded: [],
+            cancelled: []                   // user-only
+        }
+
+
+        const current = order.deliveryStatus
+        const allowedNext = allowedTransitions[current] || []
+
+        if (!allowedNext.includes(deliveryStatus)) {
+            throw Object.assign(
+                new Error(`invalid status transition from ${current} to ${deliveryStatus}`),
+                { statusCode: 409 }
+            )
+        }
+
+        const update = { deliveryStatus }
+
+        if (deliveryStatus === 'shipped') {
+            update.shippedAt = new Date()
+        }
+
+        if (deliveryStatus === 'delivered') {
+            update.deliveredAt = new Date()
+        }
+
+        const updatedOrder = await Order.findByIdAndUpdate(
+            orderId,
+            { $set: update },
+            { new: true, runValidators: true, context: 'query' }
+        )
+
+        return updatedOrder
+    } catch (error) {
+        throw error
+    }
+}
+
 
 module.exports = {
     placeOrder,
     getUserOrders,
     getOrderById,
     cancelOrder,
-    requestReturn
+    requestReturn,
+    getAllOrders,
+    updateOrderDeliveryStatus
 }

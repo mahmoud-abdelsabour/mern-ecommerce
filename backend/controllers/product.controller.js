@@ -19,6 +19,8 @@ const getProductUserStatus = async (req, res) => {
     return res.status(200).json(status)
 }
 
+// Admin
+
 const createProduct = async (request, response) => {
     const productData = request.body
     const product = await productService.createProduct(productData)
