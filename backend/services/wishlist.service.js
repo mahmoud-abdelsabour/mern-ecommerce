@@ -1,48 +1,58 @@
 const Product = require('../models/product.model')
 
 const getWishlist = async ({ user }) => {
-    return user.wishlist
+    try {
+        return user.wishlist
+    } catch (error) {
+        throw error
+    }
 }
 
 const addToWishlist = async (data) => {
-    const { productId, user } = data
+    try {
+        const { productId, user } = data
 
-    const product = Product.findById(productId)
+        const product = await Product.findById(productId)
 
-    if(!product){
-        throw Object.assign(new Error('product not found'), { statusCode: 404 })
+        if(!product){
+            throw Object.assign(new Error('product not found'), { statusCode: 404 })
+        }
+
+        const existing = user.wishlist.some(item => String(item) === String(productId))
+
+        if(existing){
+            throw Object.assign(new Error('product already exists'), { statusCode: 409 })
+        }else{
+            user.wishlist.push(productId)
+        }
+
+        await user.save()
+
+        return user.wishlist
+    } catch (error) {
+        throw error
     }
-
-    const existing = user.wishlist.find(
-        item => String(item.product) === String(productId)
-    )
-
-    if(existing){
-        throw Object.assign(new Error('product already exist'), { statusCode: 404 })
-    }else{
-        user.wishlist.push({ product: productId })
-    }
-
-    await user.save()
-
-    return user.wishlist
 
 }
 
 const removeFromWishlist = async (data) => {
-    const { productId, user } = data
+    try {
+        const { productId, user } = data
 
-    const beforeCount = user.wishlist.length
-    user.wishlist = user.wishlist.filter(
-        item => String(item.product) !== String(productId)
-    )
+        const beforeCount = user.wishlist.length
+        user.wishlist = user.wishlist.filter(
+            item => String(item) !== String(productId)
+        )
 
-    if (user.wishlist.length === beforeCount) {
-        throw Object.assign(new Error('product not in wishlist'), { statusCode: 404 })
+        if (user.wishlist.length === beforeCount) {
+            throw Object.assign(new Error('product not in wishlist'), { statusCode: 404 })
+        }
+
+        await user.save()
+        return user.wishlist
+    } catch (error) {
+        throw error
     }
-
-    await user.save()
-    return user.wishlist
 
 }
 

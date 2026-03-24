@@ -3,6 +3,43 @@ const Review = require('../models/review.model')
 const Order = require('../models/order.model')
 const { updateProductRating } = require('./product.service')
 
+const getAllReviews = async (data) => {
+    try {
+        const {
+            productId,
+            page = 1,
+            limit = 10,
+            sort = { createdAt: -1 }
+        } = data
+
+        const pageNumber = Math.max(Number(page) || 1, 1)
+        const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
+        const skip = (pageNumber - 1) * pageSize
+
+        const [reviews, totalReviews] = await Promise.all([
+            Review.find({ product: productId })
+                .sort(sort)
+                .skip(skip)
+                .limit(pageSize)
+                .populate('user', 'name'),
+            Review.countDocuments({ product: productId })
+        ])
+
+        return {
+            reviews,
+            pagination: {
+                page: pageNumber,
+                limit: pageSize,
+                total: totalReviews,
+                totalPages: Math.ceil(totalReviews / pageSize),
+                hasMore: skip + reviews.length < totalReviews
+            }
+        }
+    } catch (error) {
+        throw error
+    }
+}
+
 const createReview = async ({ user, productId, rating, comment }) => {
     const userId = user.id
 
@@ -90,5 +127,6 @@ const deleteReview = async ({ review }) => {
 module.exports = { 
     createReview,
     updateReview,
-    deleteReview
+    deleteReview,
+    getAllReviews
 }

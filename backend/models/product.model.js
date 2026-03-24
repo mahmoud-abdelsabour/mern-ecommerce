@@ -56,6 +56,15 @@ const productSchema = mongoose.Schema({
     
 },{timestamps: true})
 
+productSchema.index({ category: 1 })
+productSchema.index({ brand: 1 })
+productSchema.index({ price: 1 })
+productSchema.index({ createdAt: -1 })
+productSchema.index({ isActive: 1 })
+productSchema.index({ 'rating.score': -1 })
+
+productSchema.index({ name: 'text', description: 'text' })
+
 productSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()

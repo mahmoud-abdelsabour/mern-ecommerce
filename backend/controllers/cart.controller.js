@@ -5,7 +5,7 @@ const addToCart = async (request, response) => {
   const user = request.user
 
   const cart = await cartService.addToCart({ productId, quantity, user })
-  return response.status(200).json(cart)
+  return response.status(201).json(cart)
 }
 
 const removeFromCart = async (request, response) => {
@@ -31,9 +31,16 @@ const getCart = async (request, response) => {
   return response.status(200).json(cart)
 }
 
+const clearCart = async (request, response) => {
+  const user = request.user
+  const cart = await cartService.clearCart({ user })
+  return response.status(200).json(cart)
+}
+
 module.exports = {
   addToCart,
   removeFromCart,
   decrementCartItem,
-  getCart
+  getCart,
+  clearCart
 }

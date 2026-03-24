@@ -22,48 +22,64 @@ const addressAllowedFields = [
 ]
 
 const updateProfile = async (data) => {    
-    const {fields} = data    
-    const updateOps = await pickAllowedFields({userProfileAllowedFields, fields})
+    try {
+        const { fields, user } = data    
+        const updateOps = await pickAllowedFields({userProfileAllowedFields, fields})
 
-    const updatedUser = await User.findByIdAndUpdate(
-        data.user.id,
-        updateOps,
-        { new: true, runValidators: true, context: "query" }
-    ).select("-passwordHash");
-    
-    if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
-    return updatedUser
+        const updatedUser = await User.findByIdAndUpdate(
+            user.id,
+            updateOps,
+            { new: true, runValidators: true, context: "query" }
+        ).select("-passwordHash");
+        
+        if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
+        return updatedUser
+    } catch (error) {
+        throw error
+    }
 }
 
 const createAddress = async (data) => {
-    const updatedUser = await User.findByIdAndUpdate(
-      data.user.id,
-      { $push: { addresses: data.newAddress } },
-      { new: true, runValidators: true, context: "query" }
-    ).select("-passwordHash");
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+          data.user.id,
+          { $push: { addresses: data.newAddress } },
+          { new: true, runValidators: true, context: "query" }
+        ).select("-passwordHash");
 
-    if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
-    return updatedUser
+        if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
+        return updatedUser
+    } catch (error) {
+        throw error
+    }
 }
 
 const updateAddress = async (data) => {
-    const {fields} = data
-    const updateOps = await pickAllowedFields({addressAllowedFields, fields})
+    try {
+        const {fields} = data
+        const updateOps = await pickAllowedFields({addressAllowedFields, fields})
 
-    const updatedUser = await User.findOneAndUpdate(
-      {_id: data.user.id, "addresses._id": data.addressId},
-      updateOps,
-      { new: true, runValidators: true, context: "query" }
-    ).select("-passwordHash")
+        const updatedUser = await User.findOneAndUpdate(
+          {_id: data.user.id, "addresses._id": data.addressId},
+          updateOps,
+          { new: true, runValidators: true, context: "query" }
+        ).select("-passwordHash")
 
-    if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
-    return updatedUser
+        if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
+        return updatedUser
+    } catch (error) {
+        throw error
+    }
 }
 
 const getUser = async (data) => {
-    const user = await User.findById(data.user.id)
-    if(!user) throw Object.assign(new Error("user not found"), {statusCode: 404})
-    return user
+    try {
+        const { user } = data
+        if(!user) throw Object.assign(new Error("user not found"), {statusCode: 404})
+        return user
+    } catch (error) {
+        throw error
+    }
 }
 
 module.exports = {

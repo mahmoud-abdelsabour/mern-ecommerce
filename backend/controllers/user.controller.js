@@ -2,7 +2,6 @@ const userService = require('../services/user.service')
 
 const getUserProfile = async (request, response) => {
   const user = request.user
-
   const retrievedUser = await userService.getUser({user})
   response.status(200).json(retrievedUser)
 }

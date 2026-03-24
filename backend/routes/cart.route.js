@@ -19,16 +19,22 @@ router.post(
 )
 
 router.patch(
-    '/product/:productId',
+    '/:productId',
     auth,
     validate(cartValidator.decrementCartItemSchema),
     asyncWrapper(cartController.decrementCartItem)
 )
 
 router.delete(
-    '/product/:productId',
+    '/:productId',
     auth,
     asyncWrapper(cartController.removeFromCart)
+)
+
+router.delete(
+    '/',
+    auth,
+    asyncWrapper(cartController.clearCart)
 )
 
 

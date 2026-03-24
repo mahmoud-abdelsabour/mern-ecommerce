@@ -1,7 +1,7 @@
 const wishlistService = require('../services/wishlist.service')
 
 const addToWishlist = async (request, response) => {
-  const { productId } = request.body
+  const { productId } = request.params
   const user = request.user
 
   const wishlist = await wishlistService.addToWishlist({ productId, user })

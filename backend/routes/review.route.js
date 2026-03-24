@@ -6,13 +6,6 @@ const express = require('express')
 
 const router = express.Router()
 
-router.post(
-    '/:productId/reviews',
-    auth,
-    validate(reviewValidator.createReviewSchema),
-    asyncWrapper(reviewController.createReview)
-)
-
 router.patch(
     '/:reviewId',
     auth,

@@ -1,5 +1,12 @@
 const reviewService = require('../services/review.service')
 
+const getAllReviews = async (request, response) => {
+    const { productId } = request.params
+    const { page, limit } = request.query
+    const result = await reviewService.getAllReviews({ productId, page, limit })
+    return response.status(200).json(result)
+}
+
 const createReview = async (request, response) => {
     const user = request.user
     const { productId } = request.params
@@ -24,5 +31,6 @@ const deleteReview = async (request, response) => {
 module.exports = {
     createReview,
     updateReview,
-    deleteReview
+    deleteReview,
+    getAllReviews
 }

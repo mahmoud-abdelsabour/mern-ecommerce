@@ -39,6 +39,13 @@ const placeOrder = async (data) => {
                 throw Object.assign(new Error('not enough stock'), { statusCode: 409 })
             }
 
+            if (!product.isActive) {
+                throw Object.assign(
+                    new Error('product not available'),
+                    { statusCode: 400 }
+                )
+            }
+
             orderProducts.push({
                 product: product.id,
                 quantity: item.quantity,
@@ -61,6 +68,8 @@ const placeOrder = async (data) => {
         })
 
         await order.save({ session })
+        user.cart = []
+        await user.save({ session })
 
         await session.commitTransaction()
         session.endSession()
@@ -77,94 +86,113 @@ const placeOrder = async (data) => {
 }
 
 const getUserOrders = async (data) => {
-    const { userId, page, limit } = data
-    const skip = (page -1) * limit
+    try {
+        const { userId, page, limit } = data
+        
+        const pageNumber = Math.max(Number(page) || 1, 1)
+        const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
+        const skip = (pageNumber - 1) * pageSize
 
-    const [orders, totalOrders] = await Promise.all([
-        Order.find({ userId })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
 
-        Order.countDocuments({userId})
-    ]) 
+        const [orders, totalOrders] = await Promise.all([
+            Order.find({ userId })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit),
 
-    const totalPages = Math.ceil(totalOrders / limit)
+            Order.countDocuments({userId})
+        ]) 
 
-    return {
-        orders,
-        pagination: {
-            totalOrders,
-            totalPages,
-            currentPage: page,
-            limit
+        const totalPages = Math.ceil(totalOrders / limit)
+
+        return {
+            orders,
+            pagination: {
+                totalOrders,
+                totalPages,
+                currentPage: page,
+                limit,
+                hasMore: skip + orders.length < totalOrders
+            }
         }
+    } catch (error) {
+        throw error
     }
 }
 
 const getOrderById = async (data) => {
-    const { orderId } = data
-    const order = await Order.findById(orderId)
-    if(!order){
-        throw Object.assign(new Error('order not found'), { statusCode: 404 })
+    try {
+        const { order } = data
+        if(!order){
+            throw Object.assign(new Error('order not found'), { statusCode: 404 })
+        }
+        return order
+    } catch (error) {
+        throw error
     }
-    return order
 }
 
 const cancelOrder = async (data) => {
-    const { orderId } = data
+    try {
+        const { orderId } = data
 
-    const order = await Order.findOneAndUpdate(
-        { _id: orderId, deliveryStatus: 'pending' },
-        { $set: { deliveryStatus: 'cancelled' } },
-        { new: true }
-    )
+        const order = await Order.findOneAndUpdate(
+            { _id: orderId, deliveryStatus: 'pending' },
+            { $set: { deliveryStatus: 'cancelled' } },
+            { new: true }
+        )
 
-    if (!order) {
-        throw Object.assign(new Error('order is not pending or not found'), { statusCode: 409 })
+        if (!order) {
+            throw Object.assign(new Error('order is not pending or not found'), { statusCode: 409 })
+        }
+
+        return order
+    } catch (error) {
+        throw error
     }
-
-    return order
 }
 
 const requestReturn = async (data) => {
-    const { orderId, returnedItems } = data
+    try {
+        const { returnedItems, order } = data
 
-    const order = await Order.findById(orderId)
-    if (!order) throw Object.assign(new Error('order not found'), { statusCode: 404 })
-        
-    if (order.deliveryStatus !== 'delivered') {
-        throw Object.assign(new Error('order not delivered yet or already requested a return'), { statusCode: 400 })
+        if (!order) throw Object.assign(new Error('order not found'), { statusCode: 404 })
+            
+        if (order.deliveryStatus !== 'delivered') {
+            throw Object.assign(new Error('order not delivered yet or already requested a return'), { statusCode: 400 })
+        }
+
+        const orderProductsMap = new Map(
+            order.products.map(p => [String(p.product), p.quantity])
+        )
+
+        for (const item of returnedItems) {
+            const boughtQty = orderProductsMap.get(String(item.product))
+            if (!boughtQty) throw Object.assign(new Error('product not in order'), { statusCode: 400 })
+            if (item.quantity > boughtQty) throw Object.assign(new Error('return quantity exceeds purchased quantity'), { statusCode: 400 })
+        }
+
+        const deliveredAt = order.deliveredAt
+        if (!deliveredAt) {
+            throw Object.assign(new Error('missing delivery date'), { statusCode: 400 })
+        }
+
+        const days = (Date.now() - new Date(deliveredAt).getTime()) / (1000 * 60 * 60 * 24)
+        if (days > 14) {
+            throw Object.assign(new Error('return window expired'), { statusCode: 400 })
+        }
+
+        order.deliveryStatus = 'return requested'
+        order.returnInfo = {
+            returnedItems,
+            returnDate: null
+        }
+
+        await order.save()
+        return order
+    } catch (error) {
+        throw error
     }
-
-    const orderProductsMap = new Map(
-        order.products.map(p => [String(p.product), p.quantity])
-    )
-
-    for (const item of returnedItems) {
-        const boughtQty = orderProductsMap.get(String(item.product))
-        if (!boughtQty) throw Object.assign(new Error('product not in order'), { statusCode: 400 })
-        if (item.quantity > boughtQty) throw Object.assign(new Error('return quantity exceeds purchased quantity'), { statusCode: 400 })
-    }
-
-    const deliveredAt = order.deliveredAt
-    if (!deliveredAt) {
-        throw Object.assign(new Error('missing delivery date'), { statusCode: 400 })
-    }
-
-    const days = (Date.now() - new Date(deliveredAt).getTime()) / (1000 * 60 * 60 * 24)
-    if (days > 14) {
-        throw Object.assign(new Error('return window expired'), { statusCode: 400 })
-    }
-
-    order.deliveryStatus = 'return requested'
-    order.returnInfo = {
-        returnedItems,
-        returnDate: null
-    }
-
-    await order.save()
-    return order
 }
 
 

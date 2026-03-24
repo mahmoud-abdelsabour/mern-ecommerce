@@ -15,9 +15,9 @@ const getOrders = async (request, response) => {
 }
 
 const getOrderById = async (request, response) => {
-    const {orderId} = request.params
-    const order = await orderService.getOrderById({orderId})
-    return response.status(200).json(order)
+    const order = request.resource
+    const retrievedOrder = await orderService.getOrderById({order})
+    return response.status(200).json(retrievedOrder)
 }
 
 const cancelOrder = async (request, response) => {
@@ -30,8 +30,8 @@ const cancelOrder = async (request, response) => {
 }
 
 const returnRequest = async (request, response) => {
-    const {orderId} = request.params
-    const returnedOrder = await orderService.returnRequest({...request.body, orderId})
+    const order = request.resource
+    const returnedOrder = await orderService.returnRequest({...request.body, order})
     return response.status(201).json({
       message: 'Return request submitted',
       order: returnedOrder

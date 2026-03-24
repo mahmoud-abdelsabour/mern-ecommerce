@@ -1,4 +1,3 @@
-const { object } = require('joi')
 const logger = require('./logger.middleware')
 
 const errorHandler = (error, request, response, next) => {
