@@ -9,7 +9,7 @@ const getCart = async ({ user }) => {
     }
 }
 
-const addToCart = async ({ productId, quantity, user }) => {
+const addToCart = async ({ productId, quantity=1, user }) => {
     try {
         const product = await Product.findById(productId)
 

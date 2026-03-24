@@ -39,13 +39,6 @@ const placeOrder = async (data) => {
                 throw Object.assign(new Error('not enough stock'), { statusCode: 409 })
             }
 
-            if (!product.isActive) {
-                throw Object.assign(
-                    new Error('product not available'),
-                    { statusCode: 400 }
-                )
-            }
-
             orderProducts.push({
                 product: product.id,
                 quantity: item.quantity,

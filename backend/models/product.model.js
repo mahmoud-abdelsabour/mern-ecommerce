@@ -52,9 +52,9 @@ const productSchema = mongoose.Schema({
         ref: "Brand",
         required: true
     },
-    isActive: {
+    isDeleted: {
         type: Boolean,
-        default: true
+        default: false
     }
     
 },{timestamps: true})
@@ -63,7 +63,6 @@ productSchema.index({ category: 1 })
 productSchema.index({ brand: 1 })
 productSchema.index({ price: 1 })
 productSchema.index({ createdAt: -1 })
-productSchema.index({ isActive: 1 })
 productSchema.index({ 'rating.score': -1 })
 
 productSchema.index({ name: 'text', description: 'text' })
@@ -74,6 +73,13 @@ productSchema.set('toJSON', {
     delete returnedObject._id
     delete returnedObject.__v
   }
+})
+
+productSchema.pre(/^find/, function(next) {
+  if (!this.getOptions().skipDeletedFilter) {
+    this.where({ isDeleted: false })
+  }
+  next()
 })
 
 const Product = mongoose.model('Product', productSchema)

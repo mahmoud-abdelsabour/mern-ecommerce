@@ -22,8 +22,14 @@ const getWishlist = async (request, response) => {
   return response.status(200).json(wishlist)
 }
 
+const clearWishlist = async (request, response) => {
+  const wishlist = await wishlistService.clearWishlist({ user: request.user })
+  return response.status(200).json(wishlist)
+}
+
 module.exports = {
   addToWishlist,
   removeFromWishlist,
-  getWishlist
+  getWishlist,
+  clearWishlist
 }

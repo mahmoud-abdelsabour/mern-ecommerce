@@ -2,6 +2,7 @@ const Product = require('../models/product.model')
 const Category = require('../models/category.model')
 const Brand = require('../models/brand.model')
 const Review = require('../models/review.model')
+const pickAllowedFields = require('../utils/request/pick-fields.util')
 
 const getProducts = async (data) => {
     try {
@@ -18,8 +19,6 @@ const getProducts = async (data) => {
         } = data
 
         const filter = {}
-
-        filter.isActive = true
 
         if (brand) {
             const brandDoc = await Brand.findOne({ slug: brand })
@@ -91,15 +90,10 @@ const getProductById = async (data) => {
         .populate('category', 'name')
         .populate('brand', 'name')
 
-        
         if (!product) {
             throw Object.assign(new Error('product not found'), { statusCode: 404 })
         }
         
-        if (!product.isActive){
-            throw Object.assign(new Error('product not available'), { statusCode: 400 })
-        }
-
         const reviewsPreview = await Review.find({ product: productId })
         .sort({ createdAt: -1 })
         .limit(5)
@@ -185,8 +179,7 @@ const createProduct = async (data) => {
             description,
             category,
             stock,
-            brand,
-            isActive
+            brand
         } = data
 
         const DbBrand = await Brand.findById(brand)
@@ -203,12 +196,98 @@ const createProduct = async (data) => {
             description,
             category,
             stock,
-            brand,
-            isActive
+            brand
         })
 
         const savedProduct = await product.save()
         return savedProduct
+    } catch (error) {
+        throw error
+    }
+}
+
+const updateProduct = async (data) => {
+    try {
+        const { productId, updateData } = data
+
+        const allowedFields = [
+            'name',
+            'price',
+            'photos',
+            'description',
+            'category',
+            'brand',
+            'stock',
+        ]
+
+        const updateOps = await pickAllowedFields({
+            allowedFields,
+            requestFields: updateData,
+            user: null
+        })
+
+        if (updateOps.$set.brand) {
+            const brandExists = await Brand.exists({ _id: updateOps.$set.brand })
+            if (!brandExists) {
+                throw Object.assign(new Error('brand not found'), { statusCode: 404 })
+            }
+        }
+
+        if (updateOps.$set.category) {
+            const categoryExists = await Category.exists({ _id: updateOps.$set.category })
+            if (!categoryExists) {
+                throw Object.assign(new Error('category not found'), { statusCode: 404 })
+            }
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(
+            productId,
+            updateOps,
+            { new: true, runValidators: true, context: 'query' }
+        )
+
+        if (!updatedProduct) {
+            throw Object.assign(new Error('product not found'), { statusCode: 404 })
+        }
+
+        return updatedProduct
+    } catch (error) {
+        throw error
+    }
+}
+
+const deleteProduct = async ({ productId }) => {
+    try {
+        
+        const product = await Product.findByIdAndUpdate(
+            productId,
+            { $set: { isDeleted : true } },
+            { new: true, runValidators: true, context: 'query' }
+        )
+
+        if (!product) {
+            throw Object.assign(new Error('product not found'), { statusCode: 404 })
+        }
+
+        return product
+    } catch (error) {
+        throw error
+    }
+}
+
+const restoreProduct = async ({ productId }) => {
+    try {
+        const product = await Product.findByIdAndUpdate(
+            productId,
+            { $set: { isDeleted : false } },
+            { new: true, runValidators: true, context: 'query' }
+        )
+
+        if (!product) {
+            throw Object.assign(new Error('product not found'), { statusCode: 404 })
+        }
+
+        return product
     } catch (error) {
         throw error
     }
@@ -220,5 +299,8 @@ module.exports = {
   getProductById, 
   updateProductRating,
   getProductUserStatus,
-  createProduct
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  restoreProduct
 }

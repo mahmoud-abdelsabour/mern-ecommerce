@@ -11,9 +11,23 @@ const createProductSchema = Joi.object({
     category: Joi.string().hex().length(24).required(),
     brand: Joi.string().hex().length(24).required(),
     stock: Joi.number().integer().min(0).required(),
-    isActive: Joi.boolean()
+    isDeleted: Joi.boolean()
 })
 
+const updateProductSchema = Joi.object({
+    name: Joi.string().trim().min(1),
+    price: Joi.number().positive(),
+    photos: Joi.array()
+        .items(Joi.string().uri({ scheme: ['http', 'https'] }))
+        .min(1),
+    description: Joi.string().trim().min(20).max(2000),
+    category: Joi.string().hex().length(24),
+    brand: Joi.string().hex().length(24),
+    stock: Joi.number().integer().min(0),
+    isDeleted: Joi.boolean()
+}).min(1)
+
 module.exports = {
-    createProductSchema
+    createProductSchema,
+    updateProductSchema
 }

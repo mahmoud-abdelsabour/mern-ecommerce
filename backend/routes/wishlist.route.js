@@ -22,4 +22,10 @@ router.delete(
     asyncWrapper(wishlistController.removeFromWishlist)
 )
 
+router.delete(
+    '/',
+    auth,
+    asyncWrapper(wishlistController.clearWishlist)
+)
+
 module.exports = router

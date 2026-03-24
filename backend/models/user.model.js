@@ -1,4 +1,3 @@
-const { string, required } = require('joi')
 const mongoose = require('mongoose')
 
 const userSchema = mongoose.Schema({

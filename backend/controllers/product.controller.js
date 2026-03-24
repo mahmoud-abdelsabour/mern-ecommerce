@@ -19,8 +19,38 @@ const getProductUserStatus = async (req, res) => {
     return res.status(200).json(status)
 }
 
+const createProduct = async (request, response) => {
+    const productData = request.body
+    const product = await productService.createProduct(productData)
+    return response.status(201).json(product)
+}
+
+const updateProduct = async (request, response) => {
+    const { productId } = request.params
+    const updateData = request.body
+    const product = await productService.updateProduct({ productId, updateData })
+    return response.status(200).json(product)
+}
+
+const deleteProduct = async (request, response) => {
+    const { productId } = request.params
+    const product = await productService.deleteProduct({ productId })
+    return response.status(200).json(product)
+}
+
+const restoreProduct = async (request, response) => {
+    const { productId } = request.params
+    const product = await productService.restoreProduct({ productId })
+    return response.status(200).json(product)
+}
+
+
 module.exports = {
     getProducts,
     getProductById,
-    getProductUserStatus
+    getProductUserStatus,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    restoreProduct
 }

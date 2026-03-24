@@ -56,8 +56,16 @@ const removeFromWishlist = async (data) => {
 
 }
 
+const clearWishlist = async ({ user }) => {
+    user.wishlist = []
+    await user.save()
+    return user.wishlist
+}
+
+
 module.exports = {
     getWishlist,
     addToWishlist,
-    removeFromWishlist
+    removeFromWishlist,
+    clearWishlist
 }
