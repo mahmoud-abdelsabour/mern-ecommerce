@@ -31,6 +31,8 @@ brandSchema.index(
     { unique: true, partialFilterExpression: { slug: { $exists: true, $type: 'string' } } }
 )
 
+brandSchema.index({ name: 'text', slug: 'text' })
+
 brandSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()

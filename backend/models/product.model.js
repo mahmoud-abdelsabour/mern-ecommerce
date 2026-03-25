@@ -75,12 +75,13 @@ productSchema.set('toJSON', {
   }
 })
 
-productSchema.pre(/^find/, function(next) {
+productSchema.pre(/^find|countDocuments/, function(next) {
   if (!this.getOptions().skipDeletedFilter) {
     this.where({ isDeleted: false })
   }
   next()
 })
+
 
 const Product = mongoose.model('Product', productSchema)
 

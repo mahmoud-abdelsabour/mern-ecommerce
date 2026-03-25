@@ -44,7 +44,7 @@ const returnRequestSchema = Joi.object({
 
 const updateOrderDeliveryStatusSchema = Joi.object({
     deliveryStatus: Joi.string()
-        .valid('pending', 'shipped', 'delivered', 'cancelled', 'return requested', 'returned', 'refunded')
+        .valid('shipped', 'delivered', 'returned', 'refunded')
         .required()
 })
 

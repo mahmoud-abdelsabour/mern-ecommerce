@@ -1,32 +1,107 @@
-const Brand = require('../models/brand.model')
+﻿const Brand = require('../models/brand.model')
 const Product = require('../models/product.model')
 const slugify = require('slugify')
+const { pickAllowedFields } = require('../utils/request/pick-fields.util')
 
 const getAllBrands = async (data) => {
     try {
-        const { page = 1, limit = 10 } = data
+        const { page = 1, limit = 10, includeDeleted, onlyDeleted, search, hasProducts, minProducts, maxProducts, sort } = data
 
         const pageNumber = Math.max(Number(page) || 1, 1)
         const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
         const skip = (pageNumber - 1) * pageSize
 
-        const [brands, totalBrands] = await Promise.all([
-            Brand.find()
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(pageSize),
-            Brand.countDocuments()
-        ])
+        const match = {}
 
-        const brandsWithCounts = await Promise.all(
-            brands.map(async (brand) => {
-                const productsCount = await Product.countDocuments({ brand: brand.id })
-                return { ...brand.toJSON(), productsCount }
-            })
-        )
+        if (onlyDeleted === 'true' || onlyDeleted === true) {
+            match.isDeleted = true
+        } else if (includeDeleted === 'true' || includeDeleted === true) {
+            // no filter => include all
+        } else {
+            match.isDeleted = false
+        }
+
+        if (search) {
+            match.$text = { $search: search }
+        }
+
+        let sortObj = { createdAt: -1 }
+        if (sort) {
+            if (typeof sort === 'object') {
+                sortObj = sort
+            } else if (typeof sort === 'string') {
+                try {
+                    sortObj = JSON.parse(sort)
+                } catch (e) {
+                    sortObj = { createdAt: -1 }
+                }
+            }
+        }
+
+        const sanitizedSort = {}
+        for (const key of Object.keys(sortObj || {})) {
+            const dir = Number(sortObj[key])
+            sanitizedSort[key] = dir === 1 ? 1 : -1
+        }
+        if (Object.keys(sanitizedSort).length === 0) {
+            sanitizedSort.createdAt = -1
+        }
+
+        const pipeline = [
+            { $match: match },
+            {
+                $lookup: {
+                    from: 'products',
+                    let: { brandId: '$_id' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$brand', '$$brandId'] } } },
+                        { $count: 'count' }
+                    ],
+                    as: 'productsCountArr'
+                }
+            },
+            {
+                $addFields: {
+                    productsCount: {
+                        $ifNull: [{ $arrayElemAt: ['$productsCountArr.count', 0] }, 0]
+                    }
+                }
+            },
+            { $project: { productsCountArr: 0 } }
+        ]
+
+        if (hasProducts === 'true' || hasProducts === true) {
+            pipeline.push({ $match: { productsCount: { $gt: 0 } } })
+        } else if (hasProducts === 'false' || hasProducts === false) {
+            pipeline.push({ $match: { productsCount: 0 } })
+        }
+
+        if (hasProducts !== false && hasProducts !== 'false') {
+            if (minProducts !== undefined || maxProducts !== undefined) {
+                const countFilter = {}
+                if (minProducts !== undefined) countFilter.$gte = Number(minProducts)
+                if (maxProducts !== undefined) countFilter.$lte = Number(maxProducts)
+                pipeline.push({ $match: { productsCount: countFilter } })
+            }
+        }
+
+        pipeline.push({
+            $facet: {
+                data: [
+                    { $sort: sanitizedSort },
+                    { $skip: skip },
+                    { $limit: pageSize }
+                ],
+                total: [{ $count: 'totalBrands' }]
+            }
+        })
+
+        const result = await Brand.aggregate(pipeline)
+        const brands = result[0]?.data || []
+        const totalBrands = result[0]?.total[0]?.totalBrands || 0
 
         return {
-            brands: brandsWithCounts,
+            brands,
             pagination: {
                 totalBrands,
                 totalPages: Math.ceil(totalBrands / pageSize),

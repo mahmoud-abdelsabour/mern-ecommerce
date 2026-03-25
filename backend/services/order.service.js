@@ -236,7 +236,6 @@ const getAllOrders = async (data) => {
             }
         }
 
-
         const [orders, totalOrders] = await Promise.all([
             Order.find(filter)
                 .select('createdAt deliveryStatus totalPrice products.0.photos')

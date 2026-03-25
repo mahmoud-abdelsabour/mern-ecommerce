@@ -1,7 +1,7 @@
 const express = require('express')
 const orderController = require('../../controllers/order.controller')
+const { asyncWrapper, auth, role, validate } = require('../../utils/middleware/index')
 const orderValidator = require('../../validators/order.validator')
-const { asyncWrapper, validate, auth, role } = require('../../utils/middleware')
 
 const router = express.Router()
 
@@ -16,6 +16,7 @@ router.patch(
     '/:orderId/deliveryStatus',
     auth,
     role('admin'),
+    validate(orderValidator.updateOrderDeliveryStatusSchema),
     asyncWrapper(orderController.updateOrderDeliveryStatus)
 )
 

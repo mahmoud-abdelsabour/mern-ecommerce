@@ -1,8 +1,15 @@
-// admin.brand.route.js
+const express = require('express')
+const brandController = require('../../controllers/brand.controller')
+const brandValidator = require('../../validators/brand.validator')
+const { asyncWrapper, validate, auth, role } = require('../../utils/middleware/index')
+
+const router = express.Router()
+
 router.post(
     '/brands',
     auth,
     role('admin'),
+    validate(brandValidator.createBrandSchema),
     asyncWrapper(brandController.createBrand)
 )
 
@@ -24,6 +31,7 @@ router.patch(
     '/brands/:brandId',
     auth,
     role('admin'),
+    validate(brandValidator.updateBrandSchema),
     asyncWrapper(brandController.updateBrand)
 )
 
@@ -40,3 +48,5 @@ router.patch(
     role('admin'),
     asyncWrapper(brandController.restoreBrand)
 )
+
+module.exports = router

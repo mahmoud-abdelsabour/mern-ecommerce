@@ -7,11 +7,14 @@ const pickAllowedFields = require('../utils/request/pick-fields.util')
 const getProducts = async (data) => {
     try {
         const {
+            user,
             brand,
             category,
             minPrice,
             maxPrice,
             minRating,
+            includeDeleted,
+            onlyDeleted,
             search,
             page = 1,
             limit = 12,
@@ -42,6 +45,19 @@ const getProducts = async (data) => {
             filter.rating.score = { $gte: Number(minRating) }
         }
 
+        let skipDeletedFilter = false
+
+        if(user.role === 'admin'){
+            skipDeletedFilter = true
+            if (onlyDeleted === 'true' || onlyDeleted === true) {
+                filter.isDeleted = true
+            } else if (includeDeleted === 'true' || includeDeleted === true) {
+                // no filter => include all
+            } else {
+                filter.isDeleted = false
+            }
+        }
+
         if (search){
             filter.$text = { $search: search }
         }
@@ -54,7 +70,7 @@ const getProducts = async (data) => {
         const sortObj = typeof sort === 'string' ? JSON.parse(sort) : sort
 
         const [products, totalProducts] = await Promise.all([
-            Product.find(filter)
+            Product.find(filter).setOptions({ skipDeletedFilter })
             .select('name price photos category rating brand')
             .populate('category', 'name')
             .populate('brand', 'name')
@@ -62,7 +78,7 @@ const getProducts = async (data) => {
             .skip(skip)
             .limit(Number(limit)),
 
-            Product.countDocuments(filter)
+            Product.countDocuments(filter).setOptions({ skipDeletedFilter })
         ])
 
         const totalPages = Math.ceil(totalProducts / limit)
