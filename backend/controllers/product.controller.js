@@ -1,12 +1,12 @@
 const productService = require('../services/product.service')
 
 const getProducts = async (request, response) => {
-    const products = await productService.getProducts({ ...request.query })
+    const products = await productService.getProducts({ ...request.query, ...request.user })
     return response.status(200).json(products)
 }
 
 const getProductById = async (request, response) => {
-    const result = await productService.getProductById({ ...request.params })
+    const result = await productService.getProductById({ ...request.params, ...request.user })
     return response.status(200).json(result)
 }
 

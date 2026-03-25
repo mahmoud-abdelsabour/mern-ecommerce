@@ -1,6 +1,6 @@
 const productController = require('../controllers/product.controller')
 const reviewController = require('../controllers/review.controller')
-const { asyncWrapper, auth, validate } = require('../utils/middleware/index')
+const { asyncWrapper, auth, validate, role } = require('../utils/middleware/index')
 const reviewValidator = require('../validators/review.validator')
 const express = require('express')
 
@@ -18,6 +18,7 @@ router.get(
 router.post(
     '/:productId/reviews',
     auth,
+    role('user'),
     validate(reviewValidator.createReviewSchema),
     asyncWrapper(reviewController.createReview)
 )

@@ -100,9 +100,15 @@ const getProducts = async (data) => {
 
 const getProductById = async (data) => {
     try {
-        const { productId } = data
+        const { productId, user } = data
 
+        let skipDeletedFilter = false
+
+        if(user.role === 'admin'){
+            skipDeletedFilter = true
+        }
         const product = await Product.findById(productId)
+        .setOptions({ skipDeletedFilter })
         .populate('category', 'name')
         .populate('brand', 'name')
 

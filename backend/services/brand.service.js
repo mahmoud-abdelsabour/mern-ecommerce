@@ -5,7 +5,16 @@ const { pickAllowedFields } = require('../utils/request/pick-fields.util')
 
 const getAllBrands = async (data) => {
     try {
-        const { page = 1, limit = 10, includeDeleted, onlyDeleted, search, hasProducts, minProducts, maxProducts, sort } = data
+        const { page = 1,
+            limit = 10,
+            includeDeleted,
+            onlyDeleted,
+            search,
+            hasProducts,
+            minProducts,
+            maxProducts,
+            sort
+        } = data
 
         const pageNumber = Math.max(Number(page) || 1, 1)
         const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
@@ -184,6 +193,11 @@ const updateBrand = async ({ brandId, updateData }) => {
 
 const deleteBrand = async ({ brandId }) => {
     try {
+        const hasProducts = await Product.exists({ brand: brandId })
+        if(hasProducts){
+            throw new Error('Brand has products, cannot delete')
+        }
+
         const brand = await Brand.findByIdAndUpdate(
             brandId,
             { $set: { isDeleted: true } },
@@ -193,11 +207,6 @@ const deleteBrand = async ({ brandId }) => {
         if (!brand) {
             throw Object.assign(new Error('brand not found'), { statusCode: 404 })
         }
-
-        await Product.updateMany(
-            { brand: brandId },
-            { $set: { isDeleted: true } }
-        )
 
         return brand
     } catch (error) {
@@ -216,11 +225,6 @@ const restoreBrand = async ({ brandId }) => {
         if (!brand) {
             throw Object.assign(new Error('brand not found'), { statusCode: 404 })
         }
-
-        await Product.updateMany(
-            { brand: brandId },
-            { $set: { isDeleted: false } }
-        )
 
         return brand
     } catch (error) {

@@ -5,6 +5,7 @@ const orderValidator = require('../../validators/order.validator')
 
 const router = express.Router()
 
+// get all orders
 router.get(
     '/',
     auth,
@@ -12,12 +13,21 @@ router.get(
     asyncWrapper(orderController.getAllOrders)
 )
 
+// change the delivery status
 router.patch(
     '/:orderId/deliveryStatus',
     auth,
     role('admin'),
     validate(orderValidator.updateOrderDeliveryStatusSchema),
     asyncWrapper(orderController.updateOrderDeliveryStatus)
+)
+
+//get user's orders
+router.get(
+    '/user/:userId',
+    auth,
+    role('admin'),
+    asyncWrapper(orderController.getUserOrdersForAdmin)
 )
 
 module.exports = router

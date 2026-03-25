@@ -18,6 +18,8 @@ categorySchema.index(
     { unique: true, partialFilterExpression: { slug: { $exists: true, $type: 'string' } } }
 )
 
+categorySchema.index({ name: 'text', slug: 'text' })
+
 categorySchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()

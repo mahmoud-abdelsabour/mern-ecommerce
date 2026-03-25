@@ -14,6 +14,14 @@ const getOrders = async (request, response) => {
     return response.status(200).json(result)
 }
 
+const getUserOrdersForAdmin = async (request, response) => {
+    const { userId } = request.params
+    const page = Number(request.query.page) || 1
+    const limit = Number(request.query.limit) || 10
+    const result = await orderService.getUserOrders({userId, page, limit})
+    return response.status(200).json(result)
+}
+
 const getOrderById = async (request, response) => {
     const order = request.resource
     const retrievedOrder = await orderService.getOrderById({order})
@@ -65,5 +73,6 @@ module.exports = {
     cancelOrder,
     returnRequest,
     getAllOrders,
-    updateOrderDeliveryStatus
+    updateOrderDeliveryStatus,
+    getUserOrdersForAdmin
 }
