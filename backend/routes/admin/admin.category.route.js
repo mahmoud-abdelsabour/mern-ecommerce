@@ -1,6 +1,7 @@
 const express = require('express')
 const categoryController = require('../../controllers/category.controller')
 const { asyncWrapper, auth, role, validate } = require('../../utils/middleware')
+const categoryValidator = require('../../validators/category.validator')
 
 const router = express.Router()
 
@@ -9,6 +10,7 @@ router.post(
     '/',
     auth,
     role('admin'),
+    validate(categoryValidator.createCategorySchema),
     asyncWrapper(categoryController.createCategory)
 )
 
@@ -25,6 +27,7 @@ router.patch(
     '/:categoryId',
     auth,
     role('admin'),
+    validate(categoryValidator.updateCategorySchema),
     asyncWrapper(categoryController.updateCategory)
 )
 
