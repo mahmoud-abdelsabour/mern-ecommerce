@@ -18,7 +18,12 @@ const brandSchema = mongoose.Schema({
             validator: (value) => !value || /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(value),
             message: 'Logo must be a valid URL'
         }
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
+
 })
 
 brandSchema.index(

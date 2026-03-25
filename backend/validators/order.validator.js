@@ -42,7 +42,14 @@ const returnRequestSchema = Joi.object({
     .required()
 })
 
+const updateOrderDeliveryStatusSchema = Joi.object({
+    deliveryStatus: Joi.string()
+        .valid('pending', 'shipped', 'delivered', 'cancelled', 'return requested', 'returned', 'refunded')
+        .required()
+})
+
 module.exports = {
     createOrderSchema,
-    returnRequestSchema
+    returnRequestSchema,
+    updateOrderDeliveryStatusSchema
 }

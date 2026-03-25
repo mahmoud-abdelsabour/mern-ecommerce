@@ -277,6 +277,12 @@ const deleteProduct = async ({ productId }) => {
 
 const restoreProduct = async ({ productId }) => {
     try {
+
+        const brand = await Brand.findById(product.brand)
+        if (brand && brand.isDeleted) {
+            throw Object.assign(new Error('brand is deleted; restore brand first'), { statusCode: 409 })
+        }
+
         const product = await Product.findByIdAndUpdate(
             productId,
             { $set: { isDeleted : false } },
