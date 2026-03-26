@@ -138,7 +138,9 @@ const userSchema = mongoose.Schema({
         default: "user"
     }
 
-})
+}, { timestamps: true })
+
+userSchema.index({ firstName: 'text', lastName: 'text', username: 'text' })
 
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {

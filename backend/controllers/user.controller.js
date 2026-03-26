@@ -1,8 +1,19 @@
 const userService = require('../services/user.service')
 
+const getAllUsers = async (request, response) => {
+  const result = await userService.getAllUsers({ ...request.query })
+  return response.status(200).json(result)
+}
+
+const getUserById = async (request, response) => {
+  const { userId } = request.params
+  const user = await userService.getUser({ userId })
+  return response.status(200).json(user)
+}
+
 const getUserProfile = async (request, response) => {
   const user = request.user
-  const retrievedUser = await userService.getUser({user})
+  const retrievedUser = await userService.getUser({ user })
   response.status(200).json(retrievedUser)
 }
 
@@ -39,9 +50,18 @@ const updateAddress = async (request, response) => {
   })
 }
 
-module.exports = { 
+const makeAdmin = async (request, response) => {
+  const { userId } = request.params
+  const user = await userService.makeAdmin({ userId })
+  return response.status(200).json(user)
+}
+
+module.exports = {
+  getAllUsers, 
+  getUserById,
   updateProfile,
   createAddress,
   updateAddress,
-  getUserProfile 
+  getUserProfile,
+  makeAdmin
 }
