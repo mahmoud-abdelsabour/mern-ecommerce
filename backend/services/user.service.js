@@ -93,6 +93,8 @@ const getAllUsers = async (data) => {
             page = 1,
             limit = 10,
             role,
+            includeDeleted,
+            onlyDeleted,
             search,
             startDate,
             endDate,
@@ -109,6 +111,14 @@ const getAllUsers = async (data) => {
         const match = {}
 
         if (role) match.role = role
+
+        if (onlyDeleted === 'true' || onlyDeleted === true) {
+            match.isDeleted = true
+        } else if (includeDeleted === 'true' || includeDeleted === true) {
+            // include all
+        } else {
+            match.isDeleted = false
+        }
 
         if (startDate || endDate) {
             match.createdAt = {}
@@ -295,15 +305,18 @@ const getAllUsers = async (data) => {
 
 const makeAdmin = async ({ userId }) => {
     try {
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { $set: { role: 'admin' } },
-            { new: true, runValidators: true, context: 'query' }
-        ).select('-passwordHash')
+        const user = await User.findById(userId).select('-passwordHash')
 
         if (!user) {
             throw Object.assign(new Error('user not found'), { statusCode: 404 })
         }
+
+        if (user.isDeleted) {
+            throw Object.assign(new Error('cannot promote deleted user'), { statusCode: 409 })
+        }
+
+        user.role = 'admin'
+        await user.save()
 
         return user
     } catch (error) {
@@ -312,11 +325,32 @@ const makeAdmin = async ({ userId }) => {
 }
 
 
+
+const deleteUser = async ({ user }) => {
+    user.isDeleted = true
+    user.deletedAt = new Date()
+
+    user.firstName = 'Deleted'
+    user.lastName = 'User'
+    user.email = `deleted_${user.id}@deleted.com`
+    user.username = `deleted_${user.id}`
+    user.phone = null
+    user.addresses = []
+    user.profilePhoto = null
+    user.cart = []
+    user.wishlist = []
+    user.tokenVersion = (user.tokenVersion || 0) + 1
+
+    await user.save()
+    return user
+}
+
 module.exports = {
     getAllUsers,
     updateProfile,
     createAddress,
     updateAddress,
     getUser,
-    makeAdmin
+    makeAdmin,
+    deleteUser
 }

@@ -2,7 +2,7 @@ const express = require('express')
 const categoryController = require('../../controllers/category.controller')
 const { asyncWrapper, auth, role, validate } = require('../../utils/middleware')
 const categoryValidator = require('../../validators/category.validator')
-
+//api/admin/categories
 const router = express.Router()
 
 // create category

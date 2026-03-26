@@ -3,7 +3,7 @@ const { asyncWrapper, validate, auth, ownership, role } = require('../utils/midd
 const reviewValidator = require('../validators/review.validator')
 const Review = require('../models/review.model')
 const express = require('express')
-
+//api/reviews
 const router = express.Router()
 
 router.patch(

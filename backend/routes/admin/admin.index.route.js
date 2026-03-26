@@ -1,13 +1,13 @@
-const user = require('./admin.user.route')
-const brand = require('./admin.brand.route')
-const category = require('./admin.category.route')
-const order = require('./admin.order.route')
-const product = require('./admin.user.route')
+const userAdminRoutes = require('./admin.user.route')
+const brandAdminRoutes = require('./admin.brand.route')
+const categoryAdminRoutes = require('./admin.category.route')
+const orderAdminRoutes = require('./admin.order.route')
+const productAdminRoutes = require('./admin.user.route')
 
 module.exports = {
-    user,
-    brand,
-    category,
-    order,
-    product
+    userAdminRoutes,
+    brandAdminRoutes,
+    categoryAdminRoutes,
+    orderAdminRoutes,
+    productAdminRoutes
 }

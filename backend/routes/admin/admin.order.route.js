@@ -2,7 +2,7 @@ const express = require('express')
 const orderController = require('../../controllers/order.controller')
 const { asyncWrapper, auth, role, validate } = require('../../utils/middleware/index')
 const orderValidator = require('../../validators/order.validator')
-
+//api/admin/orders
 const router = express.Router()
 
 // get all orders
@@ -24,7 +24,7 @@ router.patch(
 
 //get user's orders
 router.get(
-    '/user/:userId',
+    '/users/:userId',
     auth,
     role('admin'),
     asyncWrapper(orderController.getUserOrdersForAdmin)

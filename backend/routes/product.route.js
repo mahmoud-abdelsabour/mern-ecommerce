@@ -3,7 +3,7 @@ const reviewController = require('../controllers/review.controller')
 const { asyncWrapper, auth, validate, role } = require('../utils/middleware/index')
 const reviewValidator = require('../validators/review.validator')
 const express = require('express')
-
+//api/products
 const router = express.Router()
 
 router.get('/', asyncWrapper(productController.getProducts))

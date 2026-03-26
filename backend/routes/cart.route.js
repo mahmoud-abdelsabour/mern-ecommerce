@@ -2,7 +2,7 @@ const cartController = require('../controllers/cart.controller')
 const { asyncWrapper, auth, validate, role } = require('../utils/middleware/index')
 const cartValidator = require('../validators/cart.validator')
 const express = require('express')
-
+//api/cart
 const router = express.Router()
 
 // get cart
@@ -24,7 +24,7 @@ router.post(
 
 // decrement from cart item
 router.patch(
-    '/:productId',
+    '/products/:productId',
     auth,
     role('user'),
     validate(cartValidator.decrementCartItemSchema),
@@ -33,7 +33,7 @@ router.patch(
 
 // delete from cart
 router.delete(
-    '/:productId',
+    '/products/:productId',
     auth,
     role('user'),
     asyncWrapper(cartController.removeFromCart)

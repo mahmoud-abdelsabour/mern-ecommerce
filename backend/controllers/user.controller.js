@@ -56,6 +56,12 @@ const makeAdmin = async (request, response) => {
   return response.status(200).json(user)
 }
 
+const deleteUser = async (request, response) => {
+  const user = request.user
+  const result = await userService.deleteUser({ user })
+  return response.status(200).json(result)
+}
+
 module.exports = {
   getAllUsers, 
   getUserById,
@@ -63,5 +69,6 @@ module.exports = {
   createAddress,
   updateAddress,
   getUserProfile,
-  makeAdmin
+  makeAdmin,
+  deleteUser
 }

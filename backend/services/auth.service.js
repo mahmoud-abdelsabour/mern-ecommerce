@@ -32,7 +32,12 @@ const login = async (data) => {
     try {
         const {email, password} = data
         const { user } = await isExistedUser({ email })
-        if (!user) throw Object.assign(new Error('invalid credentials'), { statusCode: 401 });
+        
+        if (!user) throw Object.assign(new Error('invalid credentials'), { statusCode: 401 })
+        
+        if(user.isDeleted === true){
+            throw Object.assign(new Error('forbidden'), { statusCode: 403 })
+        }
 
         await passwordCompare(password, user.passwordHash)
         const token = createToken(user)

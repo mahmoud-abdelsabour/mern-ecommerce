@@ -4,6 +4,7 @@ const orderValidator = require('../validators/order.validator')
 const Order = require('../models/order.model')
 const express = require('express')
 const router = express.Router()
+//api/orders
 
 // create order
 router.post(

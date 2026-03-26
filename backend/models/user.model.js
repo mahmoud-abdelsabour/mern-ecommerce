@@ -136,7 +136,12 @@ const userSchema = mongoose.Schema({
         type: String,
         enum: ["user", "admin"],
         default: "user"
-    }
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: Date
 
 }, { timestamps: true })
 

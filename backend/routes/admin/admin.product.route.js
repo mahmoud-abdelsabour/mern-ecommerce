@@ -2,7 +2,7 @@ const express = require('express')
 const productController = require('../../controllers/product.controller')
 const productValidator = require('../../validators/product.validator')
 const { asyncWrapper, validate, auth, role } = require('../../utils/middleware')
-
+//api/admin/products
 const router = express.Router()
 
 router.post(

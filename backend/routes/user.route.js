@@ -4,32 +4,38 @@ const userValidator = require('../validators/user.validator')
 const express = require('express')
 
 const router = express.Router()
-
+//api/users
 router.get(
-    '/',
+    '/me',
     auth,
     asyncWrapper(userController.getUserProfile)
 )
 
 router.patch(
-    '/update-profile',
+    '/me/update-profile',
     auth,
     validate(userValidator.updateProfileSchema),
     asyncWrapper(userController.updateProfile)
 )
 
 router.post(
-    '/create-address',
+    '/me/create-address',
     auth,
     validate(userValidator.createAddressSchema),
     asyncWrapper(userController.createAddress)
 )
 
 router.patch(
-    '/:addressId/update-address',
+    '/me/addresses/:addressId',
     auth,
     validate(userValidator.updateAddressSchema),
     asyncWrapper(userController.updateAddress)
+)
+
+router.delete(
+    '/me/delete',
+    auth,
+    asyncWrapper(userController.deleteUser)
 )
 
 module.exports = router

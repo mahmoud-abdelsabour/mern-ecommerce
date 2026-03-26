@@ -3,7 +3,7 @@ const { asyncWrapper, validate, auth, ownership } = require('../utils/middleware
 const authValidator = require('../validators/auth.validator')
 const User = require('../models/user.model')
 const express = require('express')
-
+//api/auth
 const router = express.Router()
 
 router.post(
@@ -19,7 +19,7 @@ router.post(
 )
 
 router.patch(
-    '/user/:id/update-password',
+    '/users/:id/update-password',
     auth,
     ownership(User, 'id', '_id'),
     validate(authValidator.updatePasswordSchema),
