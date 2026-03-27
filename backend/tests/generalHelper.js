@@ -3,6 +3,7 @@ const request = require('supertest')
 const app = require('../app')
 const User = require('../models/user.model')
 const { hashingValue } = require('../utils/auth/password.util')
+const { createToken } = require('../utils/auth/token.util')
 
 const api = request(app)
 
@@ -24,13 +25,13 @@ const waitForDb = (timeoutMs = 20000) => {
 const buildUserPayload = (overrides = {}) => {
     const unique = `${Date.now()}_${Math.floor(Math.random() * 1e9)}`
     return {
-    firstName: 'Test',
-    lastName: 'User',
-    username: `user_${unique}`,
-    email: `user_${unique}@example.com`,
-    password: 'Aa1@aaaa',
-    phone: `010${Math.floor(10000000 + Math.random() * 90000000)}`,
-    ...overrides
+        firstName: 'Test',
+        lastName: 'User',
+        username: `user_${unique}`,
+        email: `user_${unique}@example.com`,
+        password: 'Aa1@aaaa',
+        phone: `010${Math.floor(10000000 + Math.random() * 90000000)}`,
+        ...overrides
     }
 }
 
@@ -44,10 +45,15 @@ const createUser = async (overrides = {}) => {
         username: payload.username,
         email: payload.email,
         phone: payload.phone,
-        passwordHash
+        passwordHash,
+        role: payload.role
     }).save()
 
     return { user, payload }
+}
+
+const getAuthToken = (user) => {
+    return createToken(user)
 }
 
 const logIfServerError = (response) => {
@@ -67,5 +73,6 @@ module.exports = {
     waitForDb,
     buildUserPayload,
     createUser,
+    getAuthToken,
     logIfServerError
 }

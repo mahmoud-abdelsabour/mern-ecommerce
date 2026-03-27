@@ -1,7 +1,9 @@
-﻿const { api, mongoose, waitForDb } = require('../generalHelper')
+const { api, mongoose, waitForDb, createUser } = require('../generalHelper')
 const Product = require('../../models/product.model')
 const Brand = require('../../models/brand.model')
 const Category = require('../../models/category.model')
+const Review = require('../../models/review.model')
+const Order = require('../../models/order.model')
 
 const clearProducts = async () => {
     await Product.deleteMany({})
@@ -45,6 +47,58 @@ const createProduct = async (overrides = {}) => {
     return { product, brand, category }
 }
 
+const createReviewsForProduct = async (productId, count) => {
+    const users = await Promise.all(
+        Array.from({ length: count }, () => createUser())
+    )
+
+    return Review.create(
+        users.map((u, idx) => ({
+            user: u.user._id,
+            product: productId,
+            rating: 5,
+            comment: `Review ${idx}`,
+            name: `User ${idx}`
+        }))
+    )
+}
+
+const createDeliveredOrder = async ({ user, product }) => {
+    return new Order({
+        products: [
+            {
+                product: product._id,
+                quantity: 1,
+                priceAtPurchase: product.price,
+                name: product.name,
+                description: product.description,
+                photos: product.photos,
+                brand: 'Brand',
+                category: 'Category'
+            }
+        ],
+        userId: user._id,
+        shippingInfo: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            username: user.username,
+            email: user.email,
+            phone: user.phone,
+            address: {
+                country: 'Egypt',
+                city: 'Cairo',
+                postalcode: '12345',
+                street: 'Street 1',
+                building: '1',
+                floor: 1,
+                special_mark: ''
+            }
+        },
+        totalPrice: product.price,
+        deliveryStatus: 'delivered'
+    }).save()
+}
+
 module.exports = {
     api,
     mongoose,
@@ -52,5 +106,7 @@ module.exports = {
     clearProducts,
     createBrand,
     createCategory,
-    createProduct
+    createProduct,
+    createReviewsForProduct,
+    createDeliveredOrder
 }

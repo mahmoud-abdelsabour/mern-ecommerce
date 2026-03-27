@@ -1,4 +1,4 @@
-const { api, waitForDb, clearProducts, createProduct } = require('./helper')
+const { api, waitForDb, clearProducts, createProduct, createReviewsForProduct } = require('./helper')
 const { mongoose, createUser, logIfServerError } = require('../generalHelper')
 const Review = require('../../models/review.model')
 const User = require('../../models/user.model')
@@ -19,22 +19,6 @@ beforeEach(async () => {
 afterAll(async () => {
     await mongoose.connection.close()
 })
-
-const createReviewsForProduct = async (productId, count) => {
-    const users = await Promise.all(
-        Array.from({ length: count }, () => createUser())
-    )
-
-    return Review.create(
-        users.map((u, idx) => ({
-            user: u.user._id,
-            product: productId,
-            rating: 5,
-            comment: `Review ${idx}`,
-            name: `User ${idx}`
-        }))
-    )
-}
 
 describe('GET /api/products/:productId/reviews', () => {
     it('returns empty reviews list for product with no reviews', async () => {
