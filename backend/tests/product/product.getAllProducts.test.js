@@ -1,18 +1,8 @@
-﻿const { api, waitForDb, clearProducts, createBrand, createCategory, createProduct } = require('./helper')
-const { mongoose } = require('../generalHelper')
+const { api, waitForDb, clearProducts, createBrand, createCategory, createProduct } = require('./helper')
+const { mongoose, logIfServerError } = require('../generalHelper')
 
 jest.setTimeout(20000)
 
-const logIfServerError = (response) => {
-    if (response.status >= 500) {
-        // eslint-disable-next-line no-console
-        console.log('Server error response:', response.body)
-        if (response.body && response.body.stack) {
-            // eslint-disable-next-line no-console
-            console.log('Server error stack:', response.body.stack)
-        }
-    }
-}
 
 beforeAll(async () => {
     await waitForDb()
