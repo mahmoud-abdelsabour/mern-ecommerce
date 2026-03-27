@@ -1,4 +1,6 @@
 const express = require("express")
+const mongoose = require('mongoose')
+const config = require('./utils/config/config')
 const {security} = require("./utils/middleware/index")
 const orderRoutes = require("./routes/order.route")
 const authRoutes = require("./routes/auth.route")
@@ -7,7 +9,7 @@ const userRoutes = require("./routes/user.route")
 const cartRoutes = require("./routes/cart.route")
 const wishlistRoutes = require("./routes/wishlist.route")
 const reviewRoutes = require("./routes/review.route")
-const { requestLogger, unknownEndpoint, errorHandler } = require('./utils/middleware/index')
+const { requestLogger, unknownEndpoint, errorHandler, logger } = require('./utils/middleware/index')
 const { userAdminRoutes,
         brandAdminRoutes,
         categoryAdminRoutes,
@@ -15,6 +17,16 @@ const { userAdminRoutes,
         productAdminRoutes } = require('./routes/admin/admin.index.route')
 
 const app = express()
+
+logger.info('connecting to MongoDB')
+
+mongoose.connect(config.MONGODB_URI, { family: 4 })
+        .then(() => {
+            logger.info('connected to MongoDB Successfully')
+        })
+        .catch(error => {
+            logger.error('error connecting to MongoDB:', error.message)
+        })
 
 app.use(express.json())
 security(app)

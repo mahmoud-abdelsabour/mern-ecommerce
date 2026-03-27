@@ -28,8 +28,19 @@ const corsOptions = {
 const securityMiddleware = (app) => {
   app.use(helmet())
   app.use(cors(corsOptions))
-  app.use("/api", limiter)
-  app.use("/api/auth/login", authLimiter)
+  if (process.env.NODE_ENV !== 'test') {
+    app.use("/api", limiter)
+    app.use("/api/auth/login", authLimiter)
+  }
+  app.use((req, res, next) => {
+    Object.defineProperty(req, 'query', {
+      value: { ...req.query },
+      writable: true,
+      configurable: true,
+      enumerable: true
+    })
+    next()
+  })
   app.use(mongoSanitize())
   app.use(hpp())
 }
