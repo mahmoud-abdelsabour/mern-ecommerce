@@ -1,7 +1,7 @@
 const productService = require('../services/product.service')
 
 const getProducts = async (request, response) => {
-    const products = await productService.getProducts({ ...request.query, ...request.user })
+    const products = await productService.getProducts({ ...request.query, user: request.user })
     return response.status(200).json(products)
 }
 

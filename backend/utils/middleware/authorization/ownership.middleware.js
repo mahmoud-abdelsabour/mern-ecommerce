@@ -9,7 +9,7 @@ const ownership = (Model, paramName, ownerField = 'userId', adminBypass = false)
 
     req.resource = resource
 
-    if(adminBypass && req.user?.role === 'admin'){
+    if (adminBypass && req.user && req.user.role === 'admin') {
       return next()
     }
 

@@ -75,11 +75,10 @@ productSchema.set('toJSON', {
   }
 })
 
-productSchema.pre(/^find|countDocuments/, function(next) {
+productSchema.pre(/^find|countDocuments/, function() {
   if (!this.getOptions().skipDeletedFilter) {
     this.where({ isDeleted: false })
   }
-  next()
 })
 
 

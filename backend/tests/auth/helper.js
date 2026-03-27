@@ -1,29 +1,7 @@
-﻿const mongoose = require('mongoose')
-const request = require('supertest')
-const app = require('../../app')
+﻿const { api, mongoose, waitForDb } = require('../generalHelper')
 const User = require('../../models/user.model')
 const { hashingValue } = require('../../utils/auth/password.util')
 const { createToken } = require('../../utils/auth/token.util')
-
-const api = request(app)
-
-const waitForDb = (timeoutMs = 20000) => {
-    if (mongoose.connection.readyState === 1) return Promise.resolve()
-    return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-            reject(new Error('MongoDB connection timeout'))
-        }, timeoutMs)
-
-        mongoose.connection.once('open', () => {
-            clearTimeout(timer)
-            resolve()
-        })
-        mongoose.connection.once('error', (err) => {
-            clearTimeout(timer)
-            reject(err)
-        })
-    })
-}
 
 const clearUsers = async () => {
     await User.deleteMany({})
@@ -61,6 +39,7 @@ const getAuthToken = (user) => {
 
 module.exports = {
     api,
+    mongoose,
     waitForDb,
     clearUsers,
     buildUserPayload,

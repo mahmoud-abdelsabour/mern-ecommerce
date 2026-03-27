@@ -42,12 +42,12 @@ const getProducts = async (data) => {
         }
 
         if (minRating){
-            filter.rating.score = { $gte: Number(minRating) }
+            filter['rating.score'] = { $gte: Number(minRating) }
         }
 
         let skipDeletedFilter = false
 
-        if(user.role === 'admin'){
+        if(user && user.role === 'admin'){
             skipDeletedFilter = true
             if (onlyDeleted === 'true' || onlyDeleted === true) {
                 filter.isDeleted = true
@@ -104,7 +104,7 @@ const getProductById = async (data) => {
 
         let skipDeletedFilter = false
 
-        if(user.role === 'admin'){
+        if(user && user.role === 'admin'){
             skipDeletedFilter = true
         }
         const product = await Product.findById(productId)

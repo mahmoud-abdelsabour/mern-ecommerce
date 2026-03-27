@@ -13,6 +13,20 @@ router.post(
     asyncWrapper(productController.createProduct)
 )
 
+router.get(
+    '/',
+    auth,
+    role('admin'),
+    asyncWrapper(productController.getProducts)
+)
+
+router.get(
+    '/:productId',
+    auth,
+    role('admin'),
+    asyncWrapper(productController.getProductById)
+)
+
 router.patch(
     '/:productId',
     auth,
