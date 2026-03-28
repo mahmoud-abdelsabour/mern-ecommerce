@@ -27,7 +27,7 @@ router.get(
 router.get(
     '/:orderId',
     auth,
-    ownership(Order, 'orderId', true),
+    ownership(Order, 'orderId', 'userId', true),
     asyncWrapper(orderController.getOrderById)
 )
 
