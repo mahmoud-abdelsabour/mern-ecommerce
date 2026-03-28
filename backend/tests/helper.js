@@ -112,16 +112,6 @@ const clearCartData = async () => {
     await User.deleteMany({})
 }
 
-const createReview = async ({ user, product, rating = 4, comment = 'Nice' }) => {
-    return Review.create({
-        user: user._id,
-        product: product._id,
-        rating,
-        comment,
-        name: user.firstName
-    })
-}
-
 const createReviewsForProduct = async (productId, count) => {
     const users = await Promise.all(
         Array.from({ length: count }, () => createUser())
@@ -191,6 +181,17 @@ const buildShippingInfo = (user) => ({
     }
 })
 
+const buildAddress = () => ({
+    address_name: 'Home',
+    country: 'Egypt',
+    city: 'Cairo',
+    postalcode: '12345',
+    street: 'Street 1',
+    building: '1',
+    floor: 2,
+    special_mark: 'nearby'
+})
+
 const seedOrder = async ({ user, product, status = 'pending' }) => {
     return new Order({
         products: [
@@ -244,10 +245,10 @@ module.exports = {
     createProduct,
     clearProducts,
     clearCartData,
-    createReview,
     createReviewsForProduct,
     createDeliveredOrder,
     buildShippingInfo,
+    buildAddress,
     seedOrder,
     setDeliveredAt,
     getAuthToken,
