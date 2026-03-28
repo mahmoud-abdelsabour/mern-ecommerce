@@ -156,13 +156,30 @@ const createDeliveredOrder = async ({ user, product }) => {
                 street: 'Street 1',
                 building: '1',
                 floor: 1,
-                special_mark: ''
+                special_mark: 'nearby'
             }
         },
         totalPrice: product.price,
         deliveryStatus: 'delivered'
     }).save()
 }
+
+const buildShippingInfo = (user) => ({
+    firstName: user.firstName,
+    lastName: user.lastName,
+    username: user.username,
+    email: user.email,
+    phone: user.phone,
+    address: {
+        country: 'Egypt',
+        city: 'Cairo',
+        postalcode: '12345',
+        street: 'Street 1',
+        building: '1',
+        floor: 1,
+        special_mark: 'nearby'
+    }
+})
 
 const getAuthToken = (user) => {
     return createToken(user)
@@ -193,6 +210,7 @@ module.exports = {
     clearCartData,
     createReviewsForProduct,
     createDeliveredOrder,
+    buildShippingInfo,
     getAuthToken,
     logIfServerError
 }

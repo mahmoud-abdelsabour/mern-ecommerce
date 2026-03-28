@@ -24,7 +24,7 @@ const createOrderSchema = Joi.object({
             street: Joi.string().trim().required(),
             building: Joi.string().trim().required(),
             floor: Joi.number().integer().required(),
-            special_mark: Joi.string().trim().required(),
+            special_mark: Joi.string().trim(),
         })
     })
 })
