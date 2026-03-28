@@ -1,5 +1,6 @@
 const { api, waitForDb, clearUsers, createUser, getAuthToken } = require('../helper')
 const mongoose = require('mongoose')
+const User = require('../../models/user.model')
 
 jest.setTimeout(20000)
 
@@ -31,6 +32,24 @@ describe('PATCH /api/auth/users/:id/update-password', () => {
 
         expect(response.body).toHaveProperty('id')
         expect(response.body).not.toHaveProperty('passwordHash')
+    })
+
+    it('increments tokenVersion after password update', async () => {
+        const { user, payload } = await createUser()
+        const token = getAuthToken(user)
+        const oldTokenVersion = user.tokenVersion
+
+        await api
+            .patch(`/api/auth/users/${user.id}/update-password`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                currentPassword: payload.password,
+                newPassword: 'Aa1@bbbb'
+            })
+            .expect(200)
+
+        const updatedUser = await User.findById(user.id)
+        expect(updatedUser.tokenVersion).toBe(oldTokenVersion + 1)
     })
 
     it('rejects invalid current password', async () => {

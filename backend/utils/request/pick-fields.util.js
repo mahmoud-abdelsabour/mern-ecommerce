@@ -1,4 +1,4 @@
-const isExistedUser = require('../user/user-check.util')
+const { isExistedUser } = require('../user/user-check.util')
 
 const pickAllowedFields = async (props) => {
     const updates = {};

@@ -24,7 +24,7 @@ const addressAllowedFields = [
 const updateProfile = async (data) => {    
     try {
         const { fields, user } = data    
-        const updateOps = await pickAllowedFields({userProfileAllowedFields, fields})
+        const updateOps = await pickAllowedFields({ allowedFields: userProfileAllowedFields, requestFields: fields, user })
 
         const updatedUser = await User.findByIdAndUpdate(
             user.id,
@@ -57,7 +57,7 @@ const createAddress = async (data) => {
 const updateAddress = async (data) => {
     try {
         const {fields} = data
-        const updateOps = await pickAllowedFields({addressAllowedFields, fields})
+        const updateOps = await pickAllowedFields({ allowedFields: addressAllowedFields, requestFields: fields, user: data.user })
 
         const updatedUser = await User.findOneAndUpdate(
           {_id: data.user.id, "addresses._id": data.addressId},
