@@ -59,9 +59,14 @@ const updateAddress = async (data) => {
         const {fields} = data
         const updateOps = await pickAllowedFields({ allowedFields: addressAllowedFields, requestFields: fields, user: data.user })
 
+        const addressSet = {}
+        for (const [key, value] of Object.entries(updateOps.$set || {})) {
+            addressSet[`addresses.$.${key}`] = value
+        }
+
         const updatedUser = await User.findOneAndUpdate(
           {_id: data.user.id, "addresses._id": data.addressId},
-          updateOps,
+          { $set: addressSet },
           { new: true, runValidators: true, context: "query" }
         ).select("-passwordHash")
 

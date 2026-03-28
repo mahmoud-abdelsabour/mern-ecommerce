@@ -112,6 +112,16 @@ const clearCartData = async () => {
     await User.deleteMany({})
 }
 
+const createReview = async ({ user, product, rating = 4, comment = 'Nice' }) => {
+    return Review.create({
+        user: user._id,
+        product: product._id,
+        rating,
+        comment,
+        name: user.firstName
+    })
+}
+
 const createReviewsForProduct = async (productId, count) => {
     const users = await Promise.all(
         Array.from({ length: count }, () => createUser())
@@ -245,6 +255,7 @@ module.exports = {
     createProduct,
     clearProducts,
     clearCartData,
+    createReview,
     createReviewsForProduct,
     createDeliveredOrder,
     buildShippingInfo,
