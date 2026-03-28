@@ -181,6 +181,27 @@ const buildShippingInfo = (user) => ({
     }
 })
 
+const seedOrder = async ({ user, product, status = 'pending' }) => {
+    return new Order({
+        products: [
+            {
+                product: product._id,
+                quantity: 1,
+                priceAtPurchase: product.price,
+                name: product.name,
+                description: product.description,
+                photos: product.photos,
+                brand: 'Brand',
+                category: 'Category'
+            }
+        ],
+        userId: user._id,
+        shippingInfo: buildShippingInfo(user),
+        totalPrice: product.price,
+        deliveryStatus: status
+    }).save()
+}
+
 const getAuthToken = (user) => {
     return createToken(user)
 }
@@ -211,6 +232,7 @@ module.exports = {
     createReviewsForProduct,
     createDeliveredOrder,
     buildShippingInfo,
+    seedOrder,
     getAuthToken,
     logIfServerError
 }

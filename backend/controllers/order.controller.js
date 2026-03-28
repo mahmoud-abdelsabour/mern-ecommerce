@@ -7,7 +7,7 @@ const createOrder = async (request, response) => {
 }
 
 const getOrders = async (request, response) => {
-    const { userId } = request.user.id
+    const userId = request.user.id
     const page = Number(request.query.page) || 1
     const limit = Number(request.query.limit) || 10
     const result = await orderService.getUserOrders({userId, page, limit})
