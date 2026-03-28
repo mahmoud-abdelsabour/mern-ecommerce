@@ -202,6 +202,11 @@ const seedOrder = async ({ user, product, status = 'pending' }) => {
     }).save()
 }
 
+const setDeliveredAt = async (order, daysAgo = 1) => {
+    order.deliveredAt = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000)
+    await order.save()
+}
+
 const getAuthToken = (user) => {
     return createToken(user)
 }
@@ -233,6 +238,7 @@ module.exports = {
     createDeliveredOrder,
     buildShippingInfo,
     seedOrder,
+    setDeliveredAt,
     getAuthToken,
     logIfServerError
 }

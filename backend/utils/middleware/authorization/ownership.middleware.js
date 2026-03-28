@@ -1,7 +1,7 @@
 const ownership = (Model, paramName, ownerField = 'userId', adminBypass = false) => {
   return async (req, res, next) => {
 
-    const resource = await Model.findById(req.params[paramName]).select(ownerField)
+    const resource = await Model.findById(req.params[paramName])
 
     if (!resource) {
       return res.status(404).json({ error: 'resource not found' })

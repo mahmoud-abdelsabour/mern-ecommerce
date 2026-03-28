@@ -317,6 +317,7 @@ module.exports = {
     getOrderById,
     cancelOrder,
     requestReturn,
+    returnRequest: requestReturn,
     getAllOrders,
     updateOrderDeliveryStatus
 }
