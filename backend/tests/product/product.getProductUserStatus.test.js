@@ -1,5 +1,4 @@
-const { api, waitForDb, clearProducts, createProduct } = require('./helper')
-const { mongoose, createUser, logIfServerError, getAuthToken } = require('../generalHelper')
+const { api, waitForDb, clearProducts, createProduct, mongoose, createUser, logIfServerError, getAuthToken } = require('../helper')
 const User = require('../../models/user.model')
 
 jest.setTimeout(60000)

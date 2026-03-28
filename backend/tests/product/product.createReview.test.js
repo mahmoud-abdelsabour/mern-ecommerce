@@ -1,5 +1,4 @@
-const { api, waitForDb, clearProducts, createProduct, createDeliveredOrder } = require('./helper')
-const { mongoose, createUser, logIfServerError, getAuthToken } = require('../generalHelper')
+const { api, waitForDb, clearProducts, createProduct, createDeliveredOrder, mongoose, createUser, logIfServerError, getAuthToken } = require('../helper')
 const Review = require('../../models/review.model')
 const Order = require('../../models/order.model')
 const User = require('../../models/user.model')

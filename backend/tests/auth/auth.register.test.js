@@ -1,4 +1,4 @@
-﻿const { api, waitForDb, clearUsers, buildUserPayload } = require('./helper')
+const { api, waitForDb, clearUsers, buildUserPayload } = require('../helper')
 const mongoose = require('mongoose')
 
 jest.setTimeout(20000)

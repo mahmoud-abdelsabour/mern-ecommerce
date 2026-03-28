@@ -1,4 +1,4 @@
-﻿const { api, waitForDb, clearUsers, buildUserPayload } = require('./helper')
+const { api, waitForDb, clearUsers, buildUserPayload } = require('../helper')
 const mongoose = require('mongoose')
 const User = require('../../models/user.model')
 const { hashingValue } = require('../../utils/auth/password.util')
