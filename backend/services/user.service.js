@@ -346,7 +346,7 @@ const deleteUser = async ({ user }) => {
     user.wishlist = []
     user.tokenVersion = (user.tokenVersion || 0) + 1
 
-    await user.save()
+    await user.save({ validateBeforeSave: false })
     return user
 }
 
