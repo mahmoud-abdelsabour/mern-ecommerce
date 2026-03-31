@@ -2,7 +2,7 @@ const Product = require('../models/product.model')
 const Category = require('../models/category.model')
 const Brand = require('../models/brand.model')
 const Review = require('../models/review.model')
-const pickAllowedFields = require('../utils/request/pick-fields.util')
+const { pickAllowedFields } = require('../utils/request/pick-fields.util')
 
 const getProducts = async (data) => {
     try {
@@ -205,9 +205,9 @@ const createProduct = async (data) => {
         } = data
 
         const DbBrand = await Brand.findById(brand)
-        const DbCategory = await Brand.findById(brand)
+        const DbCategory = await Category.findById(category)
 
-        if(!DbBrand || DbCategory){
+        if(!DbBrand || !DbCategory){
             throw Object.assign(new Error('Bad Request'), { statusCode: 400 })
         }
 
@@ -247,6 +247,10 @@ const updateProduct = async (data) => {
             requestFields: updateData,
             user: null
         })
+
+        if (!updateOps.$set || Object.keys(updateOps.$set).length === 0) {
+            throw Object.assign(new Error('no valid fields to update'), { statusCode: 400 })
+        }
 
         if (updateOps.$set.brand) {
             const brandExists = await Brand.exists({ _id: updateOps.$set.brand })
@@ -300,20 +304,18 @@ const deleteProduct = async ({ productId }) => {
 const restoreProduct = async ({ productId }) => {
     try {
 
+        const product = await Product.findById(productId).setOptions({ skipDeletedFilter: true })
+        if (!product) {
+            throw Object.assign(new Error('product not found'), { statusCode: 404 })
+        }
+
         const brand = await Brand.findById(product.brand)
         if (brand && brand.isDeleted) {
             throw Object.assign(new Error('brand is deleted; restore brand first'), { statusCode: 409 })
         }
 
-        const product = await Product.findByIdAndUpdate(
-            productId,
-            { $set: { isDeleted : false } },
-            { new: true, runValidators: true, context: 'query' }
-        )
-
-        if (!product) {
-            throw Object.assign(new Error('product not found'), { statusCode: 404 })
-        }
+        product.isDeleted = false
+        await product.save()
 
         return product
     } catch (error) {

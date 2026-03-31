@@ -5,6 +5,7 @@ const { asyncWrapper, validate, auth, role } = require('../../utils/middleware')
 //api/admin/products
 const router = express.Router()
 
+//create product
 router.post(
     '/',
     auth,
@@ -13,6 +14,7 @@ router.post(
     asyncWrapper(productController.createProduct)
 )
 
+//get all products
 router.get(
     '/',
     auth,
@@ -20,6 +22,7 @@ router.get(
     asyncWrapper(productController.getProducts)
 )
 
+//get product by id
 router.get(
     '/:productId',
     auth,
@@ -27,6 +30,7 @@ router.get(
     asyncWrapper(productController.getProductById)
 )
 
+//update product
 router.patch(
     '/:productId',
     auth,
@@ -35,6 +39,7 @@ router.patch(
     asyncWrapper(productController.updateProduct)
 )
 
+//delete product
 router.delete(
     '/:productId',
     auth,
@@ -42,6 +47,7 @@ router.delete(
     asyncWrapper(productController.deleteProduct)
 )
 
+//restore product
 router.patch(
     '/:productId/restore',
     auth,

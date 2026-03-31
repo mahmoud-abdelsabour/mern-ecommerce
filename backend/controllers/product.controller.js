@@ -6,7 +6,8 @@ const getProducts = async (request, response) => {
 }
 
 const getProductById = async (request, response) => {
-    const result = await productService.getProductById({ ...request.params, ...request.user })
+    const { productId } = request.params
+    const result = await productService.getProductById({ productId, user: request.user })
     return response.status(200).json(result)
 }
 
