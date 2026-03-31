@@ -209,7 +209,7 @@ const getAllOrders = async (data) => {
         const filter = {}
 
         if (deliveryStatus) filter.deliveryStatus = deliveryStatus
-        if (userId) filter.userId = userId
+        if (userId) filter.userId = new mongoose.Types.ObjectId(userId)
 
         if (minTotal || maxTotal) {
             filter.totalPrice = {}
@@ -237,11 +237,20 @@ const getAllOrders = async (data) => {
         }
 
         const [orders, totalOrders] = await Promise.all([
-            Order.find(filter)
-                .select('createdAt deliveryStatus totalPrice products.0.photos')
-                .sort(sortObj)
-                .skip(skip)
-                .limit(pageSize),
+            Order.aggregate([
+                { $match: filter },
+                {
+                    $project: {
+                        createdAt: 1,
+                        deliveryStatus: 1,
+                        totalPrice: 1,
+                        firstPhoto: { $arrayElemAt: ['$products.photos', 0] }
+                    }
+                },
+                { $sort: sortObj },
+                { $skip: skip },
+                { $limit: pageSize }
+            ]),
             Order.countDocuments(filter)
         ])
 
