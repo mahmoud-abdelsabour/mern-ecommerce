@@ -1,17 +1,15 @@
-const { api, waitForDb, createUser, getAuthToken, logIfServerError, mongoose, clearUsers, buildAddress } = require('../helper')
-
-jest.setTimeout(60000)
+const { api, waitForDb, createUser, getAuthToken, logIfServerError,  closeDb,dropDatabase, buildAddress } = require('../helper')
 
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearUsers()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('POST /api/users/me/create-address', () => {
@@ -54,3 +52,4 @@ describe('POST /api/users/me/create-address', () => {
         expect(response.body.addresses[0].city).toBe('Cairo')
     })
 })
+

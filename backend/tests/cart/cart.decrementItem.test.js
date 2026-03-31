@@ -1,18 +1,16 @@
-const { api, waitForDb, clearCartData, createProduct, createUser, getAuthToken, logIfServerError, mongoose } = require('../helper')
+const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb, dropDatabase } = require('../helper')
 const mongooseLib = require('mongoose')
 
-jest.setTimeout(60000)
-
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearCartData()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('PATCH /api/cart/products/:productId', () => {
@@ -103,3 +101,4 @@ describe('PATCH /api/cart/products/:productId', () => {
         expect(response.body.length).toBe(0)
     })
 })
+

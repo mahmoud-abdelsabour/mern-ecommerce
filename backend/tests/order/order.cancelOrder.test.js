@@ -1,20 +1,15 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, mongoose, clearProducts, clearUsers, seedOrder } = require('../helper')
-const Order = require('../../models/order.model')
-
-jest.setTimeout(60000)
+const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb, dropDatabase, seedOrder } = require('../helper')
 
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearProducts()
-    await clearUsers()
-    await Order.deleteMany({})
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('PATCH /api/orders/:orderId/cancel', () => {
@@ -39,7 +34,7 @@ describe('PATCH /api/orders/:orderId/cancel', () => {
         expect(response.body.error || response.body.message).toBe('forbidden')
     })
 
-    it('returns 403 when cancelling another user’s order', async () => {
+    it('returns 403 when cancelling another userï¿½s order', async () => {
         const { user: userA } = await createUser()
         const { user: userB } = await createUser()
         const { product } = await createProduct()
@@ -86,3 +81,4 @@ describe('PATCH /api/orders/:orderId/cancel', () => {
         expect(response.body.message).toBe('Order cancelled')
     })
 })
+

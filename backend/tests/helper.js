@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const request = require('supertest')
+const { MongoMemoryServer } = require('mongodb-memory-server')
 const app = require('../app')
 const User = require('../models/user.model')
 const Product = require('../models/product.model')
@@ -11,10 +12,20 @@ const { hashingValue } = require('../utils/auth/password.util')
 const { createToken } = require('../utils/auth/token.util')
 
 const api = request(app)
+let mongoServer
 
-const waitForDb = (timeoutMs = 20000) => {
-    if (mongoose.connection.readyState === 1) return Promise.resolve()
-    return new Promise((resolve, reject) => {
+const waitForDb = async (timeoutMs = 10000) => {
+    if (mongoose.connection.readyState === 1) return
+
+    if (!mongoServer) {
+        mongoServer = await MongoMemoryServer.create()
+        const uri = mongoServer.getUri()
+        await mongoose.connect(uri, { family: 4 })
+    }
+
+    if (mongoose.connection.readyState === 1) return
+
+    await new Promise((resolve, reject) => {
         const timer = setTimeout(() => reject(new Error('MongoDB connection timeout')), timeoutMs)
         mongoose.connection.once('open', () => {
             clearTimeout(timer)
@@ -57,8 +68,14 @@ const createUser = async (overrides = {}) => {
     return { user, payload }
 }
 
-const clearUsers = async () => {
-    await User.deleteMany({})
+const dropDatabase = async () => {
+    await waitForDb()
+    await mongoose.connection.db.dropDatabase()
+    await Brand.syncIndexes()
+    await Category.syncIndexes()
+    await Product.syncIndexes()
+    await Review.syncIndexes()
+    await User.syncIndexes()
 }
 
 const createBrand = async (overrides = {}) => {
@@ -97,19 +114,14 @@ const createProduct = async (overrides = {}) => {
     return { product, brand, category }
 }
 
-const clearProducts = async () => {
-    await Product.deleteMany({})
-    await Brand.deleteMany({})
-    await Category.deleteMany({})
-    await Review.deleteMany({})
-    await Order.deleteMany({})
-}
-
-const clearCartData = async () => {
-    await Product.deleteMany({})
-    await Brand.deleteMany({})
-    await Category.deleteMany({})
-    await User.deleteMany({})
+const closeDb = async () => {
+    if (mongoose.connection.readyState !== 0) {
+        await mongoose.connection.close()
+    }
+    if (mongoServer) {
+        await mongoServer.stop()
+        mongoServer = null
+    }
 }
 
 const createReview = async ({ user, product, rating = 4, comment = 'Nice' }) => {
@@ -249,12 +261,10 @@ module.exports = {
     waitForDb,
     buildUserPayload,
     createUser,
-    clearUsers,
     createBrand,
     createCategory,
     createProduct,
-    clearProducts,
-    clearCartData,
+    closeDb,
     createReview,
     createReviewsForProduct,
     createDeliveredOrder,
@@ -263,5 +273,6 @@ module.exports = {
     seedOrder,
     setDeliveredAt,
     getAuthToken,
-    logIfServerError
+    logIfServerError,
+    dropDatabase
 }

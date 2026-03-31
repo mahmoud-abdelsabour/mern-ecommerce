@@ -1,20 +1,16 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, mongoose, clearProducts, clearUsers, seedOrder } = require('../helper')
+const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb, dropDatabase , seedOrder } = require('../helper')
 const Order = require('../../models/order.model')
 
-jest.setTimeout(60000)
-
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearProducts()
-    await clearUsers()
-    await Order.deleteMany({})
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('GET /api/orders', () => {
@@ -91,3 +87,4 @@ describe('GET /api/orders', () => {
         expect(response.body.pagination.totalOrders).toBe(3)
     })
 })
+

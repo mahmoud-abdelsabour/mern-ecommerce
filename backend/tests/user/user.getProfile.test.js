@@ -1,17 +1,15 @@
-const { api, waitForDb, createUser, getAuthToken, logIfServerError, mongoose, clearUsers } = require('../helper')
-
-jest.setTimeout(60000)
+const { api, waitForDb, createUser, getAuthToken, logIfServerError, dropDatabase,closeDb  } = require('../helper')
 
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearUsers()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('GET /api/users/me', () => {
@@ -64,3 +62,4 @@ describe('GET /api/users/me', () => {
         expect(response.body.passwordHash).toBeUndefined()
     })
 })
+

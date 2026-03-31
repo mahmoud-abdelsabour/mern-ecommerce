@@ -1,18 +1,16 @@
-const { api, waitForDb, createUser, getAuthToken, logIfServerError, mongoose, clearUsers, buildAddress } = require('../helper')
+const { api, waitForDb, createUser, getAuthToken, logIfServerError, closeDb,dropDatabase , buildAddress } = require('../helper')
 const mongooseLib = require('mongoose')
 
-jest.setTimeout(60000)
-
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearUsers()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('PATCH /api/users/me/addresses/:addressId', () => {
@@ -102,3 +100,4 @@ describe('PATCH /api/users/me/addresses/:addressId', () => {
         expect(updated.floor).toBe(5)
     })
 })
+

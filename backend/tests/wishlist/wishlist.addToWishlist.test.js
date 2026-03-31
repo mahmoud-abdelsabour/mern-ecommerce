@@ -5,24 +5,20 @@ const {
     createProduct,
     getAuthToken,
     logIfServerError,
-    mongoose,
-    clearUsers,
-    clearProducts
+    closeDb,
+    dropDatabase
 } = require('../helper')
 
-jest.setTimeout(60000)
-
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearUsers()
-    await clearProducts()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('POST /api/wishlist/products/:productId', () => {
@@ -121,3 +117,4 @@ describe('POST /api/wishlist/products/:productId', () => {
         expect(response.body.message).toBe('product already exists')
     })
 })
+

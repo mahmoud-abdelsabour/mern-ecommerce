@@ -1,25 +1,15 @@
-const { api, waitForDb, clearUsers, buildUserPayload } = require('../helper')
-const mongoose = require('mongoose')
-
-jest.setTimeout(20000)
-
-const logIfServerError = (response) => {
-    if (response.status >= 500) {
-        // eslint-disable-next-line no-console
-        console.log('Server error response:', response.body)
-    }
-}
+const { api, waitForDb, closeDb,dropDatabase, buildUserPayload, logIfServerError } = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearUsers()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('POST /api/auth/register', () => {

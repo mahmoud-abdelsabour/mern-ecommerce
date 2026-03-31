@@ -1,21 +1,16 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, mongoose, clearProducts, clearUsers, createReview } = require('../helper')
-const Review = require('../../models/review.model')
+const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb,dropDatabase, createReview } = require('../helper')
 const mongooseLib = require('mongoose')
 
-jest.setTimeout(60000)
-
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearProducts()
-    await clearUsers()
-    await Review.deleteMany({})
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('DELETE /api/reviews/:reviewId', () => {
@@ -43,7 +38,7 @@ describe('DELETE /api/reviews/:reviewId', () => {
         expect(response.body.message).toBe('review deleted')
     })
 
-    it('returns 403 when user tries to delete another user’s review', async () => {
+    it('returns 403 when user tries to delete another userï¿½s review', async () => {
         const { user: userA } = await createUser()
         const { user: userB } = await createUser()
         const { product } = await createProduct()
@@ -87,3 +82,4 @@ describe('DELETE /api/reviews/:reviewId', () => {
         expect(response.body.message).toBe('review deleted')
     })
 })
+

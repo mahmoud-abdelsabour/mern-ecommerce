@@ -1,20 +1,17 @@
-const { api, waitForDb, clearUsers, buildUserPayload } = require('../helper')
-const mongoose = require('mongoose')
+const { api, waitForDb, buildUserPayload, closeDb, dropDatabase } = require('../helper')
 const User = require('../../models/user.model')
 const { hashingValue } = require('../../utils/auth/password.util')
-
-jest.setTimeout(20000)
 
 beforeAll(async () => {
     await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearUsers()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('POST /api/auth/login', () => {

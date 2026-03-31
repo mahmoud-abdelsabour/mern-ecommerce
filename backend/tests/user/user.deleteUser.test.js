@@ -4,22 +4,20 @@ const {
     createUser,
     getAuthToken,
     logIfServerError,
-    mongoose,
-    clearUsers
+    closeDb,
+    dropDatabase
 } = require('../helper')
 
-jest.setTimeout(60000)
-
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearUsers()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('DELETE /api/users/me/delete', () => {
@@ -105,3 +103,4 @@ describe('DELETE /api/users/me/delete', () => {
         expect(response.body.role).toBe('admin')
     })
 })
+

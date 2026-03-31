@@ -24,7 +24,7 @@ const brandSchema = mongoose.Schema({
         default: false
     }
 
-})
+}, {timestamps: true})
 
 brandSchema.index(
     { slug: 1 },

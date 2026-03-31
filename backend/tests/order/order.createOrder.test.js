@@ -1,22 +1,17 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, mongoose, clearProducts, clearUsers, buildShippingInfo } = require('../helper')
-const Order = require('../../models/order.model')
+const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError,closeDb, dropDatabase, buildShippingInfo } = require('../helper')
 const Product = require('../../models/product.model')
 const User = require('../../models/user.model')
 
-jest.setTimeout(60000)
-
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearProducts()
-    await clearUsers()
-    await Order.deleteMany({})
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('POST /api/orders', () => {
@@ -101,3 +96,4 @@ describe('POST /api/orders', () => {
         expect(dbUser.cart.length).toBe(0)
     })
 })
+

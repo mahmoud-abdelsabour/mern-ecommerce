@@ -1,21 +1,16 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, mongoose, clearProducts, clearUsers, seedOrder } = require('../helper')
-const Order = require('../../models/order.model')
+const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb,dropDatabase, seedOrder } = require('../helper')
 const mongooseLib = require('mongoose')
 
-jest.setTimeout(60000)
-
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearProducts()
-    await clearUsers()
-    await Order.deleteMany({})
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('GET /api/orders/:orderId', () => {
@@ -43,7 +38,7 @@ describe('GET /api/orders/:orderId', () => {
         expect(response.body.id).toBe(order._id.toString())
     })
 
-    it('returns 403 when user tries to access another user’s order', async () => {
+    it('returns 403 when user tries to access another userï¿½s order', async () => {
         const { user: userA } = await createUser()
         const { user: userB } = await createUser()
         const { product } = await createProduct()
@@ -72,3 +67,4 @@ describe('GET /api/orders/:orderId', () => {
         expect(response.body.error).toBe('resource not found')
     })
 })
+

@@ -1,17 +1,15 @@
-const { api, waitForDb, createUser, getAuthToken, logIfServerError, mongoose, clearUsers } = require('../helper')
-
-jest.setTimeout(60000)
+const { api, waitForDb, createUser, getAuthToken, logIfServerError, closeDb,dropDatabase  } = require('../helper')
 
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearUsers()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('PATCH /api/users/me/update-profile', () => {
@@ -82,3 +80,4 @@ describe('PATCH /api/users/me/update-profile', () => {
         expect(response.body.tokenVersion).toBe(oldTokenVersion + 1)
     })
 })
+

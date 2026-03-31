@@ -1,19 +1,16 @@
-const { api, waitForDb, clearProducts, createProduct, mongoose, createUser, logIfServerError, getAuthToken } = require('../helper')
+const { api, waitForDb, createProduct, createUser, logIfServerError, getAuthToken, closeDb,dropDatabase } = require('../helper')
 const User = require('../../models/user.model')
 
-jest.setTimeout(60000)
-
 beforeAll(async () => {
-    await waitForDb(60000)
+    await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearProducts()
-    await User.deleteMany({})
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('GET /api/products/:productId/user-status', () => {
@@ -91,3 +88,4 @@ describe('GET /api/products/:productId/user-status', () => {
         expect(response.body.error).toBe('token invalid or expired')
     })
 })
+

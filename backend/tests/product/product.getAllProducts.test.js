@@ -1,18 +1,15 @@
-const { api, waitForDb, clearProducts, createBrand, createCategory, createProduct, mongoose, logIfServerError } = require('../helper')
-
-jest.setTimeout(20000)
-
+const { api, waitForDb, createBrand, createCategory, createProduct, logIfServerError ,closeDb, dropDatabase} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearProducts()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('GET /api/products', () => {

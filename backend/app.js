@@ -18,15 +18,17 @@ const { userAdminRoutes,
 
 const app = express()
 
-logger.info('connecting to MongoDB')
+if (process.env.NODE_ENV !== 'test') {
+    logger.info('connecting to MongoDB')
 
-mongoose.connect(config.MONGODB_URI, { family: 4 })
-        .then(() => {
-            logger.info('connected to MongoDB Successfully')
-        })
-        .catch(error => {
-            logger.error('error connecting to MongoDB:', error.message)
-        })
+    mongoose.connect(config.MONGODB_URI, { family: 4 })
+            .then(() => {
+                logger.info('connected to MongoDB Successfully')
+            })
+            .catch(error => {
+                logger.error('error connecting to MongoDB:', error.message)
+            })
+}
 
 app.use(express.json())
 security(app)
@@ -42,11 +44,11 @@ app.use('/api/wishlist', wishlistRoutes)
 app.use('/api/reviews', reviewRoutes)
 
 // Admin Routes
-app.use('api/admin/users', userAdminRoutes)
-app.use('api/admin/brands', brandAdminRoutes)
-app.use('api/admin/categories', categoryAdminRoutes)
-app.use('api/admin/orders', orderAdminRoutes)
-app.use('api/admin/products', productAdminRoutes)
+app.use('/api/admin/users', userAdminRoutes)
+app.use('/api/admin/brands', brandAdminRoutes)
+app.use('/api/admin/categories', categoryAdminRoutes)
+app.use('/api/admin/orders', orderAdminRoutes)
+app.use('/api/admin/products', productAdminRoutes)
 
 app.use(unknownEndpoint)
 app.use(errorHandler)

@@ -1,19 +1,16 @@
-const { api, waitForDb, clearUsers, createUser, getAuthToken } = require('../helper')
-const mongoose = require('mongoose')
+const { api, waitForDb, createUser, getAuthToken, dropDatabase, closeDb } = require('../helper')
 const User = require('../../models/user.model')
-
-jest.setTimeout(20000)
 
 beforeAll(async () => {
     await waitForDb()
 })
 
 beforeEach(async () => {
-    await clearUsers()
+    await dropDatabase()
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await closeDb()
 })
 
 describe('PATCH /api/auth/users/:id/update-password', () => {

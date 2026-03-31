@@ -13,7 +13,7 @@ const getAllBrands = async (data) => {
             hasProducts,
             minProducts,
             maxProducts,
-            sort
+            sort={ createdAt: -1 }
         } = data
 
         const pageNumber = Math.max(Number(page) || 1, 1)
