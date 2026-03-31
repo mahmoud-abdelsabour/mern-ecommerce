@@ -39,7 +39,7 @@ router.delete(
     '/:brandId',
     auth,
     role('admin'),
-    asyncWrapper(brandController.softDeleteBrand)
+    asyncWrapper(brandController.deleteBrand)
 )
 
 router.patch(
