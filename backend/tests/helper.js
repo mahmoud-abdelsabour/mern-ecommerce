@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const request = require('supertest')
-const { MongoMemoryServer } = require('mongodb-memory-server')
+const { MongoMemoryReplSet } = require('mongodb-memory-server')
 const app = require('../app')
 const User = require('../models/user.model')
 const Product = require('../models/product.model')
@@ -18,7 +18,9 @@ const waitForDb = async (timeoutMs = 10000) => {
     if (mongoose.connection.readyState === 1) return
 
     if (!mongoServer) {
-        mongoServer = await MongoMemoryServer.create()
+        mongoServer = await MongoMemoryReplSet.create({
+            replSet: { count: 1, storageEngine: 'wiredTiger' }
+        })
         const uri = mongoServer.getUri()
         await mongoose.connect(uri, { family: 4 })
     }
