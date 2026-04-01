@@ -83,6 +83,7 @@ const getUser = async (data) => {
 
         if(userId){
             user = await User.findById(userId).select('firstName lastName username phone email profilePhoto role createdAt')
+            if(!user) throw Object.assign(new Error("user not found"), {statusCode: 404})
         }
         else if(!user) throw Object.assign(new Error("user not found"), {statusCode: 404})
         
