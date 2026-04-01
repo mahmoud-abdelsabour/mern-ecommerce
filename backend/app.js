@@ -15,6 +15,8 @@ const { userAdminRoutes,
         categoryAdminRoutes,
         orderAdminRoutes,
         productAdminRoutes } = require('./routes/admin/admin.index.route')
+const swaggerUi = require('swagger-ui-express')
+const { swaggerSpec } = require('./utils/config/swagger')
 
 const app = express()
 
@@ -50,6 +52,10 @@ app.use('/api/admin/categories', categoryAdminRoutes)
 app.use('/api/admin/orders', orderAdminRoutes)
 app.use('/api/admin/products', productAdminRoutes)
 
+//Swagger
+if (process.env.NODE_ENV === 'development') {
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+}
 app.use(unknownEndpoint)
 app.use(errorHandler)
 
