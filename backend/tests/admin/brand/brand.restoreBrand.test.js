@@ -8,7 +8,7 @@ const {
     closeDb,
     dropDatabase
 } = require('../../helper')
-const Brand = require('../../models/brand.model')
+const Brand = require('../../../models/brand.model')
 
 beforeAll(async () => {
     await waitForDb()

@@ -84,6 +84,20 @@ describe('GET /api/admin/products/:productId', () => {
         expect(response.body.message).toBe('product not found')
     })
 
+    it('returns product', async () => {
+        const { user } = await createUser({ role: 'admin' })
+        const token = getAuthToken(user)
+        const { product } = await createProduct()
+
+        const response = await api
+            .get(`/api/admin/products/${product._id}`)
+            .set('Authorization', `Bearer ${token}`)
+
+        logIfServerError(response)
+        expect(response.status).toBe(200)
+        expect(response.body.product.id).toBe(product._id.toString())
+    })
+
     it('returns deleted product for admin', async () => {
         const { user } = await createUser({ role: 'admin' })
         const token = getAuthToken(user)
