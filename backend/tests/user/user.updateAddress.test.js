@@ -1,5 +1,14 @@
-const { api, waitForDb, createUser, getAuthToken, logIfServerError, closeDb,dropDatabase , buildAddress } = require('../helper')
 const mongooseLib = require('mongoose')
+const {
+    api,
+    waitForDb,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+    buildAddress,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -100,4 +109,3 @@ describe('PATCH /api/users/me/addresses/:addressId', () => {
         expect(updated.floor).toBe(5)
     })
 })
-

@@ -6,7 +6,7 @@ const {
     getAuthToken,
     logIfServerError,
     closeDb,
-    dropDatabase
+    dropDatabase,
 } = require('../../helper')
 
 beforeAll(async () => {
@@ -144,5 +144,3 @@ describe('PATCH /api/admin/brands/:brandId', () => {
         expect(response.status).toBe(400)
     })
 })
-
-

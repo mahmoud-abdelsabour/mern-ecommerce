@@ -9,5 +9,5 @@ module.exports = {
     brandAdminRoutes,
     categoryAdminRoutes,
     orderAdminRoutes,
-    productAdminRoutes
+    productAdminRoutes,
 }

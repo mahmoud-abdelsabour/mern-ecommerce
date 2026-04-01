@@ -2,14 +2,14 @@ const Joi = require('joi')
 
 const createOrderSchema = Joi.object({
     products: Joi.array()
-    .items(
-      Joi.object({
-        product: Joi.string().required(),   // product ID
-        quantity: Joi.number().integer().min(1).required()
-      })
-    )
-    .min(1)
-    .required(),
+        .items(
+            Joi.object({
+                product: Joi.string().required(), // product ID
+                quantity: Joi.number().integer().min(1).required(),
+            })
+        )
+        .min(1)
+        .required(),
 
     shippingInfo: Joi.object({
         firstName: Joi.string().trim().required(),
@@ -25,31 +25,29 @@ const createOrderSchema = Joi.object({
             building: Joi.string().trim().required(),
             floor: Joi.number().integer().required(),
             special_mark: Joi.string().trim(),
-        })
-    })
+        }),
+    }),
 })
 
 const returnRequestSchema = Joi.object({
     returnedItems: Joi.array()
-    .items(
-        Joi.object({
-            product: Joi.string().required(),
-            quantity: Joi.number().integer().min(1).required(),
-            reason: Joi.string().trim().max(300).allow('')
-        })
-    )
-    .min(1)
-    .required()
+        .items(
+            Joi.object({
+                product: Joi.string().required(),
+                quantity: Joi.number().integer().min(1).required(),
+                reason: Joi.string().trim().max(300).allow(''),
+            })
+        )
+        .min(1)
+        .required(),
 })
 
 const updateOrderDeliveryStatusSchema = Joi.object({
-    deliveryStatus: Joi.string()
-        .valid('shipped', 'delivered', 'returned', 'refunded')
-        .required()
+    deliveryStatus: Joi.string().valid('shipped', 'delivered', 'returned', 'refunded').required(),
 })
 
 module.exports = {
     createOrderSchema,
     returnRequestSchema,
-    updateOrderDeliveryStatusSchema
+    updateOrderDeliveryStatusSchema,
 }

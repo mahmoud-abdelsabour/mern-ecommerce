@@ -2,14 +2,14 @@ const Joi = require('joi')
 
 const addToCartSchema = Joi.object({
     productId: Joi.string().required(),
-    quantity: Joi.number().integer().min(1).required()
+    quantity: Joi.number().integer().min(1).required(),
 })
 
 const decrementCartItemSchema = Joi.object({
-    amount:Joi.number().integer().min(1).required()
+    amount: Joi.number().integer().min(1).required(),
 })
 
 module.exports = {
     addToCartSchema,
-    decrementCartItemSchema
+    decrementCartItemSchema,
 }

@@ -8,7 +8,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 const Brand = require('../../../models/brand.model')
 const Product = require('../../../models/product.model')

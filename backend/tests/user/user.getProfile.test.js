@@ -1,4 +1,12 @@
-const { api, waitForDb, createUser, getAuthToken, logIfServerError, dropDatabase,closeDb  } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    dropDatabase,
+    closeDb,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -22,9 +30,7 @@ describe('GET /api/users/me', () => {
     })
 
     it('returns 401 for invalid token', async () => {
-        const response = await api
-            .get('/api/users/me')
-            .set('Authorization', 'Bearer invalidtoken')
+        const response = await api.get('/api/users/me').set('Authorization', 'Bearer invalidtoken')
 
         logIfServerError(response)
         expect(response.status).toBe(401)
@@ -35,9 +41,7 @@ describe('GET /api/users/me', () => {
         const { user } = await createUser()
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/users/me')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/users/me').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -51,9 +55,7 @@ describe('GET /api/users/me', () => {
         const { user } = await createUser({ role: 'admin' })
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/users/me')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/users/me').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -62,4 +64,3 @@ describe('GET /api/users/me', () => {
         expect(response.body.passwordHash).toBeUndefined()
     })
 })
-

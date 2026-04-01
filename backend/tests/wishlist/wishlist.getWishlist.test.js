@@ -6,7 +6,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../helper')
 
 beforeAll(async () => {
@@ -31,9 +31,7 @@ describe('GET /api/wishlist', () => {
     })
 
     it('returns 401 for invalid token', async () => {
-        const response = await api
-            .get('/api/wishlist')
-            .set('Authorization', 'Bearer invalidtoken')
+        const response = await api.get('/api/wishlist').set('Authorization', 'Bearer invalidtoken')
 
         logIfServerError(response)
         expect(response.status).toBe(401)
@@ -44,9 +42,7 @@ describe('GET /api/wishlist', () => {
         const { user } = await createUser({ role: 'admin' })
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/wishlist')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/wishlist').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(403)
@@ -57,9 +53,7 @@ describe('GET /api/wishlist', () => {
         const { user } = await createUser()
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/wishlist')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/wishlist').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -75,9 +69,7 @@ describe('GET /api/wishlist', () => {
         user.wishlist = [product._id]
         await user.save()
 
-        const response = await api
-            .get('/api/wishlist')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/wishlist').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -86,4 +78,3 @@ describe('GET /api/wishlist', () => {
         expect(String(response.body[0])).toBe(String(product._id))
     })
 })
-

@@ -1,4 +1,14 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb, dropDatabase, seedOrder } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+    seedOrder,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -81,4 +91,3 @@ describe('PATCH /api/orders/:orderId/cancel', () => {
         expect(response.body.message).toBe('Order cancelled')
     })
 })
-

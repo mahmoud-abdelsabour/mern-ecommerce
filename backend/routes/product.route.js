@@ -1,9 +1,9 @@
+const express = require('express')
 const productController = require('../controllers/product.controller')
 const reviewController = require('../controllers/review.controller')
 const { asyncWrapper, auth, validate, role } = require('../utils/middleware/index')
 const reviewValidator = require('../validators/review.validator')
-const express = require('express')
-//api/products
+// api/products
 const router = express.Router()
 
 /**
@@ -117,10 +117,7 @@ router.get('/:productId', asyncWrapper(productController.getProductById))
  *             schema:
  *               $ref: '#/components/schemas/ReviewsListResponse'
  */
-router.get(
-    '/:productId/reviews',
-    asyncWrapper(reviewController.getAllReviews)
-)
+router.get('/:productId/reviews', asyncWrapper(reviewController.getAllReviews))
 
 /**
  * @swagger
@@ -194,10 +191,6 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/ProductUserStatus'
  */
-router.get(
-    '/:productId/user-status',
-    auth,
-    asyncWrapper(productController.getProductUserStatus)
-)
+router.get('/:productId/user-status', auth, asyncWrapper(productController.getProductUserStatus))
 
 module.exports = router

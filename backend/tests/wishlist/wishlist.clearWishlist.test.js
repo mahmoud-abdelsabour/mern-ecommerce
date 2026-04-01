@@ -6,7 +6,7 @@ const {
     getAuthToken,
     logIfServerError,
     closeDb,
-    dropDatabase
+    dropDatabase,
 } = require('../helper')
 
 beforeAll(async () => {
@@ -44,9 +44,7 @@ describe('DELETE /api/wishlist', () => {
         const { user } = await createUser({ role: 'admin' })
         const token = getAuthToken(user)
 
-        const response = await api
-            .delete('/api/wishlist')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.delete('/api/wishlist').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(403)
@@ -61,9 +59,7 @@ describe('DELETE /api/wishlist', () => {
         user.wishlist = [product._id]
         await user.save()
 
-        const response = await api
-            .delete('/api/wishlist')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.delete('/api/wishlist').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -75,9 +71,7 @@ describe('DELETE /api/wishlist', () => {
         const { user } = await createUser()
         const token = getAuthToken(user)
 
-        const response = await api
-            .delete('/api/wishlist')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.delete('/api/wishlist').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -85,4 +79,3 @@ describe('DELETE /api/wishlist', () => {
         expect(response.body.length).toBe(0)
     })
 })
-

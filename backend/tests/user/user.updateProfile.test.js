@@ -1,4 +1,12 @@
-const { api, waitForDb, createUser, getAuthToken, logIfServerError, closeDb,dropDatabase  } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -80,4 +88,3 @@ describe('PATCH /api/users/me/update-profile', () => {
         expect(response.body.tokenVersion).toBe(oldTokenVersion + 1)
     })
 })
-

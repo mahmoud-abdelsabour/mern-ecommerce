@@ -6,7 +6,7 @@ const {
     getAuthToken,
     logIfServerError,
     closeDb,
-    dropDatabase
+    dropDatabase,
 } = require('../helper')
 
 beforeAll(async () => {
@@ -117,4 +117,3 @@ describe('POST /api/wishlist/products/:productId', () => {
         expect(response.body.message).toBe('product already exists')
     })
 })
-

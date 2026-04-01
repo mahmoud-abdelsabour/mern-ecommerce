@@ -1,11 +1,12 @@
-﻿const Brand = require('../models/brand.model')
-const Product = require('../models/product.model')
 const slugify = require('slugify')
+const Brand = require('../models/brand.model')
+const Product = require('../models/product.model')
 const { pickAllowedFields } = require('../utils/request/pick-fields.util')
 
-const getAllBrands = async (data) => {
+const getAllBrands = async data => {
     try {
-        const { page = 1,
+        const {
+            page = 1,
             limit = 10,
             includeDeleted,
             onlyDeleted,
@@ -13,7 +14,7 @@ const getAllBrands = async (data) => {
             hasProducts,
             minProducts,
             maxProducts,
-            sort={ createdAt: -1 }
+            sort = { createdAt: -1 },
         } = data
 
         const pageNumber = Math.max(Number(page) || 1, 1)
@@ -64,19 +65,19 @@ const getAllBrands = async (data) => {
                     let: { brandId: '$_id' },
                     pipeline: [
                         { $match: { $expr: { $eq: ['$brand', '$$brandId'] } } },
-                        { $count: 'count' }
+                        { $count: 'count' },
                     ],
-                    as: 'productsCountArr'
-                }
+                    as: 'productsCountArr',
+                },
             },
             {
                 $addFields: {
                     productsCount: {
-                        $ifNull: [{ $arrayElemAt: ['$productsCountArr.count', 0] }, 0]
-                    }
-                }
+                        $ifNull: [{ $arrayElemAt: ['$productsCountArr.count', 0] }, 0],
+                    },
+                },
             },
-            { $project: { productsCountArr: 0 } }
+            { $project: { productsCountArr: 0 } },
         ]
 
         if (hasProducts === 'true' || hasProducts === true) {
@@ -96,13 +97,9 @@ const getAllBrands = async (data) => {
 
         pipeline.push({
             $facet: {
-                data: [
-                    { $sort: sanitizedSort },
-                    { $skip: skip },
-                    { $limit: pageSize }
-                ],
-                total: [{ $count: 'totalBrands' }]
-            }
+                data: [{ $sort: sanitizedSort }, { $skip: skip }, { $limit: pageSize }],
+                total: [{ $count: 'totalBrands' }],
+            },
         })
 
         const result = await Brand.aggregate(pipeline)
@@ -116,8 +113,8 @@ const getAllBrands = async (data) => {
                 totalPages: Math.ceil(totalBrands / pageSize),
                 currentPage: pageNumber,
                 limit: pageSize,
-                hasMore: skip + brands.length < totalBrands
-            }
+                hasMore: skip + brands.length < totalBrands,
+            },
         }
     } catch (error) {
         throw error
@@ -135,14 +132,14 @@ const getBrandById = async ({ brandId }) => {
 
         return {
             ...brand.toJSON(),
-            productsCount
+            productsCount,
         }
     } catch (error) {
         throw error
     }
 }
 
-const createBrand = async (data) => {
+const createBrand = async data => {
     try {
         const { name, logo } = data
 
@@ -151,7 +148,7 @@ const createBrand = async (data) => {
         const brand = new Brand({
             name,
             slug,
-            logo
+            logo,
         })
 
         const savedBrand = await brand.save()
@@ -166,18 +163,18 @@ const updateBrand = async ({ brandId, updateData }) => {
         const updateOps = await pickAllowedFields({
             allowedFields: ['name', 'logo'],
             requestFields: updateData,
-            user: null
+            user: null,
         })
 
         if (updateOps.$set.name) {
             updateOps.$set.slug = slugify(updateOps.$set.name, { lower: true, strict: true })
         }
 
-        const updatedBrand = await Brand.findByIdAndUpdate(
-            brandId,
-            updateOps,
-            { new: true, runValidators: true, context: 'query' }
-        )
+        const updatedBrand = await Brand.findByIdAndUpdate(brandId, updateOps, {
+            new: true,
+            runValidators: true,
+            context: 'query',
+        })
 
         if (!updatedBrand) {
             throw Object.assign(new Error('brand not found'), { statusCode: 404 })
@@ -194,7 +191,7 @@ const updateBrand = async ({ brandId, updateData }) => {
 const deleteBrand = async ({ brandId }) => {
     try {
         const hasProducts = await Product.exists({ brand: brandId })
-        if(hasProducts){
+        if (hasProducts) {
             throw new Error('Brand has products, cannot delete')
         }
 
@@ -232,12 +229,11 @@ const restoreBrand = async ({ brandId }) => {
     }
 }
 
-
 module.exports = {
     createBrand,
     deleteBrand,
     restoreBrand,
     getAllBrands,
     getBrandById,
-    updateBrand
+    updateBrand,
 }

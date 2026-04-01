@@ -6,7 +6,7 @@ const {
     getAuthToken,
     logIfServerError,
     closeDb,
-    dropDatabase
+    dropDatabase,
 } = require('../../helper')
 const Brand = require('../../../models/brand.model')
 
@@ -100,5 +100,3 @@ describe('PATCH /api/admin/brands/:brandId/restore', () => {
         expect(response.body.isDeleted).toBe(false)
     })
 })
-
-

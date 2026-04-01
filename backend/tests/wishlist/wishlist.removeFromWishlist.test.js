@@ -6,7 +6,7 @@ const {
     getAuthToken,
     logIfServerError,
     closeDb,
-    dropDatabase
+    dropDatabase,
 } = require('../helper')
 
 beforeAll(async () => {
@@ -103,4 +103,3 @@ describe('DELETE /api/wishlist/products/:productId', () => {
         expect(response.body.length).toBe(0)
     })
 })
-

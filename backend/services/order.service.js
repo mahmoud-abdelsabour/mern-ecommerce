@@ -1,6 +1,6 @@
+const mongoose = require('mongoose')
 const Order = require('../models/order.model')
 const Product = require('../models/product.model')
-const mongoose = require('mongoose')
 
 //  expected data (Request Body)
 //  {
@@ -9,13 +9,11 @@ const mongoose = require('mongoose')
 //      ]
 //  }
 
-const placeOrder = async (data) => {
-
+const placeOrder = async data => {
     const session = await mongoose.startSession()
     session.startTransaction()
 
     try {
-
         const { products, shippingInfo, user } = data
         const userId = user.id
 
@@ -23,19 +21,18 @@ const placeOrder = async (data) => {
         const orderProducts = []
 
         for (const item of products) {
-
             const product = await Product.findOneAndUpdate(
                 {
                     _id: item.product,
-                    stock: { $gte: item.quantity }
+                    stock: { $gte: item.quantity },
                 },
                 {
-                    $inc: { stock: -item.quantity }
+                    $inc: { stock: -item.quantity },
                 },
                 { new: true, session }
             )
 
-            if(!product) {
+            if (!product) {
                 throw Object.assign(new Error('not enough stock'), { statusCode: 409 })
             }
 
@@ -47,7 +44,7 @@ const placeOrder = async (data) => {
                 description: product.description,
                 photos: product.photos,
                 brand: product.brand,
-                category: product.category
+                category: product.category,
             })
 
             totalPrice += product.price * item.quantity
@@ -57,7 +54,7 @@ const placeOrder = async (data) => {
             products: orderProducts,
             userId,
             shippingInfo,
-            totalPrice
+            totalPrice,
         })
 
         await order.save({ session })
@@ -68,33 +65,26 @@ const placeOrder = async (data) => {
         session.endSession()
 
         return order
-
     } catch (error) {
-
         await session.abortTransaction()
         session.endSession()
         throw error
-
     }
 }
 
-const getUserOrders = async (data) => {
+const getUserOrders = async data => {
     try {
         const { userId, page, limit } = data
-        
+
         const pageNumber = Math.max(Number(page) || 1, 1)
         const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
         const skip = (pageNumber - 1) * pageSize
 
-
         const [orders, totalOrders] = await Promise.all([
-            Order.find({ userId })
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit),
+            Order.find({ userId }).sort({ createdAt: -1 }).skip(skip).limit(limit),
 
-            Order.countDocuments({userId})
-        ]) 
+            Order.countDocuments({ userId }),
+        ])
 
         const totalPages = Math.ceil(totalOrders / limit)
 
@@ -105,18 +95,18 @@ const getUserOrders = async (data) => {
                 totalPages,
                 currentPage: page,
                 limit,
-                hasMore: skip + orders.length < totalOrders
-            }
+                hasMore: skip + orders.length < totalOrders,
+            },
         }
     } catch (error) {
         throw error
     }
 }
 
-const getOrderById = async (data) => {
+const getOrderById = async data => {
     try {
         const { order } = data
-        if(!order){
+        if (!order) {
             throw Object.assign(new Error('order not found'), { statusCode: 404 })
         }
         return order
@@ -125,7 +115,7 @@ const getOrderById = async (data) => {
     }
 }
 
-const cancelOrder = async (data) => {
+const cancelOrder = async data => {
     try {
         const { orderId } = data
 
@@ -145,27 +135,32 @@ const cancelOrder = async (data) => {
     }
 }
 
-const requestReturn = async (data) => {
+const requestReturn = async data => {
     try {
         const { returnedItems, order } = data
 
         if (!order) throw Object.assign(new Error('order not found'), { statusCode: 404 })
-            
+
         if (order.deliveryStatus !== 'delivered') {
-            throw Object.assign(new Error('order not delivered yet or already requested a return'), { statusCode: 400 })
+            throw Object.assign(
+                new Error('order not delivered yet or already requested a return'),
+                { statusCode: 400 }
+            )
         }
 
-        const orderProductsMap = new Map(
-            order.products.map(p => [String(p.product), p.quantity])
-        )
+        const orderProductsMap = new Map(order.products.map(p => [String(p.product), p.quantity]))
 
         for (const item of returnedItems) {
             const boughtQty = orderProductsMap.get(String(item.product))
-            if (!boughtQty) throw Object.assign(new Error('product not in order'), { statusCode: 400 })
-            if (item.quantity > boughtQty) throw Object.assign(new Error('return quantity exceeds purchased quantity'), { statusCode: 400 })
+            if (!boughtQty)
+                throw Object.assign(new Error('product not in order'), { statusCode: 400 })
+            if (item.quantity > boughtQty)
+                throw Object.assign(new Error('return quantity exceeds purchased quantity'), {
+                    statusCode: 400,
+                })
         }
 
-        const deliveredAt = order.deliveredAt
+        const { deliveredAt } = order
         if (!deliveredAt) {
             throw Object.assign(new Error('missing delivery date'), { statusCode: 400 })
         }
@@ -178,7 +173,7 @@ const requestReturn = async (data) => {
         order.deliveryStatus = 'return requested'
         order.returnInfo = {
             returnedItems,
-            returnDate: null
+            returnDate: null,
         }
 
         await order.save()
@@ -188,7 +183,7 @@ const requestReturn = async (data) => {
     }
 }
 
-const getAllOrders = async (data) => {
+const getAllOrders = async data => {
     try {
         const {
             page = 1,
@@ -199,7 +194,7 @@ const getAllOrders = async (data) => {
             maxTotal,
             startDate,
             endDate,
-            sort = { createdAt: -1 }
+            sort = { createdAt: -1 },
         } = data
 
         const pageNumber = Math.max(Number(page) || 1, 1)
@@ -244,14 +239,14 @@ const getAllOrders = async (data) => {
                         createdAt: 1,
                         deliveryStatus: 1,
                         totalPrice: 1,
-                        firstPhoto: { $arrayElemAt: ['$products.photos', 0] }
-                    }
+                        firstPhoto: { $arrayElemAt: ['$products.photos', 0] },
+                    },
                 },
                 { $sort: sortObj },
                 { $skip: skip },
-                { $limit: pageSize }
+                { $limit: pageSize },
             ]),
-            Order.countDocuments(filter)
+            Order.countDocuments(filter),
         ])
 
         return {
@@ -261,8 +256,8 @@ const getAllOrders = async (data) => {
                 totalPages: Math.ceil(totalOrders / pageSize),
                 currentPage: pageNumber,
                 limit: pageSize,
-                hasMore: skip + orders.length < totalOrders
-            }
+                hasMore: skip + orders.length < totalOrders,
+            },
         }
     } catch (error) {
         throw error
@@ -277,15 +272,14 @@ const updateOrderDeliveryStatus = async ({ orderId, deliveryStatus }) => {
         }
 
         const allowedTransitions = {
-            pending: ['shipped'],           // admin can ship
-            shipped: ['delivered'],         // admin can deliver
-            delivered: [],                  // admin cannot initiate return
+            pending: ['shipped'], // admin can ship
+            shipped: ['delivered'], // admin can deliver
+            delivered: [], // admin cannot initiate return
             'return requested': ['returned'], // admin can confirm return
-            returned: ['refunded'],         // admin can refund
+            returned: ['refunded'], // admin can refund
             refunded: [],
-            cancelled: []                   // user-only
+            cancelled: [], // user-only
         }
-
 
         const current = order.deliveryStatus
         const allowedNext = allowedTransitions[current] || []
@@ -319,7 +313,6 @@ const updateOrderDeliveryStatus = async ({ orderId, deliveryStatus }) => {
     }
 }
 
-
 module.exports = {
     placeOrder,
     getUserOrders,
@@ -328,5 +321,5 @@ module.exports = {
     requestReturn,
     returnRequest: requestReturn,
     getAllOrders,
-    updateOrderDeliveryStatus
+    updateOrderDeliveryStatus,
 }

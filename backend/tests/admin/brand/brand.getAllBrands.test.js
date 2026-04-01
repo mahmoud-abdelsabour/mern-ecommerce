@@ -7,7 +7,7 @@ const {
     getAuthToken,
     logIfServerError,
     closeDb,
-    dropDatabase
+    dropDatabase,
 } = require('../../helper')
 const Brand = require('../../../models/brand.model')
 
@@ -46,9 +46,7 @@ describe('GET /api/admin/brands', () => {
         const { user } = await createUser()
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/admin/brands')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/admin/brands').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(403)
@@ -63,9 +61,7 @@ describe('GET /api/admin/brands', () => {
         const deleted = await createBrand({ name: 'Deleted', slug: 'deleted' })
         await Brand.findByIdAndUpdate(deleted._id, { $set: { isDeleted: true } })
 
-        const response = await api
-            .get('/api/admin/brands')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/admin/brands').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -251,5 +247,3 @@ describe('GET /api/admin/brands', () => {
         expect(response.body.brands[1].name).toBe('B')
     })
 })
-
-

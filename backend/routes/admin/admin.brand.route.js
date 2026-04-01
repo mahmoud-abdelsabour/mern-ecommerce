@@ -2,7 +2,7 @@ const express = require('express')
 const brandController = require('../../controllers/brand.controller')
 const brandValidator = require('../../validators/brand.validator')
 const { asyncWrapper, validate, auth, role } = require('../../utils/middleware/index')
-//api/admin/brands
+// api/admin/brands
 const router = express.Router()
 
 /**
@@ -90,12 +90,7 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/BrandsListResponse'
  */
-router.get(
-    '/',
-    auth,
-    role('admin'),
-    asyncWrapper(brandController.getAllBrands)
-)
+router.get('/', auth, role('admin'), asyncWrapper(brandController.getAllBrands))
 
 /**
  * @swagger
@@ -128,12 +123,7 @@ router.get(
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get(
-    '/:brandId',
-    auth,
-    role('admin'),
-    asyncWrapper(brandController.getBrandById)
-)
+router.get('/:brandId', auth, role('admin'), asyncWrapper(brandController.getBrandById))
 
 /**
  * @swagger
@@ -207,12 +197,7 @@ router.patch(
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.delete(
-    '/:brandId',
-    auth,
-    role('admin'),
-    asyncWrapper(brandController.deleteBrand)
-)
+router.delete('/:brandId', auth, role('admin'), asyncWrapper(brandController.deleteBrand))
 
 /**
  * @swagger
@@ -241,11 +226,6 @@ router.delete(
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch(
-    '/:brandId/restore',
-    auth,
-    role('admin'),
-    asyncWrapper(brandController.restoreBrand)
-)
+router.patch('/:brandId/restore', auth, role('admin'), asyncWrapper(brandController.restoreBrand))
 
 module.exports = router

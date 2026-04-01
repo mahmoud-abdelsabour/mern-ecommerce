@@ -23,7 +23,7 @@ describe('PATCH /api/auth/users/:id/update-password', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 currentPassword: payload.password,
-                newPassword: 'Aa1@bbbb'
+                newPassword: 'Aa1@bbbb',
             })
             .expect(200)
 
@@ -41,7 +41,7 @@ describe('PATCH /api/auth/users/:id/update-password', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 currentPassword: payload.password,
-                newPassword: 'Aa1@bbbb'
+                newPassword: 'Aa1@bbbb',
             })
             .expect(200)
 
@@ -58,7 +58,7 @@ describe('PATCH /api/auth/users/:id/update-password', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 currentPassword: 'WrongPass1@',
-                newPassword: 'Aa1@bbbb'
+                newPassword: 'Aa1@bbbb',
             })
             .expect(401)
 
@@ -74,7 +74,7 @@ describe('PATCH /api/auth/users/:id/update-password', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 currentPassword: payload.password,
-                newPassword: 'password'
+                newPassword: 'password',
             })
             .expect(400)
 
@@ -88,7 +88,7 @@ describe('PATCH /api/auth/users/:id/update-password', () => {
             .patch(`/api/auth/users/${user.id}/update-password`)
             .send({
                 currentPassword: payload.password,
-                newPassword: 'Aa1@bbbb'
+                newPassword: 'Aa1@bbbb',
             })
             .expect(401)
 
@@ -105,7 +105,7 @@ describe('PATCH /api/auth/users/:id/update-password', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 currentPassword: payload.password,
-                newPassword: 'Aa1@bbbb'
+                newPassword: 'Aa1@bbbb',
             })
             .expect(403)
 

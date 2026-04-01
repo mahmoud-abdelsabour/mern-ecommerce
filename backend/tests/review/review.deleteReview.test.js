@@ -1,5 +1,15 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb,dropDatabase, createReview } = require('../helper')
 const mongooseLib = require('mongoose')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+    createReview,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -15,7 +25,9 @@ afterAll(async () => {
 
 describe('DELETE /api/reviews/:reviewId', () => {
     it('returns 401 when no token', async () => {
-        const response = await api.delete(`/api/reviews/${new mongooseLib.Types.ObjectId().toString()}`)
+        const response = await api.delete(
+            `/api/reviews/${new mongooseLib.Types.ObjectId().toString()}`
+        )
         logIfServerError(response)
 
         expect(response.status).toBe(401)
@@ -82,4 +94,3 @@ describe('DELETE /api/reviews/:reviewId', () => {
         expect(response.body.message).toBe('review deleted')
     })
 })
-

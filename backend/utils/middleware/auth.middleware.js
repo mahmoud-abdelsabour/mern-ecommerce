@@ -4,9 +4,8 @@ const User = require('../../models/user.model')
 
 const auth = async (request, response, next) => {
     const authHeader = request.get('authorization')
-    const token = authHeader && authHeader.startsWith('Bearer ')
-        ? authHeader.replace('Bearer ', '')
-        : null
+    const token =
+        authHeader && authHeader.startsWith('Bearer ') ? authHeader.replace('Bearer ', '') : null
 
     if (!token) {
         return response.status(401).json({ error: 'token missing' })
@@ -14,7 +13,7 @@ const auth = async (request, response, next) => {
 
     try {
         const decodedToken = jwt.verify(token, config.JWT_SECRET)
-        if (!decodedToken.id ) {
+        if (!decodedToken.id) {
             return response.status(401).json({ error: 'token invalid' })
         }
 
@@ -33,5 +32,5 @@ const auth = async (request, response, next) => {
 }
 
 module.exports = {
-    auth
+    auth,
 }

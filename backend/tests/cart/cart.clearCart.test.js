@@ -1,4 +1,13 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb, dropDatabase } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -25,9 +34,7 @@ describe('DELETE /api/cart', () => {
         const { user } = await createUser({ role: 'admin' })
         const token = getAuthToken(user)
 
-        const response = await api
-            .delete('/api/cart')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.delete('/api/cart').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(403)
@@ -41,9 +48,7 @@ describe('DELETE /api/cart', () => {
         await user.save()
         const token = getAuthToken(user)
 
-        const response = await api
-            .delete('/api/cart')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.delete('/api/cart').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -51,4 +56,3 @@ describe('DELETE /api/cart', () => {
         expect(response.body.length).toBe(0)
     })
 })
-

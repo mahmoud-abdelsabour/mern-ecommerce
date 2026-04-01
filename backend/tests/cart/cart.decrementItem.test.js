@@ -1,5 +1,14 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb, dropDatabase } = require('../helper')
 const mongooseLib = require('mongoose')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -101,4 +110,3 @@ describe('PATCH /api/cart/products/:productId', () => {
         expect(response.body.length).toBe(0)
     })
 })
-

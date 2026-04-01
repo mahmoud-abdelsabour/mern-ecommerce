@@ -7,7 +7,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 
 beforeAll(async () => {
@@ -101,5 +101,3 @@ describe('GET /api/admin/brands/:brandId', () => {
         expect(response.body.productsCount).toBe(1)
     })
 })
-
-

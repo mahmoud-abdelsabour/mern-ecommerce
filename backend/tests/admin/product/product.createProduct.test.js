@@ -7,7 +7,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 
 beforeAll(async () => {
@@ -86,7 +86,7 @@ describe('POST /api/admin/products', () => {
                 description: 'This is a valid long description for the product.',
                 category: category._id,
                 brand: brand._id,
-                stock: 5
+                stock: 5,
             })
 
         logIfServerError(response)
@@ -110,7 +110,7 @@ describe('POST /api/admin/products', () => {
                 description: 'This is a valid long description for the product.',
                 category: category._id,
                 brand: brand._id,
-                stock: 5
+                stock: 5,
             })
 
         logIfServerError(response)
@@ -134,7 +134,7 @@ describe('POST /api/admin/products', () => {
                 description: 'This is a valid long description for the product.',
                 category: 'invalid-id',
                 brand: 'invalid-id',
-                stock: 5
+                stock: 5,
             })
 
         logIfServerError(response)

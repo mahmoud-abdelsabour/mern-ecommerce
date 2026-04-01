@@ -1,51 +1,40 @@
 const User = require('../models/user.model')
-const {pickAllowedFields} = require('../utils/request/pick-fields.util')
+const { pickAllowedFields } = require('../utils/request/pick-fields.util')
 
 const userProfileAllowedFields = [
-    "firstName",
-    "lastName",
-    "username",
-    "email",
-    "phone",
-    "profilePhoto"
+    'firstName',
+    'lastName',
+    'username',
+    'email',
+    'phone',
+    'profilePhoto',
 ]
 
 const addressAllowedFields = [
-    "address_name",
-    "country",
-    "city",
-    "street",
-    "building",
-    "postalcode",
-    "special_mark",
-    "floor"
+    'address_name',
+    'country',
+    'city',
+    'street',
+    'building',
+    'postalcode',
+    'special_mark',
+    'floor',
 ]
 
-const updateProfile = async (data) => {    
+const updateProfile = async data => {
     try {
-        const { fields, user } = data    
-        const updateOps = await pickAllowedFields({ allowedFields: userProfileAllowedFields, requestFields: fields, user })
+        const { fields, user } = data
+        const updateOps = await pickAllowedFields({
+            allowedFields: userProfileAllowedFields,
+            requestFields: fields,
+            user,
+        })
 
-        const updatedUser = await User.findByIdAndUpdate(
-            user.id,
-            updateOps,
-            { new: true, runValidators: true, context: "query" }
-        ).select("-passwordHash");
-        
-        if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
-        return updatedUser
-    } catch (error) {
-        throw error
-    }
-}
-
-const createAddress = async (data) => {
-    try {
-        const updatedUser = await User.findByIdAndUpdate(
-          data.user.id,
-          { $push: { addresses: data.newAddress } },
-          { new: true, runValidators: true, context: "query" }
-        ).select("-passwordHash");
+        const updatedUser = await User.findByIdAndUpdate(user.id, updateOps, {
+            new: true,
+            runValidators: true,
+            context: 'query',
+        }).select('-passwordHash')
 
         if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
         return updatedUser
@@ -54,10 +43,29 @@ const createAddress = async (data) => {
     }
 }
 
-const updateAddress = async (data) => {
+const createAddress = async data => {
     try {
-        const {fields} = data
-        const updateOps = await pickAllowedFields({ allowedFields: addressAllowedFields, requestFields: fields, user: data.user })
+        const updatedUser = await User.findByIdAndUpdate(
+            data.user.id,
+            { $push: { addresses: data.newAddress } },
+            { new: true, runValidators: true, context: 'query' }
+        ).select('-passwordHash')
+
+        if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
+        return updatedUser
+    } catch (error) {
+        throw error
+    }
+}
+
+const updateAddress = async data => {
+    try {
+        const { fields } = data
+        const updateOps = await pickAllowedFields({
+            allowedFields: addressAllowedFields,
+            requestFields: fields,
+            user: data.user,
+        })
 
         const addressSet = {}
         for (const [key, value] of Object.entries(updateOps.$set || {})) {
@@ -65,10 +73,10 @@ const updateAddress = async (data) => {
         }
 
         const updatedUser = await User.findOneAndUpdate(
-          {_id: data.user.id, "addresses._id": data.addressId},
-          { $set: addressSet },
-          { new: true, runValidators: true, context: "query" }
-        ).select("-passwordHash")
+            { _id: data.user.id, 'addresses._id': data.addressId },
+            { $set: addressSet },
+            { new: true, runValidators: true, context: 'query' }
+        ).select('-passwordHash')
 
         if (!updatedUser) throw Object.assign(new Error('user not found'), { statusCode: 404 })
         return updatedUser
@@ -77,23 +85,25 @@ const updateAddress = async (data) => {
     }
 }
 
-const getUser = async (data) => {
+const getUser = async data => {
     try {
-        let { user, userId } = data
+        const { userId } = data
+        let { user } = data
 
-        if(userId){
-            user = await User.findById(userId).select('firstName lastName username phone email profilePhoto role createdAt')
-            if(!user) throw Object.assign(new Error("user not found"), {statusCode: 404})
-        }
-        else if(!user) throw Object.assign(new Error("user not found"), {statusCode: 404})
-        
+        if (userId) {
+            user = await User.findById(userId).select(
+                'firstName lastName username phone email profilePhoto role createdAt'
+            )
+            if (!user) throw Object.assign(new Error('user not found'), { statusCode: 404 })
+        } else if (!user) throw Object.assign(new Error('user not found'), { statusCode: 404 })
+
         return user
     } catch (error) {
         throw error
     }
 }
 
-const getAllUsers = async (data) => {
+const getAllUsers = async data => {
     try {
         const {
             page = 1,
@@ -104,10 +114,10 @@ const getAllUsers = async (data) => {
             search,
             startDate,
             endDate,
-            hasOrders,          // true / false
-            minOrders,          // number
-            maxOrders,          // number
-            sortOrders          // 'high' | 'low' (optional)
+            hasOrders, // true / false
+            minOrders, // number
+            maxOrders, // number
+            sortOrders, // 'high' | 'low' (optional)
         } = data
 
         const pageNumber = Math.max(Number(page) || 1, 1)
@@ -148,18 +158,18 @@ const getAllUsers = async (data) => {
                         {
                             $group: {
                                 _id: '$deliveryStatus',
-                                count: { $sum: 1 }
-                            }
-                        }
+                                count: { $sum: 1 },
+                            },
+                        },
                     ],
-                    as: 'ordersByStatus'
-                }
+                    as: 'ordersByStatus',
+                },
             },
 
             {
                 $addFields: {
                     totalOrders: {
-                        $sum: '$ordersByStatus.count'
+                        $sum: '$ordersByStatus.count',
                     },
                     activeOrders: {
                         $sum: {
@@ -168,13 +178,13 @@ const getAllUsers = async (data) => {
                                     $filter: {
                                         input: '$ordersByStatus',
                                         as: 's',
-                                        cond: { $in: ['$$s._id', ['pending', 'shipped']] }
-                                    }
+                                        cond: { $in: ['$$s._id', ['pending', 'shipped']] },
+                                    },
                                 },
                                 as: 'x',
-                                in: '$$x.count'
-                            }
-                        }
+                                in: '$$x.count',
+                            },
+                        },
                     },
                     deliveredOrders: {
                         $sum: {
@@ -183,13 +193,13 @@ const getAllUsers = async (data) => {
                                     $filter: {
                                         input: '$ordersByStatus',
                                         as: 's',
-                                        cond: { $eq: ['$$s._id', 'delivered'] }
-                                    }
+                                        cond: { $eq: ['$$s._id', 'delivered'] },
+                                    },
                                 },
                                 as: 'x',
-                                in: '$$x.count'
-                            }
-                        }
+                                in: '$$x.count',
+                            },
+                        },
                     },
                     cancelledOrders: {
                         $sum: {
@@ -198,13 +208,13 @@ const getAllUsers = async (data) => {
                                     $filter: {
                                         input: '$ordersByStatus',
                                         as: 's',
-                                        cond: { $eq: ['$$s._id', 'cancelled'] }
-                                    }
+                                        cond: { $eq: ['$$s._id', 'cancelled'] },
+                                    },
                                 },
                                 as: 'x',
-                                in: '$$x.count'
-                            }
-                        }
+                                in: '$$x.count',
+                            },
+                        },
                     },
                     activeReturnRequests: {
                         $sum: {
@@ -213,13 +223,13 @@ const getAllUsers = async (data) => {
                                     $filter: {
                                         input: '$ordersByStatus',
                                         as: 's',
-                                        cond: { $eq: ['$$s._id', 'return requested'] }
-                                    }
+                                        cond: { $eq: ['$$s._id', 'return requested'] },
+                                    },
                                 },
                                 as: 'x',
-                                in: '$$x.count'
-                            }
-                        }
+                                in: '$$x.count',
+                            },
+                        },
                     },
                     returnedOrders: {
                         $sum: {
@@ -228,13 +238,13 @@ const getAllUsers = async (data) => {
                                     $filter: {
                                         input: '$ordersByStatus',
                                         as: 's',
-                                        cond: { $eq: ['$$s._id', 'returned'] }
-                                    }
+                                        cond: { $eq: ['$$s._id', 'returned'] },
+                                    },
                                 },
                                 as: 'x',
-                                in: '$$x.count'
-                            }
-                        }
+                                in: '$$x.count',
+                            },
+                        },
                     },
                     refundedOrders: {
                         $sum: {
@@ -243,18 +253,29 @@ const getAllUsers = async (data) => {
                                     $filter: {
                                         input: '$ordersByStatus',
                                         as: 's',
-                                        cond: { $eq: ['$$s._id', 'refunded'] }
-                                    }
+                                        cond: { $eq: ['$$s._id', 'refunded'] },
+                                    },
                                 },
                                 as: 'x',
-                                in: '$$x.count'
-                            }
-                        }
-                    }
-                }
+                                in: '$$x.count',
+                            },
+                        },
+                    },
+                },
             },
 
-            { $project: { passwordHash: 0, ordersByStatus: 0, email: 0, phone: 0, addresses: 0, cart: 0, wishlist: 0, tokenVersion: 0 } }
+            {
+                $project: {
+                    passwordHash: 0,
+                    ordersByStatus: 0,
+                    email: 0,
+                    phone: 0,
+                    addresses: 0,
+                    cart: 0,
+                    wishlist: 0,
+                    tokenVersion: 0,
+                },
+            },
         ]
 
         if (hasOrders === 'true' || hasOrders === true) {
@@ -282,12 +303,9 @@ const getAllUsers = async (data) => {
 
         pipeline.push({
             $facet: {
-                data: [
-                    { $skip: skip },
-                    { $limit: pageSize }
-                ],
-                total: [{ $count: 'totalUsers' }]
-            }
+                data: [{ $skip: skip }, { $limit: pageSize }],
+                total: [{ $count: 'totalUsers' }],
+            },
         })
 
         const result = await User.aggregate(pipeline)
@@ -301,8 +319,8 @@ const getAllUsers = async (data) => {
                 totalPages: Math.ceil(totalUsers / pageSize),
                 currentPage: pageNumber,
                 limit: pageSize,
-                hasMore: skip + users.length < totalUsers
-            }
+                hasMore: skip + users.length < totalUsers,
+            },
         }
     } catch (error) {
         throw error
@@ -330,8 +348,6 @@ const makeAdmin = async ({ userId }) => {
     }
 }
 
-
-
 const deleteUser = async ({ user }) => {
     user.isDeleted = true
     user.deletedAt = new Date()
@@ -358,5 +374,5 @@ module.exports = {
     updateAddress,
     getUser,
     makeAdmin,
-    deleteUser
+    deleteUser,
 }

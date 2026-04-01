@@ -2,10 +2,10 @@ const express = require('express')
 const productController = require('../../controllers/product.controller')
 const productValidator = require('../../validators/product.validator')
 const { asyncWrapper, validate, auth, role } = require('../../utils/middleware')
-//api/admin/products
+// api/admin/products
 const router = express.Router()
 
-//create product
+// create product
 /**
  * @swagger
  * /api/admin/products:
@@ -53,7 +53,7 @@ router.post(
     asyncWrapper(productController.createProduct)
 )
 
-//get all products
+// get all products
 /**
  * @swagger
  * /api/admin/products:
@@ -104,14 +104,9 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/ProductsListResponse'
  */
-router.get(
-    '/',
-    auth,
-    role('admin'),
-    asyncWrapper(productController.getProducts)
-)
+router.get('/', auth, role('admin'), asyncWrapper(productController.getProducts))
 
-//get product by id
+// get product by id
 /**
  * @swagger
  * /api/admin/products/{productId}:
@@ -139,14 +134,9 @@ router.get(
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get(
-    '/:productId',
-    auth,
-    role('admin'),
-    asyncWrapper(productController.getProductById)
-)
+router.get('/:productId', auth, role('admin'), asyncWrapper(productController.getProductById))
 
-//update product
+// update product
 /**
  * @swagger
  * /api/admin/products/{productId}:
@@ -199,7 +189,7 @@ router.patch(
     asyncWrapper(productController.updateProduct)
 )
 
-//delete product
+// delete product
 /**
  * @swagger
  * /api/admin/products/{productId}:
@@ -227,14 +217,9 @@ router.patch(
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.delete(
-    '/:productId',
-    auth,
-    role('admin'),
-    asyncWrapper(productController.deleteProduct)
-)
+router.delete('/:productId', auth, role('admin'), asyncWrapper(productController.deleteProduct))
 
-//restore product
+// restore product
 /**
  * @swagger
  * /api/admin/products/{productId}/restore:

@@ -1,5 +1,13 @@
-const { api, waitForDb, createProduct, createReviewsForProduct, logIfServerError,closeDb,dropDatabase } = require('../helper')
 const mongooseLib = require('mongoose')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createReviewsForProduct,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -70,4 +78,3 @@ describe('GET /api/products/:productId/reviews', () => {
         expect(response.body.error).toBe('malformatted id')
     })
 })
-

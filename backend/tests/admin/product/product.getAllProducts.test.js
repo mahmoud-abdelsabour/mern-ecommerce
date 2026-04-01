@@ -8,7 +8,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 
 beforeAll(async () => {
@@ -113,7 +113,11 @@ describe('GET /api/admin/products', () => {
         const category = await createCategory({ name: 'Phones', slug: 'phones' })
 
         await createProduct({ name: 'iPhone', brand, category })
-        await createProduct({ name: 'Other', brand: await createBrand({ name: 'Samsung', slug: 'samsung' }), category })
+        await createProduct({
+            name: 'Other',
+            brand: await createBrand({ name: 'Samsung', slug: 'samsung' }),
+            category,
+        })
 
         const response = await api
             .get('/api/admin/products?brand=apple&category=phones')

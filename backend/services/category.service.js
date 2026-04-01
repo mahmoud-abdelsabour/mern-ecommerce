@@ -1,9 +1,9 @@
 // category.service.js
+const slugify = require('slugify')
 const Category = require('../models/category.model')
 const Product = require('../models/product.model')
-const slugify = require('slugify')
 
-const createCategory = async (data) => {
+const createCategory = async data => {
     try {
         const { name } = data
         const slug = slugify(name, { lower: true, strict: true })
@@ -42,9 +42,8 @@ const updateCategory = async ({ categoryId, updateData }) => {
 
 const deleteCategory = async ({ categoryId }) => {
     try {
-
         const hasProducts = await Product.exists({ category: categoryId })
-        if(hasProducts){
+        if (hasProducts) {
             throw new Error('Category has products, cannot delete')
         }
 
@@ -60,7 +59,7 @@ const deleteCategory = async ({ categoryId }) => {
     }
 }
 
-const getAllCategories = async (data) => {
+const getAllCategories = async data => {
     try {
         const { page = 1, limit = 10, search, hasProducts } = data
 
@@ -82,19 +81,19 @@ const getAllCategories = async (data) => {
                     let: { categoryId: '$_id' },
                     pipeline: [
                         { $match: { $expr: { $eq: ['$category', '$$categoryId'] } } },
-                        { $count: 'count' }
+                        { $count: 'count' },
                     ],
-                    as: 'productsCountArr'
-                }
+                    as: 'productsCountArr',
+                },
             },
             {
                 $addFields: {
                     productsCount: {
-                        $ifNull: [{ $arrayElemAt: ['$productsCountArr.count', 0] }, 0]
-                    }
-                }
+                        $ifNull: [{ $arrayElemAt: ['$productsCountArr.count', 0] }, 0],
+                    },
+                },
             },
-            { $project: { productsCountArr: 0 } }
+            { $project: { productsCountArr: 0 } },
         ]
 
         if (hasProducts === 'true' || hasProducts === true) {
@@ -105,13 +104,9 @@ const getAllCategories = async (data) => {
 
         pipeline.push({
             $facet: {
-                data: [
-                    { $sort: { createdAt: -1 } },
-                    { $skip: skip },
-                    { $limit: pageSize }
-                ],
-                total: [{ $count: 'totalCategories' }]
-            }
+                data: [{ $sort: { createdAt: -1 } }, { $skip: skip }, { $limit: pageSize }],
+                total: [{ $count: 'totalCategories' }],
+            },
         })
 
         const result = await Category.aggregate(pipeline)
@@ -125,8 +120,8 @@ const getAllCategories = async (data) => {
                 totalPages: Math.ceil(totalCategories / pageSize),
                 currentPage: pageNumber,
                 limit: pageSize,
-                hasMore: skip + categories.length < totalCategories
-            }
+                hasMore: skip + categories.length < totalCategories,
+            },
         }
     } catch (error) {
         throw error
@@ -137,5 +132,5 @@ module.exports = {
     createCategory,
     updateCategory,
     deleteCategory,
-    getAllCategories
+    getAllCategories,
 }

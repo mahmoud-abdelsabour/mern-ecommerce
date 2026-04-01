@@ -40,5 +40,5 @@ module.exports = {
     getBrandById,
     updateBrand,
     deleteBrand,
-    restoreBrand
+    restoreBrand,
 }

@@ -7,7 +7,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 const User = require('../../../models/user.model')
 
@@ -46,9 +46,7 @@ describe('GET /api/admin/users', () => {
         const { user } = await createUser()
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/admin/users')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/admin/users').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(403)
@@ -63,9 +61,7 @@ describe('GET /api/admin/users', () => {
         const deleted = await createUser()
         await User.findByIdAndUpdate(deleted.user._id, { $set: { isDeleted: true } })
 
-        const response = await api
-            .get('/api/admin/users')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/admin/users').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)

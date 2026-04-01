@@ -1,7 +1,7 @@
+const express = require('express')
 const wishlistController = require('../controllers/wishlist.controller')
 const { asyncWrapper, auth, role } = require('../utils/middleware/index')
-const express = require('express')
-//api/wishlist
+// api/wishlist
 const router = express.Router()
 
 // get wishlist
@@ -22,12 +22,7 @@ const router = express.Router()
  *               type: array
  *               items: { type: string }
  */
-router.get(
-    '/',
-    auth,
-    role('user'),
-    asyncWrapper(wishlistController.getWishlist)
-)
+router.get('/', auth, role('user'), asyncWrapper(wishlistController.getWishlist))
 
 // add to wishlist
 /**
@@ -125,11 +120,6 @@ router.delete(
  *               type: array
  *               items: { type: string }
  */
-router.delete(
-    '/',
-    auth,
-    role('user'),
-    asyncWrapper(wishlistController.clearWishlist)
-)
+router.delete('/', auth, role('user'), asyncWrapper(wishlistController.clearWishlist))
 
 module.exports = router

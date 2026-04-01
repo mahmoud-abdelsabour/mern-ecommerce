@@ -2,7 +2,7 @@ const express = require('express')
 const orderController = require('../../controllers/order.controller')
 const { asyncWrapper, auth, role, validate } = require('../../utils/middleware/index')
 const orderValidator = require('../../validators/order.validator')
-//api/admin/orders
+// api/admin/orders
 const router = express.Router()
 
 // get all orders
@@ -50,12 +50,7 @@ const router = express.Router()
  *             schema:
  *               $ref: '#/components/schemas/AdminOrdersListResponse'
  */
-router.get(
-    '/',
-    auth,
-    role('admin'),
-    asyncWrapper(orderController.getAllOrders)
-)
+router.get('/', auth, role('admin'), asyncWrapper(orderController.getAllOrders))
 
 // change the delivery status
 /**
@@ -110,7 +105,7 @@ router.patch(
     asyncWrapper(orderController.updateOrderDeliveryStatus)
 )
 
-//get user's orders
+// get user's orders
 /**
  * @swagger
  * /api/admin/orders/users/{userId}:

@@ -7,7 +7,7 @@ const {
     getAuthToken,
     logIfServerError,
     closeDb,
-    dropDatabase
+    dropDatabase,
 } = require('../../helper')
 const Brand = require('../../../models/brand.model')
 
@@ -118,5 +118,3 @@ describe('DELETE /api/admin/brands/:brandId', () => {
         expect(response.body.message).toBe('Brand has products, cannot delete')
     })
 })
-
-

@@ -7,7 +7,7 @@ const {
     logIfServerError,
     mongoose,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 
 beforeAll(async () => {
@@ -25,7 +25,9 @@ afterAll(async () => {
 describe('PATCH /api/admin/categories/:categoryId', () => {
     it('returns 401 when no token', async () => {
         const category = await createCategory({ name: 'Phones', slug: 'phones' })
-        const response = await api.patch(`/api/admin/categories/${category._id}`).send({ name: 'Mobile' })
+        const response = await api
+            .patch(`/api/admin/categories/${category._id}`)
+            .send({ name: 'Mobile' })
         logIfServerError(response)
 
         expect(response.status).toBe(401)

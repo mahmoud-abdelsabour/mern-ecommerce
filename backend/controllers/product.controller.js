@@ -13,7 +13,7 @@ const getProductById = async (request, response) => {
 
 const getProductUserStatus = async (req, res) => {
     const { productId } = req.params
-    const user = req.user
+    const { user } = req
 
     const status = await productService.getProductUserStatus({ productId, user })
 
@@ -47,7 +47,6 @@ const restoreProduct = async (request, response) => {
     return response.status(200).json(product)
 }
 
-
 module.exports = {
     getProducts,
     getProductById,
@@ -55,5 +54,5 @@ module.exports = {
     createProduct,
     updateProduct,
     deleteProduct,
-    restoreProduct
+    restoreProduct,
 }

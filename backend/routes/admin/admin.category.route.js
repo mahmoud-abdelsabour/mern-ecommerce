@@ -2,7 +2,7 @@ const express = require('express')
 const categoryController = require('../../controllers/category.controller')
 const { asyncWrapper, auth, role, validate } = require('../../utils/middleware')
 const categoryValidator = require('../../validators/category.validator')
-//api/admin/categories
+// api/admin/categories
 const router = express.Router()
 
 // create category
@@ -75,12 +75,7 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/CategoriesListResponse'
  */
-router.get(
-    '/',
-    auth,
-    role('admin'),
-    asyncWrapper(categoryController.getAllCategories)
-)
+router.get('/', auth, role('admin'), asyncWrapper(categoryController.getAllCategories))
 
 // update category
 /**
@@ -155,11 +150,6 @@ router.patch(
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.delete(
-    '/:categoryId',
-    auth,
-    role('admin'),
-    asyncWrapper(categoryController.deleteCategory)
-)
+router.delete('/:categoryId', auth, role('admin'), asyncWrapper(categoryController.deleteCategory))
 
 module.exports = router

@@ -1,10 +1,10 @@
+const express = require('express')
 const userController = require('../controllers/user.controller')
 const { asyncWrapper, validate, auth } = require('../utils/middleware/index')
 const userValidator = require('../validators/user.validator')
-const express = require('express')
 
 const router = express.Router()
-//api/users
+// api/users
 /**
  * @swagger
  * /api/users/me:
@@ -27,11 +27,7 @@ const router = express.Router()
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get(
-    '/me',
-    auth,
-    asyncWrapper(userController.getUserProfile)
-)
+router.get('/me', auth, asyncWrapper(userController.getUserProfile))
 
 /**
  * @swagger
@@ -177,10 +173,6 @@ router.patch(
  *             schema:
  *               $ref: '#/components/schemas/User'
  */
-router.delete(
-    '/me/delete',
-    auth,
-    asyncWrapper(userController.deleteUser)
-)
+router.delete('/me/delete', auth, asyncWrapper(userController.deleteUser))
 
 module.exports = router

@@ -19,7 +19,7 @@ const waitForDb = async (timeoutMs = 10000) => {
 
     if (!mongoServer) {
         mongoServer = await MongoMemoryReplSet.create({
-            replSet: { count: 1, storageEngine: 'wiredTiger' }
+            replSet: { count: 1, storageEngine: 'wiredTiger' },
         })
         const uri = mongoServer.getUri()
         await mongoose.connect(uri, { family: 4 })
@@ -33,7 +33,7 @@ const waitForDb = async (timeoutMs = 10000) => {
             clearTimeout(timer)
             resolve()
         })
-        mongoose.connection.once('error', (err) => {
+        mongoose.connection.once('error', err => {
             clearTimeout(timer)
             reject(err)
         })
@@ -49,7 +49,7 @@ const buildUserPayload = (overrides = {}) => {
         email: `user_${unique}@example.com`,
         password: 'Aa1@aaaa',
         phone: `010${Math.floor(10000000 + Math.random() * 90000000)}`,
-        ...overrides
+        ...overrides,
     }
 }
 
@@ -64,7 +64,7 @@ const createUser = async (overrides = {}) => {
         email: payload.email,
         phone: payload.phone,
         passwordHash,
-        role: payload.role
+        role: payload.role,
     }).save()
 
     return { user, payload }
@@ -84,7 +84,7 @@ const createBrand = async (overrides = {}) => {
     const brand = await new Brand({
         name: overrides.name || `Brand ${Date.now()}`,
         slug: overrides.slug || `brand-${Date.now()}`,
-        logo: overrides.logo
+        logo: overrides.logo,
     }).save()
     return brand
 }
@@ -92,14 +92,14 @@ const createBrand = async (overrides = {}) => {
 const createCategory = async (overrides = {}) => {
     const category = await new Category({
         name: overrides.name || `Category ${Date.now()}`,
-        slug: overrides.slug || `category-${Date.now()}`
+        slug: overrides.slug || `category-${Date.now()}`,
     }).save()
     return category
 }
 
 const createProduct = async (overrides = {}) => {
-    const brand = overrides.brand || await createBrand()
-    const category = overrides.category || await createCategory()
+    const brand = overrides.brand || (await createBrand())
+    const category = overrides.category || (await createCategory())
 
     const product = await new Product({
         name: overrides.name || `Product ${Date.now()}`,
@@ -110,7 +110,7 @@ const createProduct = async (overrides = {}) => {
         brand: brand._id,
         stock: overrides.stock ?? 5,
         rating: overrides.rating || { score: 0, voters: 0 },
-        isDeleted: overrides.isDeleted ?? false
+        isDeleted: overrides.isDeleted ?? false,
     }).save()
 
     return { product, brand, category }
@@ -126,20 +126,17 @@ const closeDb = async () => {
     }
 }
 
-const createReview = async ({ user, product, rating = 4, comment = 'Nice' }) => {
-    return Review.create({
+const createReview = async ({ user, product, rating = 4, comment = 'Nice' }) =>
+    Review.create({
         user: user._id,
         product: product._id,
         rating,
         comment,
-        name: user.firstName
+        name: user.firstName,
     })
-}
 
 const createReviewsForProduct = async (productId, count) => {
-    const users = await Promise.all(
-        Array.from({ length: count }, () => createUser())
-    )
+    const users = await Promise.all(Array.from({ length: count }, () => createUser()))
 
     return Review.create(
         users.map((u, idx) => ({
@@ -147,13 +144,13 @@ const createReviewsForProduct = async (productId, count) => {
             product: productId,
             rating: 5,
             comment: `Review ${idx}`,
-            name: `User ${idx}`
+            name: `User ${idx}`,
         }))
     )
 }
 
-const createDeliveredOrder = async ({ user, product }) => {
-    return new Order({
+const createDeliveredOrder = async ({ user, product }) =>
+    new Order({
         products: [
             {
                 product: product._id,
@@ -163,8 +160,8 @@ const createDeliveredOrder = async ({ user, product }) => {
                 description: product.description,
                 photos: product.photos,
                 brand: 'Brand',
-                category: 'Category'
-            }
+                category: 'Category',
+            },
         ],
         userId: user._id,
         shippingInfo: {
@@ -180,15 +177,14 @@ const createDeliveredOrder = async ({ user, product }) => {
                 street: 'Street 1',
                 building: '1',
                 floor: 1,
-                special_mark: 'nearby'
-            }
+                special_mark: 'nearby',
+            },
         },
         totalPrice: product.price,
-        deliveryStatus: 'delivered'
+        deliveryStatus: 'delivered',
     }).save()
-}
 
-const buildShippingInfo = (user) => ({
+const buildShippingInfo = user => ({
     firstName: user.firstName,
     lastName: user.lastName,
     username: user.username,
@@ -201,8 +197,8 @@ const buildShippingInfo = (user) => ({
         street: 'Street 1',
         building: '1',
         floor: 1,
-        special_mark: 'nearby'
-    }
+        special_mark: 'nearby',
+    },
 })
 
 const buildAddress = () => ({
@@ -213,11 +209,11 @@ const buildAddress = () => ({
     street: 'Street 1',
     building: '1',
     floor: 2,
-    special_mark: 'nearby'
+    special_mark: 'nearby',
 })
 
-const seedOrder = async ({ user, product, status = 'pending' }) => {
-    return new Order({
+const seedOrder = async ({ user, product, status = 'pending' }) =>
+    new Order({
         products: [
             {
                 product: product._id,
@@ -227,26 +223,23 @@ const seedOrder = async ({ user, product, status = 'pending' }) => {
                 description: product.description,
                 photos: product.photos,
                 brand: 'Brand',
-                category: 'Category'
-            }
+                category: 'Category',
+            },
         ],
         userId: user._id,
         shippingInfo: buildShippingInfo(user),
         totalPrice: product.price,
-        deliveryStatus: status
+        deliveryStatus: status,
     }).save()
-}
 
 const setDeliveredAt = async (order, daysAgo = 1) => {
     order.deliveredAt = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000)
     await order.save()
 }
 
-const getAuthToken = (user) => {
-    return createToken(user)
-}
+const getAuthToken = user => createToken(user)
 
-const logIfServerError = (response) => {
+const logIfServerError = response => {
     if (response.status >= 500) {
         // eslint-disable-next-line no-console
         console.log('Server error response:', response.body)
@@ -276,5 +269,5 @@ module.exports = {
     setDeliveredAt,
     getAuthToken,
     logIfServerError,
-    dropDatabase
+    dropDatabase,
 }

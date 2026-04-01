@@ -1,4 +1,13 @@
-const { api, waitForDb, createUser, getAuthToken, logIfServerError,  closeDb,dropDatabase, buildAddress } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+    buildAddress,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -52,4 +61,3 @@ describe('POST /api/users/me/create-address', () => {
         expect(response.body.addresses[0].city).toBe('Cairo')
     })
 })
-

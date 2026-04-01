@@ -1,4 +1,15 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb ,dropDatabase, seedOrder, setDeliveredAt } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+    seedOrder,
+    setDeliveredAt,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -46,7 +57,9 @@ describe('POST /api/orders/:orderId/return', () => {
             .post(`/api/orders/${order._id}/return`)
             .set('Authorization', `Bearer ${token}`)
             .send({
-                returnedItems: [{ product: product._id.toString(), quantity: 1, reason: 'Damaged' }]
+                returnedItems: [
+                    { product: product._id.toString(), quantity: 1, reason: 'Damaged' },
+                ],
             })
 
         logIfServerError(response)
@@ -64,7 +77,7 @@ describe('POST /api/orders/:orderId/return', () => {
             .post(`/api/orders/${order._id}/return`)
             .set('Authorization', `Bearer ${token}`)
             .send({
-                returnedItems: [{ product: product._id.toString(), quantity: 1, reason: '' }]
+                returnedItems: [{ product: product._id.toString(), quantity: 1, reason: '' }],
             })
 
         logIfServerError(response)
@@ -84,7 +97,7 @@ describe('POST /api/orders/:orderId/return', () => {
             .post(`/api/orders/${order._id}/return`)
             .set('Authorization', `Bearer ${token}`)
             .send({
-                returnedItems: [{ product: otherProduct._id.toString(), quantity: 1, reason: '' }]
+                returnedItems: [{ product: otherProduct._id.toString(), quantity: 1, reason: '' }],
             })
 
         logIfServerError(response)
@@ -103,7 +116,7 @@ describe('POST /api/orders/:orderId/return', () => {
             .post(`/api/orders/${order._id}/return`)
             .set('Authorization', `Bearer ${token}`)
             .send({
-                returnedItems: [{ product: product._id.toString(), quantity: 2, reason: '' }]
+                returnedItems: [{ product: product._id.toString(), quantity: 2, reason: '' }],
             })
 
         logIfServerError(response)
@@ -122,7 +135,7 @@ describe('POST /api/orders/:orderId/return', () => {
             .post(`/api/orders/${order._id}/return`)
             .set('Authorization', `Bearer ${token}`)
             .send({
-                returnedItems: [{ product: product._id.toString(), quantity: 1, reason: '' }]
+                returnedItems: [{ product: product._id.toString(), quantity: 1, reason: '' }],
             })
 
         logIfServerError(response)
@@ -141,7 +154,9 @@ describe('POST /api/orders/:orderId/return', () => {
             .post(`/api/orders/${order._id}/return`)
             .set('Authorization', `Bearer ${token}`)
             .send({
-                returnedItems: [{ product: product._id.toString(), quantity: 1, reason: 'Damaged' }]
+                returnedItems: [
+                    { product: product._id.toString(), quantity: 1, reason: 'Damaged' },
+                ],
             })
 
         logIfServerError(response)
@@ -150,4 +165,3 @@ describe('POST /api/orders/:orderId/return', () => {
         expect(response.body.message).toBe('Return request submitted')
     })
 })
-

@@ -5,12 +5,12 @@ const categorySchema = mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        trim: true
+        trim: true,
     },
     slug: {
         type: String,
-        required: false
-    }
+        required: false,
+    },
 })
 
 categorySchema.index(
@@ -21,11 +21,11 @@ categorySchema.index(
 categorySchema.index({ name: 'text', slug: 'text' })
 
 categorySchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
+    transform: (document, returnedObject) => {
+        returnedObject.id = returnedObject._id.toString()
+        delete returnedObject._id
+        delete returnedObject.__v
+    },
 })
 
 const Category = mongoose.model('Category', categorySchema)

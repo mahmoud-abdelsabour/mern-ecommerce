@@ -1,9 +1,9 @@
+const express = require('express')
 const reviewController = require('../controllers/review.controller')
 const { asyncWrapper, validate, auth, ownership, role } = require('../utils/middleware/index')
 const reviewValidator = require('../validators/review.validator')
 const Review = require('../models/review.model')
-const express = require('express')
-//api/reviews
+// api/reviews
 const router = express.Router()
 
 /**

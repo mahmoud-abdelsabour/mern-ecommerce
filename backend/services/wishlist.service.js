@@ -8,21 +8,21 @@ const getWishlist = async ({ user }) => {
     }
 }
 
-const addToWishlist = async (data) => {
+const addToWishlist = async data => {
     try {
         const { productId, user } = data
 
         const product = await Product.findById(productId)
 
-        if(!product){
+        if (!product) {
             throw Object.assign(new Error('product not found'), { statusCode: 404 })
         }
 
         const existing = user.wishlist.some(item => String(item) === String(productId))
 
-        if(existing){
+        if (existing) {
             throw Object.assign(new Error('product already exists'), { statusCode: 409 })
-        }else{
+        } else {
             user.wishlist.push(productId)
         }
 
@@ -32,17 +32,14 @@ const addToWishlist = async (data) => {
     } catch (error) {
         throw error
     }
-
 }
 
-const removeFromWishlist = async (data) => {
+const removeFromWishlist = async data => {
     try {
         const { productId, user } = data
 
         const beforeCount = user.wishlist.length
-        user.wishlist = user.wishlist.filter(
-            item => String(item) !== String(productId)
-        )
+        user.wishlist = user.wishlist.filter(item => String(item) !== String(productId))
 
         if (user.wishlist.length === beforeCount) {
             throw Object.assign(new Error('product not in wishlist'), { statusCode: 404 })
@@ -53,7 +50,6 @@ const removeFromWishlist = async (data) => {
     } catch (error) {
         throw error
     }
-
 }
 
 const clearWishlist = async ({ user }) => {
@@ -62,10 +58,9 @@ const clearWishlist = async ({ user }) => {
     return user.wishlist
 }
 
-
 module.exports = {
     getWishlist,
     addToWishlist,
     removeFromWishlist,
-    clearWishlist
+    clearWishlist,
 }

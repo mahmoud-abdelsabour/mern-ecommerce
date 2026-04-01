@@ -7,7 +7,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 const Order = require('../../../models/order.model')
 
@@ -46,9 +46,7 @@ describe('GET /api/admin/orders', () => {
         const { user } = await createUser()
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/admin/orders')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/admin/orders').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(403)
@@ -170,9 +168,7 @@ describe('GET /api/admin/orders', () => {
 
         await seedOrder({ user, product, status: 'pending' })
 
-        const response = await api
-            .get('/api/admin/orders')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/admin/orders').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)

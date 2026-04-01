@@ -6,7 +6,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 const Product = require('../../../models/product.model')
 

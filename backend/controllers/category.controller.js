@@ -26,5 +26,5 @@ module.exports = {
     createCategory,
     getAllCategories,
     updateCategory,
-    deleteCategory
+    deleteCategory,
 }

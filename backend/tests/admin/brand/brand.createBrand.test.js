@@ -6,7 +6,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 
 beforeAll(async () => {
@@ -112,5 +112,3 @@ describe('POST /api/admin/brands', () => {
         expect(response.body.error).toBe('name already exists')
     })
 })
-
-

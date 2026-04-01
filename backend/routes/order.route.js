@@ -1,10 +1,11 @@
+const express = require('express')
 const orderController = require('../controllers/order.controller')
 const { asyncWrapper, auth, validate, ownership, role } = require('../utils/middleware/index')
 const orderValidator = require('../validators/order.validator')
 const Order = require('../models/order.model')
-const express = require('express')
+
 const router = express.Router()
-//api/orders
+// api/orders
 
 // create order
 /**
@@ -80,12 +81,7 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/OrdersListResponse'
  */
-router.get(
-    '/',
-    auth,
-    role('user'),
-    asyncWrapper(orderController.getOrders)
-)
+router.get('/', auth, role('user'), asyncWrapper(orderController.getOrders))
 
 // get order by id
 /**

@@ -1,5 +1,15 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb,dropDatabase, seedOrder } = require('../helper')
 const mongooseLib = require('mongoose')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+    seedOrder,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -67,4 +77,3 @@ describe('GET /api/orders/:orderId', () => {
         expect(response.body.error).toBe('resource not found')
     })
 })
-

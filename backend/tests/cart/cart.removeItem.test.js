@@ -1,5 +1,14 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb, dropDatabase } = require('../helper')
 const mongooseLib = require('mongoose')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -15,7 +24,9 @@ afterAll(async () => {
 
 describe('DELETE /api/cart/products/:productId', () => {
     it('returns 401 when no token', async () => {
-        const response = await api.delete(`/api/cart/products/${new mongooseLib.Types.ObjectId().toString()}`)
+        const response = await api.delete(
+            `/api/cart/products/${new mongooseLib.Types.ObjectId().toString()}`
+        )
         logIfServerError(response)
 
         expect(response.status).toBe(401)
@@ -65,4 +76,3 @@ describe('DELETE /api/cart/products/:productId', () => {
         expect(response.body.length).toBe(0)
     })
 })
-

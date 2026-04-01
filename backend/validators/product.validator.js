@@ -11,7 +11,7 @@ const createProductSchema = Joi.object({
     category: Joi.string().hex().length(24).required(),
     brand: Joi.string().hex().length(24).required(),
     stock: Joi.number().integer().min(0).required(),
-    isDeleted: Joi.boolean()
+    isDeleted: Joi.boolean(),
 })
 
 const updateProductSchema = Joi.object({
@@ -24,10 +24,10 @@ const updateProductSchema = Joi.object({
     category: Joi.string().hex().length(24),
     brand: Joi.string().hex().length(24),
     stock: Joi.number().integer().min(0),
-    isDeleted: Joi.boolean()
+    isDeleted: Joi.boolean(),
 }).min(1)
 
 module.exports = {
     createProductSchema,
-    updateProductSchema
+    updateProductSchema,
 }

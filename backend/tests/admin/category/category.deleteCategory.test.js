@@ -8,7 +8,7 @@ const {
     logIfServerError,
     mongoose,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 const Category = require('../../../models/category.model')
 

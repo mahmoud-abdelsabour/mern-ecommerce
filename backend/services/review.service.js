@@ -3,14 +3,9 @@ const Review = require('../models/review.model')
 const Order = require('../models/order.model')
 const { updateProductRating } = require('./product.service')
 
-const getAllReviews = async (data) => {
+const getAllReviews = async data => {
     try {
-        const {
-            productId,
-            page = 1,
-            limit = 10,
-            sort = { createdAt: -1 }
-        } = data
+        const { productId, page = 1, limit = 10, sort = { createdAt: -1 } } = data
 
         const pageNumber = Math.max(Number(page) || 1, 1)
         const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
@@ -22,7 +17,7 @@ const getAllReviews = async (data) => {
                 .skip(skip)
                 .limit(pageSize)
                 .populate('user', 'name'),
-            Review.countDocuments({ product: productId })
+            Review.countDocuments({ product: productId }),
         ])
 
         return {
@@ -32,8 +27,8 @@ const getAllReviews = async (data) => {
                 limit: pageSize,
                 total: totalReviews,
                 totalPages: Math.ceil(totalReviews / pageSize),
-                hasMore: skip + reviews.length < totalReviews
-            }
+                hasMore: skip + reviews.length < totalReviews,
+            },
         }
     } catch (error) {
         throw error
@@ -46,7 +41,7 @@ const createReview = async ({ user, productId, rating, comment }) => {
     const hasBought = await Order.exists({
         userId,
         'products.product': productId,
-        deliveryStatus: { $in: ['delivered', 'return requested', 'returned', 'refunded'] }
+        deliveryStatus: { $in: ['delivered', 'return requested', 'returned', 'refunded'] },
     })
 
     if (!hasBought) {
@@ -66,7 +61,7 @@ const createReview = async ({ user, productId, rating, comment }) => {
             product: productId,
             rating,
             comment: comment || '',
-            name: user.firstName
+            name: user.firstName,
         })
 
         const savedReview = await review.save({ session })
@@ -112,7 +107,7 @@ const deleteReview = async ({ review }) => {
     try {
         await review.deleteOne({ session })
 
-        await updateProductRating({ productId: review.product, session });
+        await updateProductRating({ productId: review.product, session })
 
         await session.commitTransaction()
         return { message: 'review deleted' }
@@ -124,9 +119,9 @@ const deleteReview = async ({ review }) => {
     }
 }
 
-module.exports = { 
+module.exports = {
     createReview,
     updateReview,
     deleteReview,
-    getAllReviews
+    getAllReviews,
 }

@@ -6,7 +6,7 @@ const {
     getAuthToken,
     logIfServerError,
     dropDatabase,
-    closeDb
+    closeDb,
 } = require('../../helper')
 
 beforeAll(async () => {
@@ -24,7 +24,9 @@ afterAll(async () => {
 describe('PATCH /api/admin/products/:productId', () => {
     it('returns 401 when no token', async () => {
         const { product } = await createProduct()
-        const response = await api.patch(`/api/admin/products/${product._id}`).send({ name: 'Updated' })
+        const response = await api
+            .patch(`/api/admin/products/${product._id}`)
+            .send({ name: 'Updated' })
         logIfServerError(response)
 
         expect(response.status).toBe(401)

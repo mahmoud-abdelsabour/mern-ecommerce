@@ -4,26 +4,26 @@ const productsType = [
     {
         product: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Product",
-            required: true
+            ref: 'Product',
+            required: true,
         },
         quantity: {
             type: Number,
             required: true,
-            min: 1
+            min: 1,
         },
         priceAtPurchase: {
             type: Number,
             required: true,
-            min: 0
+            min: 0,
         },
         name: {
             type: String,
-            required: true
+            required: true,
         },
         description: {
             type: String,
-            required: true
+            required: true,
         },
         photos: {
             type: [String],
@@ -31,111 +31,122 @@ const productsType = [
         },
         brand: {
             type: String,
-            required: true
+            required: true,
         },
         category: {
             type: String,
-            required: true
+            required: true,
         },
-    }
+    },
 ]
 
-const orderSchema = mongoose.Schema({
-    products: {
-        type: productsType,
-        required: true,
-        validate: {
-            validator: (arr) => Array.isArray(arr) && arr.length > 0,
-            message: 'Order must include at least one product'
-        }
-    },
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true
-    },
-    shippingInfo: {
-        firstName: {
-            type: String,
-            required: true
+const orderSchema = mongoose.Schema(
+    {
+        products: {
+            type: productsType,
+            required: true,
+            validate: {
+                validator: arr => Array.isArray(arr) && arr.length > 0,
+                message: 'Order must include at least one product',
+            },
         },
-        lastName: {
-            type: String,
-            required: true
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
         },
-        username: {
-            type: String,
-            required: true
+        shippingInfo: {
+            firstName: {
+                type: String,
+                required: true,
+            },
+            lastName: {
+                type: String,
+                required: true,
+            },
+            username: {
+                type: String,
+                required: true,
+            },
+            email: {
+                type: String,
+                required: true,
+            },
+            phone: {
+                type: String,
+                required: true,
+            },
+            address: {
+                country: {
+                    type: String,
+                    required: true,
+                },
+                city: {
+                    type: String,
+                    required: true,
+                },
+                postalcode: {
+                    type: String,
+                    required: true,
+                },
+                street: {
+                    type: String,
+                    required: true,
+                },
+                building: {
+                    type: String,
+                    required: true,
+                },
+                floor: {
+                    type: Number,
+                    required: true,
+                },
+                special_mark: {
+                    type: String,
+                    required: false,
+                },
+            },
         },
-        email: {
-            type: String,
-            required: true
+        totalPrice: {
+            type: Number,
+            required: true,
+            min: 0,
         },
-        phone: {
-            type: String,
-            required: true
+        returnInfo: {
+            returnedItems: [
+                {
+                    product: mongoose.Schema.Types.ObjectId,
+                    quantity: Number,
+                    reason: String,
+                },
+            ],
+            returnDate: Date,
         },
-        address: {
-            country: {
-                type: String,
-                required: true
-            },
-            city: {
-                type: String,
-                required: true
-            },
-            postalcode: {
-                type: String,
-                required: true
-            },
-            street: {
-                type: String,
-                required: true
-            },
-            building: {
-                type: String,
-                required: true
-            },
-            floor: {
-                type: Number,
-                required: true
-            },
-            special_mark: {
-                type: String,
-                required: false
-            }
-        }
+        deliveryStatus: {
+            type: String,
+            enum: [
+                'pending',
+                'shipped',
+                'delivered',
+                'cancelled',
+                'return requested',
+                'returned',
+                'refunded',
+            ],
+            default: 'pending',
+        },
+        deliveredAt: Date,
+        shippedAt: Date,
     },
-    totalPrice: {
-        type: Number,
-        required: true,
-        min: 0
-    },
-    returnInfo: {
-        returnedItems : [
-            {
-                product: mongoose.Schema.Types.ObjectId,
-                quantity: Number,
-                reason: String
-            }
-        ],
-        returnDate: Date
-    },
-    deliveryStatus: {
-        type: String,
-        enum: ["pending", "shipped", "delivered", "cancelled", "return requested", "returned", "refunded"],
-        default: "pending",
-    },
-    deliveredAt: Date,
-    shippedAt: Date
-}, { timestamps: true })
+    { timestamps: true }
+)
 
 orderSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
+    transform: (document, returnedObject) => {
+        returnedObject.id = returnedObject._id.toString()
+        delete returnedObject._id
+        delete returnedObject.__v
+    },
 })
 
 const Order = mongoose.model('Order', orderSchema)

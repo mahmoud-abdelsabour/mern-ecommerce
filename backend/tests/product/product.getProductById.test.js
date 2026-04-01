@@ -1,6 +1,14 @@
-const { api, waitForDb, createProduct, createUser, logIfServerError,closeDb, dropDatabase } = require('../helper')
-const Review = require('../../models/review.model')
 const mongooseLib = require('mongoose')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+} = require('../helper')
+const Review = require('../../models/review.model')
 
 beforeAll(async () => {
     await waitForDb()
@@ -25,7 +33,7 @@ describe('GET /api/products/:productId', () => {
         await Review.create([
             { user: user1._id, product: product._id, rating: 5, comment: 'Great', name: 'U1' },
             { user: user2._id, product: product._id, rating: 4, comment: 'Good', name: 'U2' },
-            { user: user3._id, product: product._id, rating: 3, comment: 'Ok', name: 'U3' }
+            { user: user3._id, product: product._id, rating: 3, comment: 'Ok', name: 'U3' },
         ])
 
         const response = await api.get(`/api/products/${product._id}`)
@@ -46,9 +54,7 @@ describe('GET /api/products/:productId', () => {
     it('limits reviewsPreview to 5 and sets hasMoreReviews true when >5', async () => {
         const { product } = await createProduct()
 
-        const users = await Promise.all(
-            Array.from({ length: 6 }, () => createUser())
-        )
+        const users = await Promise.all(Array.from({ length: 6 }, () => createUser()))
 
         await Review.create(
             users.map((u, idx) => ({
@@ -56,7 +62,7 @@ describe('GET /api/products/:productId', () => {
                 product: product._id,
                 rating: 5,
                 comment: `Review ${idx}`,
-                name: `User ${idx}`
+                name: `User ${idx}`,
             }))
         )
 
@@ -94,4 +100,3 @@ describe('GET /api/products/:productId', () => {
         expect(response.body.error).toBe('malformatted id')
     })
 })
-

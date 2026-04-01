@@ -1,4 +1,13 @@
-const { api, waitForDb, createProduct, createUser, logIfServerError, getAuthToken, closeDb, dropDatabase } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    logIfServerError,
+    getAuthToken,
+    closeDb,
+    dropDatabase,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -22,9 +31,7 @@ describe('GET /api/cart', () => {
     })
 
     it('returns 401 for invalid token', async () => {
-        const response = await api
-            .get('/api/cart')
-            .set('Authorization', 'Bearer invalidtoken')
+        const response = await api.get('/api/cart').set('Authorization', 'Bearer invalidtoken')
 
         logIfServerError(response)
         expect(response.status).toBe(401)
@@ -35,9 +42,7 @@ describe('GET /api/cart', () => {
         const { user } = await createUser({ role: 'admin' })
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/cart')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/cart').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(403)
@@ -48,9 +53,7 @@ describe('GET /api/cart', () => {
         const { user } = await createUser()
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/cart')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/cart').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -66,9 +69,7 @@ describe('GET /api/cart', () => {
         await user.save()
 
         const token = getAuthToken(user)
-        const response = await api
-            .get('/api/cart')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/cart').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -80,4 +81,3 @@ describe('GET /api/cart', () => {
         expect(response.body[0].product.name).toBeDefined()
     })
 })
-

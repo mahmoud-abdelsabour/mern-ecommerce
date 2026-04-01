@@ -1,4 +1,11 @@
-const { api, waitForDb, closeDb,dropDatabase, buildUserPayload, logIfServerError } = require('../helper')
+const {
+    api,
+    waitForDb,
+    closeDb,
+    dropDatabase,
+    buildUserPayload,
+    logIfServerError,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -16,9 +23,7 @@ describe('POST /api/auth/register', () => {
     it('registers a user with valid data', async () => {
         const payload = buildUserPayload()
 
-        const response = await api
-            .post('/api/auth/register')
-            .send(payload)
+        const response = await api.post('/api/auth/register').send(payload)
 
         logIfServerError(response)
 
@@ -32,9 +37,7 @@ describe('POST /api/auth/register', () => {
     it('rejects missing required fields', async () => {
         const payload = buildUserPayload({ email: undefined })
 
-        const response = await api
-            .post('/api/auth/register')
-            .send(payload)
+        const response = await api.post('/api/auth/register').send(payload)
 
         logIfServerError(response)
 
@@ -46,9 +49,7 @@ describe('POST /api/auth/register', () => {
     it('rejects invalid password format', async () => {
         const payload = buildUserPayload({ password: 'password' })
 
-        const response = await api
-            .post('/api/auth/register')
-            .send(payload)
+        const response = await api.post('/api/auth/register').send(payload)
 
         logIfServerError(response)
 
@@ -59,9 +60,7 @@ describe('POST /api/auth/register', () => {
     it('rejects invalid phone format', async () => {
         const payload = buildUserPayload({ phone: '123' })
 
-        const response = await api
-            .post('/api/auth/register')
-            .send(payload)
+        const response = await api.post('/api/auth/register').send(payload)
 
         logIfServerError(response)
 

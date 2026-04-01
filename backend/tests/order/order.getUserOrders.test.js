@@ -1,4 +1,14 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb, dropDatabase , seedOrder } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+    seedOrder,
+} = require('../helper')
 const Order = require('../../models/order.model')
 
 beforeAll(async () => {
@@ -26,9 +36,7 @@ describe('GET /api/orders', () => {
         const { user } = await createUser({ role: 'admin' })
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/orders')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/orders').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(403)
@@ -39,9 +47,7 @@ describe('GET /api/orders', () => {
         const { user } = await createUser()
         const token = getAuthToken(user)
 
-        const response = await api
-            .get('/api/orders')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/orders').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -59,9 +65,7 @@ describe('GET /api/orders', () => {
         await seedOrder({ user: userB, product })
 
         const token = getAuthToken(userA)
-        const response = await api
-            .get('/api/orders')
-            .set('Authorization', `Bearer ${token}`)
+        const response = await api.get('/api/orders').set('Authorization', `Bearer ${token}`)
 
         logIfServerError(response)
         expect(response.status).toBe(200)
@@ -87,4 +91,3 @@ describe('GET /api/orders', () => {
         expect(response.body.pagination.totalOrders).toBe(3)
     })
 })
-

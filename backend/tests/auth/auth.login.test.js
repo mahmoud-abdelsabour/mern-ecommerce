@@ -25,7 +25,7 @@ describe('POST /api/auth/login', () => {
             username: payload.username,
             email: payload.email,
             phone: payload.phone,
-            passwordHash
+            passwordHash,
         }).save()
 
         const response = await api
@@ -77,7 +77,7 @@ describe('POST /api/auth/login', () => {
             username: payload.username,
             email: payload.email,
             phone: payload.phone,
-            passwordHash
+            passwordHash,
         }).save()
 
         const response = await api
@@ -99,7 +99,7 @@ describe('POST /api/auth/login', () => {
             email: payload.email,
             phone: payload.phone,
             passwordHash,
-            isDeleted: true
+            isDeleted: true,
         }).save()
 
         const response = await api

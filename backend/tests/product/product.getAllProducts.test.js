@@ -1,4 +1,13 @@
-const { api, waitForDb, createBrand, createCategory, createProduct, logIfServerError ,closeDb, dropDatabase} = require('../helper')
+const {
+    api,
+    waitForDb,
+    createBrand,
+    createCategory,
+    createProduct,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()

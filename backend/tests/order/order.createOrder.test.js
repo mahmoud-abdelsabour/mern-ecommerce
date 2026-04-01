@@ -1,4 +1,14 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError,closeDb, dropDatabase, buildShippingInfo } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+    buildShippingInfo,
+} = require('../helper')
 const Product = require('../../models/product.model')
 const User = require('../../models/user.model')
 
@@ -61,7 +71,7 @@ describe('POST /api/orders', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 products: [{ product: product._id.toString(), quantity: 2 }],
-                shippingInfo: buildShippingInfo(user)
+                shippingInfo: buildShippingInfo(user),
             })
 
         logIfServerError(response)
@@ -81,7 +91,7 @@ describe('POST /api/orders', () => {
             .set('Authorization', `Bearer ${token}`)
             .send({
                 products: [{ product: product._id.toString(), quantity: 2 }],
-                shippingInfo: buildShippingInfo(user)
+                shippingInfo: buildShippingInfo(user),
             })
 
         logIfServerError(response)
@@ -96,4 +106,3 @@ describe('POST /api/orders', () => {
         expect(dbUser.cart.length).toBe(0)
     })
 })
-

@@ -5,7 +5,7 @@ const {
     getAuthToken,
     logIfServerError,
     closeDb,
-    dropDatabase
+    dropDatabase,
 } = require('../helper')
 
 beforeAll(async () => {
@@ -103,4 +103,3 @@ describe('DELETE /api/users/me/delete', () => {
         expect(response.body.role).toBe('admin')
     })
 })
-

@@ -1,8 +1,8 @@
+const express = require('express')
 const cartController = require('../controllers/cart.controller')
 const { asyncWrapper, auth, validate, role } = require('../utils/middleware/index')
 const cartValidator = require('../validators/cart.validator')
-const express = require('express')
-//api/cart
+// api/cart
 const router = express.Router()
 
 // get cart
@@ -24,12 +24,7 @@ const router = express.Router()
  *               items:
  *                 $ref: '#/components/schemas/CartItem'
  */
-router.get(
-    '/',
-    auth,
-    role('user'),
-    asyncWrapper(cartController.getCart)
-)
+router.get('/', auth, role('user'), asyncWrapper(cartController.getCart))
 
 // add to cart
 /**
@@ -183,13 +178,6 @@ router.delete(
  *               items:
  *                 $ref: '#/components/schemas/CartItem'
  */
-router.delete(
-    '/',
-    auth,
-    role('user'),
-    asyncWrapper(cartController.clearCart)
-)
-
-
+router.delete('/', auth, role('user'), asyncWrapper(cartController.clearCart))
 
 module.exports = router

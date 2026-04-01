@@ -1,9 +1,9 @@
+const express = require('express')
 const authController = require('../controllers/auth.controller')
 const { asyncWrapper, validate, auth, ownership } = require('../utils/middleware/index')
 const authValidator = require('../validators/auth.validator')
 const User = require('../models/user.model')
-const express = require('express')
-//api/auth
+// api/auth
 const router = express.Router()
 
 /**
@@ -88,11 +88,7 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post(
-    '/login',
-    validate(authValidator.loginSchema),
-    asyncWrapper(authController.login)
-)
+router.post('/login', validate(authValidator.loginSchema), asyncWrapper(authController.login))
 
 /**
  * @swagger

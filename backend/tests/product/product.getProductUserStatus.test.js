@@ -1,4 +1,13 @@
-const { api, waitForDb, createProduct, createUser, logIfServerError, getAuthToken, closeDb,dropDatabase } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    logIfServerError,
+    getAuthToken,
+    closeDb,
+    dropDatabase,
+} = require('../helper')
 const User = require('../../models/user.model')
 
 beforeAll(async () => {
@@ -88,4 +97,3 @@ describe('GET /api/products/:productId/user-status', () => {
         expect(response.body.error).toBe('token invalid or expired')
     })
 })
-

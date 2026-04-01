@@ -1,4 +1,14 @@
-const { api, waitForDb, createProduct, createDeliveredOrder, closeDb,dropDatabase, createUser, logIfServerError, getAuthToken } = require('../helper')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createDeliveredOrder,
+    closeDb,
+    dropDatabase,
+    createUser,
+    logIfServerError,
+    getAuthToken,
+} = require('../helper')
 const Review = require('../../models/review.model')
 
 beforeAll(async () => {
@@ -100,7 +110,7 @@ describe('POST /api/products/:productId/reviews', () => {
             product: product._id,
             rating: 5,
             comment: 'First',
-            name: user.firstName
+            name: user.firstName,
         })
 
         const response = await api
@@ -113,4 +123,3 @@ describe('POST /api/products/:productId/reviews', () => {
         expect(response.body.message).toBe('product already reviewed')
     })
 })
-

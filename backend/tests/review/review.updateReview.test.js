@@ -1,5 +1,15 @@
-const { api, waitForDb, createProduct, createUser, getAuthToken, logIfServerError, closeDb ,dropDatabase, createReview } = require('../helper')
 const mongooseLib = require('mongoose')
+const {
+    api,
+    waitForDb,
+    createProduct,
+    createUser,
+    getAuthToken,
+    logIfServerError,
+    closeDb,
+    dropDatabase,
+    createReview,
+} = require('../helper')
 
 beforeAll(async () => {
     await waitForDb()
@@ -102,4 +112,3 @@ describe('PATCH /api/reviews/:reviewId', () => {
         expect(response.body.comment).toBe('Updated')
     })
 })
-

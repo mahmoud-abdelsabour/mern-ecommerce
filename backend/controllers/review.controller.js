@@ -8,7 +8,7 @@ const getAllReviews = async (request, response) => {
 }
 
 const createReview = async (request, response) => {
-    const user = request.user
+    const { user } = request
     const { productId } = request.params
     const { rating, comment } = request.body
     const review = await reviewService.createReview({ user, productId, rating, comment })
@@ -18,7 +18,7 @@ const createReview = async (request, response) => {
 const updateReview = async (request, response) => {
     const review = request.resource
     const { rating, comment } = request.body
-    const updatedReview = await reviewService.updateReview({rating, comment, review})
+    const updatedReview = await reviewService.updateReview({ rating, comment, review })
     return response.status(200).json(updatedReview)
 }
 
@@ -32,5 +32,5 @@ module.exports = {
     createReview,
     updateReview,
     deleteReview,
-    getAllReviews
+    getAllReviews,
 }

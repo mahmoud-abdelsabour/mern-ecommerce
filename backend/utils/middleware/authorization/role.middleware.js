@@ -1,11 +1,11 @@
-const requireRole = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: "forbidden" })
-    }
+const requireRole =
+    (...roles) =>
+    (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return res.status(403).json({ error: 'forbidden' })
+        }
 
-    next()
-  }
-}
+        next()
+    }
 
 module.exports = requireRole
