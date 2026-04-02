@@ -57,7 +57,8 @@ const seed = async () => {
 
     // Categories
     const categoryDocs = Array.from({ length: categoryCount }, () => {
-        const name = faker.commerce.department()
+        const baseName = faker.commerce.department()
+        const name = `${baseName} ${faker.string.alphanumeric(4)}`
         return {
             name,
             slug: slugify(`${name}-${faker.string.alphanumeric(4)}`, { lower: true, strict: true })
@@ -71,9 +72,11 @@ const seed = async () => {
     const userDocs = Array.from({ length: userCount }, (_, idx) => {
         const firstName = faker.person.firstName()
         const lastName = faker.person.lastName()
-        const username = faker.internet.userName({ firstName, lastName }) + faker.string.alphanumeric(4)
+        const baseUsername = faker.internet.username({ firstName, lastName })
+        const username = `${baseUsername}${faker.string.alphanumeric(4)}`.slice(0, 30)
         const email = faker.internet.email({ firstName, lastName }).toLowerCase()
-        const phone = `01${faker.string.numeric(9)}`
+        const phonePrefix = faker.helpers.arrayElement(['010', '011', '012', '015'])
+        const phone = `${phonePrefix}${faker.string.numeric(8)}`
         const isAdmin = idx < 5
         const isDeleted = faker.datatype.boolean({ probability: 0.05 })
         const address = {
@@ -104,10 +107,13 @@ const seed = async () => {
     })
     const users = await User.insertMany(userDocs)
 
+    const activeBrands = brands.filter(b => !b.isDeleted)
+    const activeCategories = categories.filter(c => !c.isDeleted)
+
     // Products
     const productDocs = Array.from({ length: productCount }, () => {
-        const brand = pickOne(brands)
-        const category = pickOne(categories)
+        const brand = pickOne(activeBrands)
+        const category = pickOne(activeCategories)
         const photosCount = randomInt(2, 4)
         const photos = Array.from({ length: photosCount }, () =>
             `https://picsum.photos/seed/product-${faker.string.alphanumeric(10)}/800/800`
