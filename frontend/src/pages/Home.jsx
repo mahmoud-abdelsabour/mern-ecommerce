@@ -1,5 +1,6 @@
-import { Carousel, IconButton, Box, Button, Flex } from "@chakra-ui/react"
+import { Carousel, IconButton, Box, Button, Flex, HStack, Text } from "@chakra-ui/react"
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu"
+import { ProductCard, properties } from "../components/productCard"
 
 const items = [
   "https://picsum.photos/seed/hero-1/1200/500",
@@ -12,7 +13,8 @@ const items = [
 
 const Home = () => {
   return (
-        <div>
+        <Box maxW="1400px" mx="auto" px={4}>
+            {/* Hero Section */}
             <Carousel.Root autoplay={true} slideCount={items.length} w="100%">
             <Carousel.ItemGroup>
                 {items.map((src, index) => (
@@ -48,9 +50,103 @@ const Home = () => {
             <Flex justify="center" mt={4}>
                 <Button>Shop Now</Button>
             </Flex>
-        </div>
+
+            {/* featured products */}
+            <Carousel.Root slideCount={properties.length} slidesPerPage={6} gap="0">
+                <HStack justify="space-between">
+                    <Text fontWeight="700" fontSize="xl">
+                        Featured Products
+                    </Text>
+                    <HStack>
+                        <Carousel.PrevTrigger asChild>
+                            <IconButton size="xs" variant="subtle">
+                                <LuChevronLeft />
+                            </IconButton>
+                        </Carousel.PrevTrigger>
+                        <Carousel.NextTrigger asChild>
+                            <IconButton size="xs" variant="subtle">
+                                <LuChevronRight />
+                            </IconButton>
+                        </Carousel.NextTrigger>
+                    </HStack>
+                </HStack>
+                <Carousel.ItemGroup>
+                    {properties.map((property, index) => (
+                        <Carousel.Item key={property.id} index={index}>
+                            <ProductCard data={property} />
+                        </Carousel.Item>
+                    ))}
+                </Carousel.ItemGroup>
+            </Carousel.Root>
+
+            {/* Top Rated */}
+            <Box mt={10}>
+                <Carousel.Root slideCount={properties.length} slidesPerPage={6} gap="0">
+                    <HStack justify="space-between">
+                        <Text fontWeight="700" fontSize="xl">
+                            Top Rated
+                        </Text>
+                        <HStack>
+                            <Carousel.PrevTrigger asChild>
+                                <IconButton size="xs" variant="subtle">
+                                    <LuChevronLeft />
+                                </IconButton>
+                            </Carousel.PrevTrigger>
+                            <Carousel.NextTrigger asChild>
+                                <IconButton size="xs" variant="subtle">
+                                    <LuChevronRight />
+                                </IconButton>
+                            </Carousel.NextTrigger>
+                        </HStack>
+                    </HStack>
+                    <Carousel.ItemGroup>
+                        {properties.map((property, index) => (
+                            <Carousel.Item key={`top-${property.id}`} index={index}>
+                                <ProductCard data={property} />
+                            </Carousel.Item>
+                        ))}
+                    </Carousel.ItemGroup>
+                </Carousel.Root>
+            </Box>
+
+            {/* Electronics */}
+            <Box mt={10}>
+                <Carousel.Root slideCount={properties.length} slidesPerPage={6} gap="0">
+                    <HStack justify="space-between">
+                        <Text fontWeight="700" fontSize="xl">
+                            Electronics
+                        </Text>
+                        <HStack>
+                            <Carousel.PrevTrigger asChild>
+                                <IconButton size="xs" variant="subtle">
+                                    <LuChevronLeft />
+                                </IconButton>
+                            </Carousel.PrevTrigger>
+                            <Carousel.NextTrigger asChild>
+                                <IconButton size="xs" variant="subtle">
+                                    <LuChevronRight />
+                                </IconButton>
+                            </Carousel.NextTrigger>
+                        </HStack>
+                    </HStack>
+                    <Carousel.ItemGroup>
+                        {properties.map((property, index) => (
+                            <Carousel.Item key={`elec-${property.id}`} index={index}>
+                                <ProductCard data={property} />
+                            </Carousel.Item>
+                        ))}
+                    </Carousel.ItemGroup>
+                </Carousel.Root>
+            </Box>
+        </Box>
   )
 }
+
+
+
+
+
+
 
 
 export default Home
