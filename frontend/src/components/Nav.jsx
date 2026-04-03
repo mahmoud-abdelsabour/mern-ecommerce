@@ -70,7 +70,9 @@ const Nav = () => {
                     <Link as={RouterLink} to="/cart" >
                         <FaCartShopping size={ICON_SIZE} />
                     </Link>
-                    <MdFavorite size={ICON_SIZE} />
+                    <Link as={RouterLink} to="/wishlist">
+                        <MdFavorite size={ICON_SIZE} />
+                    </Link>
                     <Menu.Root>
                     <Menu.Trigger asChild>
                         <Button variant='unstyled' p={0} minW='unset'>
