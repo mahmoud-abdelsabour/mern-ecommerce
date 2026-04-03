@@ -9,6 +9,7 @@ import Register from './pages/auth/Register'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
 import Wishlist from './pages/Wishlist'
+import NotFound from './components/NotFound'
 
 const App = () => {
   return(
@@ -21,6 +22,7 @@ const App = () => {
         <Route path='/product' element={<Product />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/wishlist' element={<Wishlist />} />
+        <Route path='*' element={<NotFound />} />
       </Routes>
       <Box flex="1" />
       <Footer />
