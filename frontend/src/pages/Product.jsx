@@ -19,7 +19,7 @@ import {
   Textarea 
 } from "@chakra-ui/react"
 import { LuChevronLeft, LuChevronRight, LuChevronDown } from "react-icons/lu"
-import ReviewCard from "../components/utils/ReviewCard"
+import ReviewCard from "../components/ReviewCard"
 
 
 const Product = () => {

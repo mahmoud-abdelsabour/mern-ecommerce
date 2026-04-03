@@ -1,6 +1,6 @@
 import { Carousel, IconButton, Box, Button, Flex, HStack, Text } from "@chakra-ui/react"
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu"
-import { ProductCard, properties } from "../components/productCard"
+import { ProductCard, properties } from "../components/ProductCard"
 
 const items = [
   "https://picsum.photos/seed/hero-1/1200/500",

@@ -1,9 +1,10 @@
-import { Box, Stack, Image, HStack, Icon, Text, Button } from '@chakra-ui/react'
+import { Box, Stack, Image, HStack, Icon, Text, Button, IconButton } from '@chakra-ui/react'
 import { FaStar } from 'react-icons/fa'
+import { LuMinus, LuPlus } from "react-icons/lu"
 import { ICON_SIZE } from '../constants/ui'
 
-const ProductCard = ({ data }) => (
-  <Stack gap="2" borderWidth="1px" borderColor="gray.200" rounded="md" p={2} w="100%" transform="scale(0.95)">
+const ProductCard = ({ data, variant = "default" }) => (
+  <Stack gap="2" borderWidth="1px" borderColor="gray.200" rounded="md" p={2} w="100%" maxW="200px">
     <Box position="relative" w="100%" aspectRatio={1}>
       <Image
         src={data.image}
@@ -34,14 +35,28 @@ const ProductCard = ({ data }) => (
         </Text>
       </HStack>
     </HStack>
-    <HStack>
-      <Button size="xs" variant="outline" flex="1">
-        Add to cart
-      </Button>
-      <Button size="xs" colorScheme="teal" flex="1">
-        Buy now
-      </Button>
-    </HStack>
+    {variant === "cart" ? (
+      <HStack justify="space-between" align="center">
+        <IconButton size="xs" variant="outline" aria-label="Decrease">
+          <LuMinus size={ICON_SIZE} />
+        </IconButton>
+        <Text fontSize="xs" fontWeight="600">
+          Qty: {data.quantity ?? 1}
+        </Text>
+        <IconButton size="xs" variant="outline" aria-label="Increase">
+          <LuPlus size={ICON_SIZE} />
+        </IconButton>
+      </HStack>
+    ) : (
+      <HStack>
+        <Button size="xs" variant="outline" flex="1">
+          Add to cart
+        </Button>
+        <Button size="xs" colorScheme="teal" flex="1">
+          Buy now
+        </Button>
+      </HStack>
+    )}
   </Stack>
 )
 

@@ -1,11 +1,11 @@
-import logo from '../../assets/logo.svg'
+import logo from '../assets/logo.svg'
 import { Input, IconButton, Button, Menu, Portal, Avatar, HStack, Link, Flex, Box } from "@chakra-ui/react"
 import { Link as RouterLink } from "react-router-dom"
 import { LuSearch } from "react-icons/lu"
 import { FaCartShopping } from "react-icons/fa6";
 import { MdFavorite } from "react-icons/md";
 import { FaChevronDown } from "react-icons/fa";
-import { ICON_SIZE } from "../../constants/ui";
+import { ICON_SIZE } from "../constants/ui";
 
 const Nav = () => {
     return(
@@ -67,7 +67,9 @@ const Nav = () => {
                 </HStack>
 
                 <HStack spacing={3}>
-                    <FaCartShopping size={ICON_SIZE} />
+                    <Link as={RouterLink} to="/cart" >
+                        <FaCartShopping size={ICON_SIZE} />
+                    </Link>
                     <MdFavorite size={ICON_SIZE} />
                     <Menu.Root>
                     <Menu.Trigger asChild>

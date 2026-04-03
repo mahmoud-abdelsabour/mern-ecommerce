@@ -3,7 +3,7 @@ import { IoLogoGithub } from "react-icons/io";
 import { FaLinkedin } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 import { Box, HStack, Text, Link } from "@chakra-ui/react";
-import { ICON_SIZE } from "../../constants/ui";
+import { ICON_SIZE } from "../constants/ui";
 
 const Footer = () => {
     return(
