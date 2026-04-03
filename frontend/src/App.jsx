@@ -6,6 +6,7 @@ import { Routes, Route, useMatch } from 'react-router-dom'
 import Home from './pages/Home'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import Product from './pages/Product'
 
 const App = () => {
   return(
@@ -15,6 +16,7 @@ const App = () => {
         <Route path='/' element={<Home/>} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
+        <Route path='/product' element={<Product />} />
       </Routes>
       <Box flex="1" />
       <Footer />

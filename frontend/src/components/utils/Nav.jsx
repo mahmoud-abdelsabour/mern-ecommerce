@@ -1,5 +1,6 @@
 import logo from '../../assets/logo.svg'
 import { Input, IconButton, Button, Menu, Portal, Avatar, HStack, Link, Flex, Box } from "@chakra-ui/react"
+import { Link as RouterLink } from "react-router-dom"
 import { LuSearch } from "react-icons/lu"
 import { FaCartShopping } from "react-icons/fa6";
 import { MdFavorite } from "react-icons/md";
@@ -10,9 +11,9 @@ const Nav = () => {
     return(
         <Box as="nav" borderBottom="1px solid" borderColor="gray.200" px={6} py={3}>
             <Flex align="center" gap={4}>
-                <Box>
+                <Link as={RouterLink} to="/" display="inline-flex" alignItems="center">
                     <img src={logo} alt="logo" style={{ height: 40, width: 'auto' }} />
-                </Box>
+                </Link>
 
                 <Box flex="1">
                     <Input placeholder="Search" size="sm" width="100%" />
@@ -60,7 +61,7 @@ const Nav = () => {
                         </Portal>
                     </Menu.Root>
 
-                    <Link href="/orders" fontWeight="500">
+                    <Link as={RouterLink} to="/orders" fontWeight="500">
                         Orders
                     </Link>
                 </HStack>
@@ -68,10 +69,25 @@ const Nav = () => {
                 <HStack spacing={3}>
                     <FaCartShopping size={ICON_SIZE} />
                     <MdFavorite size={ICON_SIZE} />
-                    <Avatar.Root size="sm">
-                        <Avatar.Fallback name="Oshigaki Kisame" />
-                        <Avatar.Image src="https://example.com" />
-                    </Avatar.Root>
+                    <Menu.Root>
+                    <Menu.Trigger asChild>
+                        <Button variant='unstyled' p={0} minW='unset'>
+                            <Avatar.Root size="sm">
+                                <Avatar.Fallback name="Oshigaki Kisame" />
+                                <Avatar.Image src="https://example.com" />
+                            </Avatar.Root>
+                        </Button>
+                    </Menu.Trigger>
+                    <Portal>
+                        <Menu.Positioner>
+                        <Menu.Content>
+                            <Menu.Item value="new-txt">view profile</Menu.Item>
+                            <Menu.Item value="new-file">edit profile</Menu.Item>
+                            <Menu.Item value="new-win">logout</Menu.Item>
+                        </Menu.Content>
+                        </Menu.Positioner>
+                    </Portal>
+                    </Menu.Root>
                 </HStack>
             </Flex>
         </Box>
