@@ -1,19 +1,20 @@
 import {
   Box,
   Button,
-  Field,
   HStack,
   IconButton,
-  Input,
-  NativeSelect,
+  Portal,
   RadioGroup,
+  Select,
   Separator,
   Stack,
   Text,
+  createListCollection,
 } from "@chakra-ui/react"
 import { useMemo, useState } from "react"
 import { LuPlus } from "react-icons/lu"
 import ProductList from "../components/ProductList"
+import AddressForm from "../components/AddressForm"
 
 const formatMoney = (value) => `$${Number(value ?? 0).toFixed(2)}`
 
@@ -92,6 +93,15 @@ const CheckOut = () => {
     return savedAddresses.find((a) => a.id === selectedAddressId) ?? null
   }, [savedAddresses, selectedAddressId])
 
+  const addressCollection = useMemo(() => {
+    return createListCollection({
+      items: savedAddresses.map((a) => ({
+        label: `${a.address.city} • ${a.address.street} • ${a.address.building}`,
+        value: a.id,
+      })),
+    })
+  }, [savedAddresses])
+
   const subtotal = useMemo(() => {
     return initialItems.reduce(
       (sum, item) => sum + Number(item.price ?? 0) * Number(item.quantity ?? 1),
@@ -154,6 +164,8 @@ const CheckOut = () => {
     })
   }
 
+  const updateAddressDraft = (patch) => setAddressDraft((prev) => ({ ...prev, ...patch }))
+
   return (
     <Box maxW="1200px" mx="auto" px={4} py={8}>
       <Stack gap={6}>
@@ -210,22 +222,38 @@ const CheckOut = () => {
                 Deliver to
               </Text>
               <HStack>
-                <NativeSelect.Root
+                <Select.Root
+                  collection={addressCollection}
                   size="sm"
                   w={{ base: "100%", sm: "360px" }}
                   disabled={!hasSavedAddresses}
-                  value={selectedAddressId}
-                  onChange={(e) => setSelectedAddressId(e.target.value)}
+                  value={selectedAddressId ? [selectedAddressId] : []}
+                  onValueChange={(details) => setSelectedAddressId(details.value[0] ?? "")}
                 >
-                  <NativeSelect.Field placeholder={hasSavedAddresses ? "Select address" : "No addresses"}>
-                    {savedAddresses.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.address.city} • {a.address.street} • {a.address.building}
-                      </option>
-                    ))}
-                  </NativeSelect.Field>
-                  <NativeSelect.Indicator />
-                </NativeSelect.Root>
+                  <Select.HiddenSelect />
+                  <Select.Control>
+                    <Select.Trigger>
+                      <Select.ValueText
+                        placeholder={hasSavedAddresses ? "Select address" : "No addresses"}
+                      />
+                    </Select.Trigger>
+                    <Select.IndicatorGroup>
+                      <Select.Indicator />
+                    </Select.IndicatorGroup>
+                  </Select.Control>
+                  <Portal>
+                    <Select.Positioner>
+                      <Select.Content>
+                        {addressCollection.items.map((address) => (
+                          <Select.Item item={address} key={address.value}>
+                            {address.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Portal>
+                </Select.Root>
 
                 <IconButton
                   aria-label="Add address"
@@ -250,109 +278,21 @@ const CheckOut = () => {
             )}
 
             {showAddressForm && (
-              <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
-                <Stack gap={3}>
-                  <Text fontSize="md" fontWeight="800">
-                    Add New Address
+              <Stack gap={2}>
+                <AddressForm
+                  title="Add New Address"
+                  draft={addressDraft}
+                  onChange={updateAddressDraft}
+                  onSubmit={onSaveAddress}
+                  submitLabel="Save address"
+                  onCancel={hasSavedAddresses ? () => setShowAddressForm(false) : undefined}
+                />
+                {!hasSavedAddresses && (
+                  <Text fontSize="xs" color="gray.500">
+                    Add at least one saved address to enable checkout.
                   </Text>
-
-                  <Stack gap={3}>
-                    <HStack gap={3} flexWrap="wrap">
-                      <Field.Root flex="1" minW="240px">
-                        <Field.Label>First name</Field.Label>
-                        <Input
-                          value={addressDraft.firstName}
-                          onChange={(e) => setAddressDraft((p) => ({ ...p, firstName: e.target.value }))}
-                        />
-                      </Field.Root>
-                      <Field.Root flex="1" minW="240px">
-                        <Field.Label>Last name</Field.Label>
-                        <Input
-                          value={addressDraft.lastName}
-                          onChange={(e) => setAddressDraft((p) => ({ ...p, lastName: e.target.value }))}
-                        />
-                      </Field.Root>
-                    </HStack>
-
-                    <Field.Root>
-                      <Field.Label>Phone</Field.Label>
-                      <Input
-                        value={addressDraft.phone}
-                        onChange={(e) => setAddressDraft((p) => ({ ...p, phone: e.target.value }))}
-                      />
-                    </Field.Root>
-
-                    <HStack gap={3} flexWrap="wrap">
-                      <Field.Root flex="1" minW="240px">
-                        <Field.Label>Country</Field.Label>
-                        <Input
-                          value={addressDraft.country}
-                          onChange={(e) => setAddressDraft((p) => ({ ...p, country: e.target.value }))}
-                        />
-                      </Field.Root>
-                      <Field.Root flex="1" minW="240px">
-                        <Field.Label>City</Field.Label>
-                        <Input
-                          value={addressDraft.city}
-                          onChange={(e) => setAddressDraft((p) => ({ ...p, city: e.target.value }))}
-                        />
-                      </Field.Root>
-                    </HStack>
-
-                    <HStack gap={3} flexWrap="wrap">
-                      <Field.Root flex="1" minW="240px">
-                        <Field.Label>Postal code</Field.Label>
-                        <Input
-                          value={addressDraft.postalcode}
-                          onChange={(e) => setAddressDraft((p) => ({ ...p, postalcode: e.target.value }))}
-                        />
-                      </Field.Root>
-                      <Field.Root flex="2" minW="240px">
-                        <Field.Label>Street</Field.Label>
-                        <Input
-                          value={addressDraft.street}
-                          onChange={(e) => setAddressDraft((p) => ({ ...p, street: e.target.value }))}
-                        />
-                      </Field.Root>
-                    </HStack>
-
-                    <HStack gap={3} flexWrap="wrap">
-                      <Field.Root flex="2" minW="240px">
-                        <Field.Label>Building</Field.Label>
-                        <Input
-                          value={addressDraft.building}
-                          onChange={(e) => setAddressDraft((p) => ({ ...p, building: e.target.value }))}
-                        />
-                      </Field.Root>
-                      <Field.Root flex="1" minW="160px">
-                        <Field.Label>Floor</Field.Label>
-                        <Input
-                          type="number"
-                          value={addressDraft.floor}
-                          onChange={(e) => setAddressDraft((p) => ({ ...p, floor: e.target.value }))}
-                        />
-                      </Field.Root>
-                    </HStack>
-
-                    <Field.Root>
-                      <Field.Label>Special mark</Field.Label>
-                      <Input
-                        value={addressDraft.special_mark}
-                        onChange={(e) => setAddressDraft((p) => ({ ...p, special_mark: e.target.value }))}
-                      />
-                    </Field.Root>
-
-                    <Button alignSelf="flex-start" onClick={onSaveAddress}>
-                      Save address
-                    </Button>
-                    {!hasSavedAddresses && (
-                      <Text fontSize="xs" color="gray.500">
-                        Add at least one saved address to enable checkout.
-                      </Text>
-                    )}
-                  </Stack>
-                </Stack>
-              </Box>
+                )}
+              </Stack>
             )}
           </Stack>
         </Box>

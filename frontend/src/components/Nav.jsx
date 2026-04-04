@@ -85,8 +85,16 @@ const Nav = () => {
                     <Portal>
                         <Menu.Positioner>
                         <Menu.Content>
-                            <Menu.Item value="new-txt">view profile</Menu.Item>
-                            <Menu.Item value="new-file">edit profile</Menu.Item>
+                            <Menu.Item asChild value="new-txt">
+                              <Link as={RouterLink} to="/profile">
+                                view profile
+                              </Link>
+                            </Menu.Item>
+                            <Menu.Item asChild value="new-file">
+                              <Link as={RouterLink} to="/profile">
+                                edit profile
+                              </Link>
+                            </Menu.Item>
                             <Menu.Item value="new-win">logout</Menu.Item>
                         </Menu.Content>
                         </Menu.Positioner>

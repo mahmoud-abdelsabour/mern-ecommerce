@@ -29,9 +29,11 @@ const ProductCard = ({
             <Checkbox.Root
               checked={Boolean(selected)}
               onCheckedChange={(details) => onToggleSelected?.(details.checked)}
+              colorPalette="teal"
+              size="sm"
             >
               <Checkbox.HiddenInput />
-              <Checkbox.Control bg="whiteAlpha.900" />
+              <Checkbox.Control w="5" h="5" bg="whiteAlpha.900" rounded="sm" />
             </Checkbox.Root>
           </Box>
         )}
