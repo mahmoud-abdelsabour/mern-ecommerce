@@ -113,7 +113,21 @@ const Cart = () => {
   return (
     <Box maxW="1200px" mx="auto" px={4} py={8}>
       {hasItems ? (
-        <ProductList items={cartItems} variant="cart" />
+        <VStack w="100%" gap={6}>
+          
+          <Box w="100%">
+            <ProductList items={cartItems} variant="cart" />
+          </Box>
+          <Button
+            as={RouterLink}
+            to="/order/check-out"
+            size="lg"
+            colorScheme="teal"
+            w={{ base: "100%", md: "320px" }}
+          >
+            Checkout
+          </Button>
+        </VStack>
       ) : (
         <Flex minH="70vh" align="center" justify="center">
           <EmptyState.Root size={"lg"}>

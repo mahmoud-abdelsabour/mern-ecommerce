@@ -12,6 +12,8 @@ import Wishlist from './pages/Wishlist'
 import NotFound from './components/NotFound'
 import Orders from './pages/Orders'
 import Order from './pages/Order'
+import CheckOut from './pages/CheckOut'
+import Return from './pages/Return'
 
 const App = () => {
   return(
@@ -26,6 +28,8 @@ const App = () => {
         <Route path='/wishlist' element={<Wishlist />} />
         <Route path='/orders' element={<Orders />} />
         <Route path='/order' element={<Order />} />
+        <Route path='/order/check-out' element={<CheckOut />} />
+        <Route path='/order/return' element={<Return />} />
         <Route path='*' element={<NotFound />} />
       </Routes>
       <Box flex="1" />

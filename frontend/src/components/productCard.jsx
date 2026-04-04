@@ -1,9 +1,16 @@
-import { Box, Stack, Image, HStack, Icon, Text, Button, IconButton } from '@chakra-ui/react'
+import { Box, Stack, Image, HStack, Icon, Text, Button, IconButton, Checkbox } from '@chakra-ui/react'
 import { FaStar } from 'react-icons/fa'
 import { LuMinus, LuPlus } from "react-icons/lu"
 import { ICON_SIZE } from '../constants/ui'
 
-const ProductCard = ({ data, variant = "default" }) => {
+const ProductCard = ({
+  data,
+  variant = "default",
+  selected,
+  onToggleSelected,
+  onIncrease,
+  onDecrease,
+}) => {
   const title = data?.title ?? data?.name ?? "Product"
   const brand = data?.brand ?? "—"
   const category = data?.category ?? "—"
@@ -17,6 +24,17 @@ const ProductCard = ({ data, variant = "default" }) => {
   return (
     <Stack gap="2" borderWidth="1px" borderColor="gray.200" rounded="md" p={2} w="100%" maxW="200px">
       <Box position="relative" w="100%" aspectRatio={1}>
+        {variant === "return" && (
+          <Box position="absolute" top="2" left="2" zIndex="1">
+            <Checkbox.Root
+              checked={Boolean(selected)}
+              onCheckedChange={(details) => onToggleSelected?.(details.checked)}
+            >
+              <Checkbox.HiddenInput />
+              <Checkbox.Control bg="whiteAlpha.900" />
+            </Checkbox.Root>
+          </Box>
+        )}
         <Image
           src={image}
           alt={title}
@@ -58,6 +76,28 @@ const ProductCard = ({ data, variant = "default" }) => {
             Qty: {quantity}
           </Text>
           <IconButton size="xs" variant="outline" aria-label="Increase">
+            <LuPlus size={ICON_SIZE} />
+          </IconButton>
+        </HStack>
+      ) : variant === "return" ? (
+        <HStack justify="space-between" align="center">
+          <IconButton
+            size="xs"
+            variant="outline"
+            aria-label="Decrease"
+            onClick={() => onDecrease?.()}
+          >
+            <LuMinus size={ICON_SIZE} />
+          </IconButton>
+          <Text fontSize="xs" fontWeight="600">
+            Qty: {quantity}
+          </Text>
+          <IconButton
+            size="xs"
+            variant="outline"
+            aria-label="Increase"
+            onClick={() => onIncrease?.()}
+          >
             <LuPlus size={ICON_SIZE} />
           </IconButton>
         </HStack>

@@ -1,6 +1,5 @@
-import { Badge, Box, Separator, HStack, SimpleGrid, Stack, Text, Button, Timeline } from "@chakra-ui/react"
+import { Badge, Box, Separator, HStack, Stack, Text, Button, Timeline } from "@chakra-ui/react"
 import { useState } from "react"
-import { TbBrandCashapp } from "react-icons/tb"
 import { FaClock } from "react-icons/fa"
 import { MdCancel, MdLocalShipping, MdOutlineDoneOutline } from "react-icons/md"
 import { RiRefund2Line } from "react-icons/ri"
@@ -25,7 +24,7 @@ const initialOrder = {
   id: "ORD-10021",
   createdAt: "2026-04-04T10:30:00.000Z",
   paymentMethod: "COD",
-  deliveryStatus: "pending",
+  deliveryStatus: "shipped",
   shippedAt: null,
   deliveredAt: null,
   shippingPrice: 25,
@@ -81,8 +80,6 @@ const initialOrder = {
 const Order = () => {
   const [order, setOrder] = useState(initialOrder)
 
-  const createdAtLabel = formatDate(order?.createdAt)
-
   const items = (order?.products ?? []).map((p, index) => ({
     id: p?.product ?? `${index}`,
     title: p?.name,
@@ -103,10 +100,16 @@ const Order = () => {
   const total = subtotal + shippingPrice + codFees
 
   const canCancel = String(order?.deliveryStatus ?? "").toLowerCase() === "pending"
+  const canReturn = String(order?.deliveryStatus ?? "").toLowerCase() === "delivered"
 
   const onCancelOrder = () => {
     if (!canCancel) return
     setOrder((prev) => ({ ...prev, deliveryStatus: "cancelled" }))
+  }
+
+  const onReturnOrder = () => {
+    if (!canReturn) return
+    setOrder((prev) => ({ ...prev, deliveryStatus: "return requested" }))
   }
 
   return (
@@ -128,14 +131,7 @@ const Order = () => {
           <ProductList items={items} variant="order" />
         </Stack>
 
-        <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-          <OrderInfoCard
-            createdAtLabel={createdAtLabel}
-            paymentMethod={order?.paymentMethod ?? "COD"}
-            deliveryStatus={order?.deliveryStatus ?? "pending"}
-            canCancel={canCancel}
-            onCancel={onCancelOrder}
-          />
+        <Stack gap={4}>
           <OrderTimelineCard
             createdAt={order?.createdAt}
             shippedAt={order?.shippedAt}
@@ -149,60 +145,33 @@ const Order = () => {
             codFees={codFees}
             subtotal={subtotal}
             total={total}
+            paymentMethod={order?.paymentMethod ?? "COD"}
           />
-        </SimpleGrid>
+        </Stack>
+
+        <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+          <Stack gap={2}>
+            <HStack>
+              <Button flex="1" colorScheme="red" disabled={!canCancel} onClick={onCancelOrder}>
+                Cancel Order
+              </Button>
+              <Button flex="1" colorScheme="orange" disabled={!canReturn} onClick={onReturnOrder}>
+                Return
+              </Button>
+            </HStack>
+            {!canCancel && !canReturn && (
+              <Text fontSize="xs" color="gray.500">
+                Cancel works only when pending, return works only when delivered.
+              </Text>
+            )}
+          </Stack>
+        </Box>
       </Stack>
     </Box>
   )
 }
 
 export default Order
-
-const OrderInfoCard = ({ createdAtLabel, paymentMethod, deliveryStatus, canCancel, onCancel }) => {
-  return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
-      <Stack gap={2}>
-        <Text fontSize="lg" fontWeight="800">
-          Order Info
-        </Text>
-        <Separator />
-
-        <Text fontSize="sm" color="gray.600">
-          Created at:{" "}
-          <Text as="span" color="gray.900" fontWeight="700">
-            {createdAtLabel}
-          </Text>
-        </Text>
-
-        <HStack gap={2}>
-          <TbBrandCashapp />
-          <Text fontSize="sm">
-            Payment:{" "}
-            <Text as="span" fontWeight="700">
-              {paymentMethod}
-            </Text>
-          </Text>
-        </HStack>
-
-        <HStack gap={2}>
-          <Text fontSize="sm">Delivery status:</Text>
-          <StatusBadge status={deliveryStatus} />
-        </HStack>
-
-        <Separator />
-
-        <Button colorScheme="red" disabled={!canCancel} onClick={onCancel}>
-          Cancel Order
-        </Button>
-        {!canCancel && (
-          <Text fontSize="xs" color="gray.500">
-            Cancel is available only when status is pending.
-          </Text>
-        )}
-      </Stack>
-    </Box>
-  )
-}
 
 const OrderTimelineCard = ({ createdAt, shippedAt, deliveredAt, deliveryStatus }) => {
   const status = String(deliveryStatus ?? "").toLowerCase()
@@ -215,9 +184,12 @@ const OrderTimelineCard = ({ createdAt, shippedAt, deliveredAt, deliveryStatus }
   return (
     <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
       <Stack gap={2}>
-        <Text fontSize="lg" fontWeight="800">
-          Delivery Timeline
-        </Text>
+        <HStack justify="space-between" align="center" flexWrap="wrap">
+          <Text fontSize="lg" fontWeight="800">
+            Delivery Timeline
+          </Text>
+          <StatusBadge status={deliveryStatus} />
+        </HStack>
         <Separator />
 
         <Timeline.Root maxW="400px">
@@ -274,7 +246,7 @@ const OrderTimelineCard = ({ createdAt, shippedAt, deliveredAt, deliveryStatus }
   )
 }
 
-const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total }) => {
+const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total, paymentMethod }) => {
   return (
     <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
       <Stack gap={2}>
@@ -289,8 +261,8 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total }) => {
             const price = Number(item?.price ?? 0)
             const lineTotal = qty * price
             return (
-              <HStack key={item.id} justify="space-between" align="start">
-                <Stack gap={0} maxW="70%">
+              <HStack key={item.id} align="start">
+                <Stack gap={0} minW="0">
                   <Text fontSize="sm" fontWeight="700" noOfLines={2}>
                     {item?.title ?? "Product"}
                   </Text>
@@ -298,6 +270,14 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total }) => {
                     {qty} x {formatMoney(price)}
                   </Text>
                 </Stack>
+                <Box
+                  flex="1"
+                  borderBottomWidth="1px"
+                  borderBottomStyle="dotted"
+                  borderBottomColor="gray.300"
+                  mx={3}
+                  mt={3}
+                />
                 <Text fontSize="sm" fontWeight="800">
                   {formatMoney(lineTotal)}
                 </Text>
@@ -309,26 +289,50 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total }) => {
         <Separator />
 
         <Stack gap={1}>
-          <HStack justify="space-between">
+          <HStack>
             <Text fontSize="sm" color="gray.600">
               Subtotal
             </Text>
+            <Box
+              flex="1"
+              borderBottomWidth="1px"
+              borderBottomStyle="dotted"
+              borderBottomColor="gray.300"
+              mx={3}
+              mt={2}
+            />
             <Text fontSize="sm" fontWeight="800">
               {formatMoney(subtotal)}
             </Text>
           </HStack>
-          <HStack justify="space-between">
+          <HStack>
             <Text fontSize="sm" color="gray.600">
               Shipping
             </Text>
+            <Box
+              flex="1"
+              borderBottomWidth="1px"
+              borderBottomStyle="dotted"
+              borderBottomColor="gray.300"
+              mx={3}
+              mt={2}
+            />
             <Text fontSize="sm" fontWeight="800">
               {formatMoney(shippingPrice)}
             </Text>
           </HStack>
-          <HStack justify="space-between">
+          <HStack>
             <Text fontSize="sm" color="gray.600">
               COD fees
             </Text>
+            <Box
+              flex="1"
+              borderBottomWidth="1px"
+              borderBottomStyle="dotted"
+              borderBottomColor="gray.300"
+              mx={3}
+              mt={2}
+            />
             <Text fontSize="sm" fontWeight="800">
               {formatMoney(codFees)}
             </Text>
@@ -337,12 +341,39 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total }) => {
 
         <Separator />
 
-        <HStack justify="space-between">
+        <HStack>
           <Text fontSize="md" fontWeight="900">
             Total
           </Text>
+          <Box
+            flex="1"
+            borderBottomWidth="2px"
+            borderBottomStyle="dotted"
+            borderBottomColor="gray.400"
+            mx={3}
+            mt={3}
+          />
           <Text fontSize="md" fontWeight="900">
             {formatMoney(total)}
+          </Text>
+        </HStack>
+
+        <Separator />
+
+        <HStack>
+          <Text fontSize="sm" color="gray.600">
+            Payment method
+          </Text>
+          <Box
+            flex="1"
+            borderBottomWidth="1px"
+            borderBottomStyle="dotted"
+            borderBottomColor="gray.300"
+            mx={3}
+            mt={2}
+          />
+          <Text fontSize="sm" fontWeight="800">
+            {paymentMethod}
           </Text>
         </HStack>
       </Stack>
