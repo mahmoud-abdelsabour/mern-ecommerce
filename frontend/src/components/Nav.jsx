@@ -86,12 +86,12 @@ const Nav = () => {
                         <Menu.Positioner>
                         <Menu.Content>
                             <Menu.Item asChild value="new-txt">
-                              <Link as={RouterLink} to="/profile">
+                              <Link as={RouterLink} to="/me">
                                 view profile
                               </Link>
                             </Menu.Item>
                             <Menu.Item asChild value="new-file">
-                              <Link as={RouterLink} to="/profile">
+                              <Link as={RouterLink} to="/me/edit">
                                 edit profile
                               </Link>
                             </Menu.Item>

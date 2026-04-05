@@ -7,6 +7,7 @@ import {
   Input,
   Stack,
 } from "@chakra-ui/react"
+import { Link as RouterLink } from "react-router-dom"
 
 
 const Login = () => {
@@ -32,6 +33,9 @@ const Login = () => {
 
           <Button type="submit" alignSelf="flex-start">
             Submit
+          </Button>
+          <Button as={RouterLink} to="/register" variant="link" size="sm" alignSelf="flex-start">
+            Not a user? Register
           </Button>
         </Fieldset.Root>
       </Box>

@@ -1,4 +1,5 @@
 import { Carousel, IconButton, Box, Button, Flex, HStack, Text } from "@chakra-ui/react"
+import { Link as RouterLink } from "react-router-dom"
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu"
 import { ProductCard } from "../components/ProductCard"
 import { properties } from "../constants/products"
@@ -49,7 +50,9 @@ const Home = () => {
             </Carousel.Control>
             </Carousel.Root>
             <Flex justify="center" mt={4}>
-                <Button>Shop Now</Button>
+                <Button as={RouterLink} to="/catalog">
+                    Shop Now
+                </Button>
             </Flex>
 
             {/* featured products */}

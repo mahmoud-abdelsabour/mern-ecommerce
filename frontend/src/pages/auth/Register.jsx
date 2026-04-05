@@ -4,9 +4,11 @@ import {
   Field,
   Fieldset,
   Flex,
+  HStack,
   Input,
   Stack,
 } from "@chakra-ui/react"
+import { Link as RouterLink } from "react-router-dom"
 
 
 const Register = () => {
@@ -19,10 +21,16 @@ const Register = () => {
           </Stack>
 
           <Fieldset.Content>
-            <Field.Root>
-              <Field.Label>Name</Field.Label>
-              <Input name="name" />
-            </Field.Root>
+            <HStack gap={3} flexWrap="wrap">
+              <Field.Root flex="1" minW="180px">
+                <Field.Label>First name</Field.Label>
+                <Input name="firstName" />
+              </Field.Root>
+              <Field.Root flex="1" minW="180px">
+                <Field.Label>Last name</Field.Label>
+                <Input name="lastName" />
+              </Field.Root>
+            </HStack>
 
             <Field.Root>
               <Field.Label>Username</Field.Label>
@@ -47,6 +55,9 @@ const Register = () => {
 
           <Button type="submit" alignSelf="flex-start">
             Submit
+          </Button>
+          <Button as={RouterLink} to="/login" variant="link" size="sm" alignSelf="flex-start">
+            Already a user? Login
           </Button>
         </Fieldset.Root>
       </Box>

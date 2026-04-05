@@ -3,6 +3,7 @@ import { useMemo, useState } from "react"
 import { LuPencil, LuPlus, LuTrash2 } from "react-icons/lu"
 import { HiUpload } from "react-icons/hi"
 import AddressForm from "../components/AddressForm"
+import { Link as RouterLink } from "react-router-dom"
 
 const emptyDraft = {
   firstName: "",
@@ -280,8 +281,8 @@ const Profile = () => {
         </Box>
 
         <HStack justify="flex-end">
-          <Button variant="outline" disabled>
-            Edit profile (soon)
+          <Button as={RouterLink} to="/me/edit" variant="outline">
+            Edit profile
           </Button>
         </HStack>
       </Stack>
