@@ -2,10 +2,15 @@ import { Box, Checkbox, EmptyState, HStack, Separator, Slider, Stack, Text, Rati
 import { useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 import ProductList from "../components/ProductList"
-import { properties } from "../constants/products"
 import { PiEmptyFill } from "react-icons/pi"
+import { useProducts } from "../hooks/useProducts"
 
-const uniqSorted = (items) => Array.from(new Set(items)).filter(Boolean).sort()
+const slugify = (value) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
 
 const parseListParam = (value) => {
   if (!value) return []
@@ -25,39 +30,28 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 const Catalog = () => {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const brands = useMemo(() => uniqSorted(properties.map((p) => p.brand)), [])
-  const categories = useMemo(() => uniqSorted(properties.map((p) => p.category)), [])
-
-  const minPrice = useMemo(() => Math.min(...properties.map((p) => Number(p.price ?? 0))), [])
-  const maxPrice = useMemo(() => Math.max(...properties.map((p) => Number(p.price ?? 0))), [])
-
+  const sliderMin = 0
+  const sliderMax = 100000
   const sliderStep = 1
   const sliderMinStepsBetweenThumbs = 1
-
-  let baseMin = Math.floor(minPrice)
-  let baseMax = Math.ceil(maxPrice)
-
-  if (!Number.isFinite(baseMin)) baseMin = 0
-  if (!Number.isFinite(baseMax)) baseMax = baseMin + 100
-  if (baseMax <= baseMin) baseMax = baseMin + sliderStep
 
   const queryState = useMemo(() => {
     const brandParam = parseListParam(searchParams.get("brand"))
     const categoryParam = parseListParam(searchParams.get("category"))
 
-    const selectedBrands = brandParam.filter((b) => brands.includes(b)).sort()
-    const selectedCategories = categoryParam.filter((c) => categories.includes(c)).sort()
+    const selectedBrands = brandParam.sort()
+    const selectedCategories = categoryParam.sort()
 
     const minP = Number(searchParams.get("minPrice"))
     const maxP = Number(searchParams.get("maxPrice"))
-    let nextMin = Number.isFinite(minP) ? clamp(minP, baseMin, baseMax) : baseMin
-    let nextMax = Number.isFinite(maxP) ? clamp(maxP, baseMin, baseMax) : baseMax
+    let nextMin = Number.isFinite(minP) ? clamp(minP, sliderMin, sliderMax) : sliderMin
+    let nextMax = Number.isFinite(maxP) ? clamp(maxP, sliderMin, sliderMax) : sliderMax
     if (nextMin > nextMax) [nextMin, nextMax] = [nextMax, nextMin]
 
     const minGap = sliderStep * sliderMinStepsBetweenThumbs
     if (nextMax - nextMin < minGap) {
-      const expandedMax = Math.min(baseMax, nextMin + minGap)
-      const expandedMin = Math.max(baseMin, nextMax - minGap)
+      const expandedMax = Math.min(sliderMax, nextMin + minGap)
+      const expandedMin = Math.max(sliderMin, nextMax - minGap)
       // Prefer expanding max first, then min if needed
       if (expandedMax - nextMin >= minGap) nextMax = expandedMax
       else nextMin = expandedMin
@@ -72,24 +66,67 @@ const Catalog = () => {
       priceRange: [nextMin, nextMax],
       minRating: nextRating,
     }
-  }, [searchParams, brands, categories, baseMin, baseMax, sliderStep, sliderMinStepsBetweenThumbs])
+  }, [searchParams, sliderMin, sliderMax, sliderStep, sliderMinStepsBetweenThumbs])
 
   const selectedBrands = queryState.selectedBrands
   const selectedCategories = queryState.selectedCategories
   const priceRange = queryState.priceRange
   const minRating = queryState.minRating
 
-  const filtered = useMemo(() => {
+  const apiFilters = useMemo(() => {
     const [minP, maxP] = priceRange
-    return properties.filter((p) => {
-      const brandOk = selectedBrands.length === 0 || selectedBrands.includes(p.brand)
-      const categoryOk = selectedCategories.length === 0 || selectedCategories.includes(p.category)
-      const price = Number(p.price ?? 0)
-      const priceOk = price >= minP && price <= maxP
-      const ratingOk = Number(p.rating ?? 0) >= minRating
-      return brandOk && categoryOk && priceOk && ratingOk
-    })
+    return {
+      brand: selectedBrands.length === 1 ? selectedBrands[0] : undefined,
+      category: selectedCategories.length === 1 ? selectedCategories[0] : undefined,
+      minPrice: minP,
+      maxPrice: maxP,
+      minRating,
+    }
   }, [selectedBrands, selectedCategories, priceRange, minRating])
+
+  const { data, isLoading } = useProducts(apiFilters)
+
+  const products = useMemo(() => data?.products ?? [], [data])
+
+  const items = useMemo(() => {
+    return products.map((p) => ({
+      id: p?.id ?? p?._id,
+      title: p?.name,
+      price: p?.price,
+      rating: p?.rating?.score ?? 0,
+      brand: p?.brand?.name ?? "—",
+      category: p?.category?.name ?? "—",
+      image: p?.photos?.[0],
+    }))
+  }, [products])
+
+  const brandOptions = useMemo(() => {
+    const map = new Map()
+    for (const p of products) {
+      const name = p?.brand?.name
+      if (!name) continue
+      const value = slugify(name)
+      if (!value) continue
+      if (!map.has(value)) map.set(value, name)
+    }
+    return Array.from(map.entries())
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+  }, [products])
+
+  const categoryOptions = useMemo(() => {
+    const map = new Map()
+    for (const p of products) {
+      const name = p?.category?.name
+      if (!name) continue
+      const value = slugify(name)
+      if (!value) continue
+      if (!map.has(value)) map.set(value, name)
+    }
+    return Array.from(map.entries())
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+  }, [products])
 
   const updateQuery = (updater) => {
     const next = new URLSearchParams(searchParams)
@@ -118,7 +155,7 @@ const Catalog = () => {
             Catalog
           </Text>
           <Text fontSize="sm" color="gray.500">
-            {filtered.length} products
+            {isLoading ? "Loading..." : `${items.length} products`}
           </Text>
         </Stack>
 
@@ -132,13 +169,15 @@ const Catalog = () => {
                 <Separator />
                 <Box maxH="180px" overflowY="auto" pr={2}>
                   <Stack gap={2}>
-                    {brands.map((brand) => (
+                    {brandOptions.map((brand) => (
                       <Checkbox.Root
-                        key={brand}
-                        checked={selectedBrands.includes(brand)}
+                        key={brand.value}
+                        checked={selectedBrands.includes(brand.value)}
                         onCheckedChange={(d) => {
                           const checked = Boolean(d.checked)
-                          const nextList = checked ? toggleList(selectedBrands, brand) : selectedBrands.filter((b) => b !== brand)
+                          const nextList = checked
+                            ? toggleList(selectedBrands, brand.value)
+                            : selectedBrands.filter((b) => b !== brand.value)
                           const value = serializeListParam([...nextList].sort())
                           updateQuery((sp) => {
                             if (value) sp.set("brand", value)
@@ -148,7 +187,7 @@ const Catalog = () => {
                       >
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
-                        <Checkbox.Label fontSize="sm">{brand}</Checkbox.Label>
+                        <Checkbox.Label fontSize="sm">{brand.label}</Checkbox.Label>
                       </Checkbox.Root>
                     ))}
                   </Stack>
@@ -162,15 +201,15 @@ const Catalog = () => {
                 <Separator />
                 <Box maxH="180px" overflowY="auto" pr={2}>
                   <Stack gap={2}>
-                    {categories.map((category) => (
+                    {categoryOptions.map((category) => (
                       <Checkbox.Root
-                        key={category}
-                        checked={selectedCategories.includes(category)}
+                        key={category.value}
+                        checked={selectedCategories.includes(category.value)}
                         onCheckedChange={(d) => {
                           const checked = Boolean(d.checked)
                           const nextList = checked
-                            ? toggleList(selectedCategories, category)
-                            : selectedCategories.filter((c) => c !== category)
+                            ? toggleList(selectedCategories, category.value)
+                            : selectedCategories.filter((c) => c !== category.value)
                           const value = serializeListParam([...nextList].sort())
                           updateQuery((sp) => {
                             if (value) sp.set("category", value)
@@ -180,7 +219,7 @@ const Catalog = () => {
                       >
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
-                        <Checkbox.Label fontSize="sm">{category}</Checkbox.Label>
+                        <Checkbox.Label fontSize="sm">{category.label}</Checkbox.Label>
                       </Checkbox.Root>
                     ))}
                   </Stack>
@@ -199,8 +238,8 @@ const Catalog = () => {
                 <Separator />
                 <Slider.Root
                   maxW="md"
-                  min={baseMin}
-                  max={baseMax}
+                  min={sliderMin}
+                  max={sliderMax}
                   step={sliderStep}
                   value={priceRange}
                   onValueChange={(e) => {
@@ -249,9 +288,13 @@ const Catalog = () => {
           </Box>
 
           <Box flex="1" w="100%" minH="70vh" display="flex" flexDirection="column">
-            {filtered.length > 0 ? (
+            {isLoading ? (
+              <Box flex="1" display="flex" alignItems="center" justifyContent="center">
+                <Text color="gray.500">Loading products...</Text>
+              </Box>
+            ) : items.length > 0 ? (
               <Box flex="1">
-                <ProductList items={filtered} />
+                <ProductList items={items} />
               </Box>
             ) : (
               <SimpleGrid columns={{ base: 1, sm: 2, md: 4, lg: 4 }} gap={4} w="100%" flex="1">
