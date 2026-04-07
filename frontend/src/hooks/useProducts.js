@@ -6,7 +6,7 @@ export const useProducts = (filters) => {
     queryKey: ['products', filters],
     queryFn: () => productsApi.getProducts(filters),
     keepPreviousData: true,
-    cacheTime: 1000 * 60 * 10,
-    staleTime: 1000 * 60 * 2,
+    cacheTime: 1000 * 60 * 30,
+    staleTime: 1000 * 60 * 10,
   })
 }

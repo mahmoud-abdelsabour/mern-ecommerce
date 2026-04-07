@@ -229,6 +229,19 @@ const restoreBrand = async ({ brandId }) => {
     }
 }
 
+// Public: return all non-deleted brands for storefront filters (no pagination).
+const getPublicBrands = async () => {
+    try {
+        const brands = await Brand.find({ isDeleted: false })
+            .select('name slug logo')
+            .sort({ name: 1 })
+
+        return { brands }
+    } catch (error) {
+        throw error
+    }
+}
+
 module.exports = {
     createBrand,
     deleteBrand,
@@ -236,4 +249,5 @@ module.exports = {
     getAllBrands,
     getBrandById,
     updateBrand,
+    getPublicBrands,
 }

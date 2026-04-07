@@ -128,9 +128,20 @@ const getAllCategories = async data => {
     }
 }
 
+// Public: return all categories for storefront filters (no pagination).
+const getPublicCategories = async () => {
+    try {
+        const categories = await Category.find({}).select('name slug').sort({ name: 1 })
+        return { categories }
+    } catch (error) {
+        throw error
+    }
+}
+
 module.exports = {
     createCategory,
     updateCategory,
     deleteCategory,
     getAllCategories,
+    getPublicCategories,
 }

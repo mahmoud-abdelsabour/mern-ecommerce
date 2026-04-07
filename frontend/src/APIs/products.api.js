@@ -4,7 +4,13 @@ import { getAuthConfig } from "../apis/http"
 const baseURL = "/api/products"
 
 const getProducts = async (query = {}) => {
-  const response = await axios.get(baseURL, { params: query })
+  // Axios may serialize `undefined` values in surprising ways depending on config.
+  // Always remove empty values so we don't accidentally send `brand=undefined` and get 0 results.
+  const params = Object.fromEntries(
+    Object.entries(query || {}).filter(([, value]) => value !== undefined && value !== null && value !== "")
+  )
+
+  const response = await axios.get(baseURL, { params })
   return response.data
 }
 
@@ -39,4 +45,3 @@ export default {
   createReview,
   getProductUserStatus,
 }
-

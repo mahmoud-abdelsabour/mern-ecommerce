@@ -53,6 +53,21 @@ describe('GET /api/products', () => {
         expect(response.body.products.length).toBe(1)
     })
 
+    it('filters by multiple brand slugs (comma-separated)', async () => {
+        const brandA = await createBrand({ slug: 'brand-a' })
+        const brandB = await createBrand({ slug: 'brand-b' })
+        const brandC = await createBrand({ slug: 'brand-c' })
+
+        await createProduct({ brand: brandA })
+        await createProduct({ brand: brandB })
+        await createProduct({ brand: brandC })
+
+        const response = await api.get('/api/products?brand=brand-a,brand-b')
+        logIfServerError(response)
+        expect(response.status).toBe(200)
+        expect(response.body.products.length).toBe(2)
+    })
+
     it('filters by category slug', async () => {
         const categoryA = await createCategory({ slug: 'cat-a' })
         const categoryB = await createCategory({ slug: 'cat-b' })
@@ -64,6 +79,21 @@ describe('GET /api/products', () => {
         logIfServerError(response)
         expect(response.status).toBe(200)
         expect(response.body.products.length).toBe(1)
+    })
+
+    it('filters by multiple category slugs (comma-separated)', async () => {
+        const categoryA = await createCategory({ slug: 'cat-a' })
+        const categoryB = await createCategory({ slug: 'cat-b' })
+        const categoryC = await createCategory({ slug: 'cat-c' })
+
+        await createProduct({ category: categoryA })
+        await createProduct({ category: categoryB })
+        await createProduct({ category: categoryC })
+
+        const response = await api.get('/api/products?category=cat-a,cat-c')
+        logIfServerError(response)
+        expect(response.status).toBe(200)
+        expect(response.body.products.length).toBe(2)
     })
 
     it('filters by price range', async () => {

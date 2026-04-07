@@ -4,6 +4,20 @@ const Brand = require('../models/brand.model')
 const Review = require('../models/review.model')
 const { pickAllowedFields } = require('../utils/request/pick-fields.util')
 
+// Parse list-like query params into an array of slugs.
+// Supports:
+// - "apple,samsung"
+// - ["apple", "samsung"]
+// - ["apple,samsung"] (repeated query params)
+const parseSlugList = value => {
+    if (value === null || value === undefined) return []
+    const parts = Array.isArray(value) ? value : [value]
+    return parts
+        .flatMap(v => String(v).split(','))
+        .map(v => v.trim())
+        .filter(Boolean)
+}
+
 const getProducts = async data => {
     try {
         const {
@@ -24,8 +38,11 @@ const getProducts = async data => {
         const filter = {}
 
         if (brand) {
-            const brandDoc = await Brand.findOne({ slug: brand })
-            if (!brandDoc)
+            const brandSlugs = parseSlugList(brand)
+            const brandDocs = await Brand.find({ slug: { $in: brandSlugs } }).select('_id')
+
+            // Keep existing behavior: if nothing matches, return an empty list rather than "ignore filter".
+            if (!brandDocs || brandDocs.length === 0)
                 return {
                     products: [],
                     pagination: {
@@ -35,12 +52,17 @@ const getProducts = async data => {
                         limit: Number(limit),
                     },
                 }
-            filter.brand = brandDoc.id
+
+            filter.brand = { $in: brandDocs.map(b => b._id) }
         }
 
         if (category) {
-            const categoryDoc = await Category.findOne({ slug: category })
-            if (!categoryDoc)
+            const categorySlugs = parseSlugList(category)
+            const categoryDocs = await Category.find({ slug: { $in: categorySlugs } }).select(
+                '_id'
+            )
+
+            if (!categoryDocs || categoryDocs.length === 0)
                 return {
                     products: [],
                     pagination: {
@@ -50,7 +72,8 @@ const getProducts = async data => {
                         limit: Number(limit),
                     },
                 }
-            filter.category = categoryDoc.id
+
+            filter.category = { $in: categoryDocs.map(c => c._id) }
         }
 
         if (minPrice || maxPrice) {
