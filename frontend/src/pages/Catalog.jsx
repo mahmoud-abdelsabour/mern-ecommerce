@@ -22,6 +22,7 @@ import {
 import { useMemo } from "react"
 import ProductList from "../components/ProductList"
 import { PiEmptyFill } from "react-icons/pi"
+import PaginationControls from "../components/PaginationControls"
 import { useProducts } from "../hooks/useProducts"
 import { useBrands } from "../hooks/useBrands"
 import { useCategories } from "../hooks/useCategories"
@@ -34,20 +35,26 @@ const Catalog = () => {
   const sliderMax = 100000
   const sliderStep = 1
   const sliderMinStepsBetweenThumbs = 1
+  const pageSize = 12
 
-  const { filters, setBrands, setCategories, setPriceRange, setMinRating, setSort, resetFilters, defaultSort } =
-    useCatalogFilters({
-    sliderMin,
-    sliderMax,
-    sliderStep,
-    sliderMinStepsBetweenThumbs,
-  })
+  const {
+    filters,
+    setBrands,
+    setCategories,
+    setPriceRange,
+    setMinRating,
+    setSort,
+    setPage,
+    resetFilters,
+    defaultSort,
+  } = useCatalogFilters({ sliderMin, sliderMax, sliderStep, sliderMinStepsBetweenThumbs })
 
   const selectedBrands = filters.selectedBrands
   const selectedCategories = filters.selectedCategories
   const priceRange = filters.priceRange
   const minRating = filters.minRating
   const sort = filters.sort
+  const page = filters.page
 
   // Build the backend/API query object from current UI state.
   // IMPORTANT:
@@ -62,14 +69,17 @@ const Catalog = () => {
       maxPrice: maxP,
       minRating,
       sort: sort === defaultSort ? undefined : sort,
+      page,
+      limit: pageSize,
     }
-  }, [defaultSort, selectedBrands, selectedCategories, priceRange, minRating, sort])
+  }, [defaultSort, minRating, page, pageSize, priceRange, selectedBrands, selectedCategories, sort])
 
   // Fetch products from the server (hook decides how/when to refetch).
   const { data, isLoading, isError, error } = useProducts(apiFilters)
 
   // Ensure we always work with an array, even if the response is missing/undefined.
   const products = data?.products ?? []
+  const pagination = data?.pagination ?? null
 
   // Transform backend products into the `ProductList` item shape.
   const items = products.map((p) => ({
@@ -393,6 +403,19 @@ const Catalog = () => {
                   </EmptyState.Root>
                 </Box>
               </SimpleGrid>
+            )}
+
+            {/* Pagination (server-driven) */}
+            {pagination?.totalProducts > pageSize && (
+              <Box mt={6} display="flex" justifyContent="center">
+                <PaginationControls
+                  count={pagination.totalProducts}
+                  pageSize={pagination.limit ?? pageSize}
+                  page={pagination.currentPage ?? page}
+                  onPageChange={setPage}
+                  isDisabled={isLoading}
+                />
+              </Box>
             )}
           </Box>
         </Stack>

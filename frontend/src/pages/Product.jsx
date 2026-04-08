@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import {
   AspectRatio,
   Box,
@@ -16,27 +16,71 @@ import {
   Button,
   Stack,
   Collapsible,
-  Textarea 
+  Textarea,
 } from "@chakra-ui/react"
 import { LuChevronLeft, LuChevronRight, LuChevronDown } from "react-icons/lu"
 import ReviewCard from "../components/ReviewCard"
+import { useParams } from "react-router-dom"
+import { useProductById } from "../hooks/useProducts"
 
 
 const Product = () => {
+  // Local UI state for the "Write a Review" section (UI-only for now).
   const [reviewRating, setReviewRating] = useState(0)
-    let rn = 4652
+
+  // Read the `:productId` route param from `/product/:productId`.
+  const { productId } = useParams()
+
+  // Fetch the real product data from the backend.
+  // Response shape: `{ product, reviewsPreview, hasMoreReviews }`.
+  const { data, isLoading, isError, error } = useProductById(productId)
+
+  // Normalize the server response to predictable values for rendering.
+  const product = data?.product ?? null
+  const reviewsPreview = data?.reviewsPreview ?? []
+  const hasMoreReviews = Boolean(data?.hasMoreReviews)
+
+  // Convert `product.photos` (string URLs) into the shape expected by Chakra Carousel.
+  // If no photos exist, we show a single placeholder image.
+  const items = useMemo(() => {
+    const photos = product?.photos ?? []
+    if (!photos || photos.length === 0) {
+      return [
+        {
+          label: product?.name ?? "Product",
+          url: "https://placehold.co/1200x900?text=No+Image",
+        },
+      ]
+    }
+    return photos.map((url, index) => ({
+      label: `Photo ${index + 1}`,
+      url,
+    }))
+  }, [product])
+
+  // Display a short reviews count (e.g. "3" or "3+" when there are more).
+  const reviewsLabel = `${reviewsPreview.length}${hasMoreReviews ? "+" : ""}`
+
   return (
     <Box maxW="1200px" mx="auto" px={4} mt={6} pb={10}>
+      {/* Show request errors (instead of silently rendering an empty product). */}
+      {isError && (
+        <Text fontSize="sm" color="red.500" mb={4}>
+          Failed to load product: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
+        </Text>
+      )}
       <Text fontSize="sm" color="gray.500" fontWeight="600">
-        Brand Name
+        {/* Brand name */}
+        {isLoading ? "Loading..." : product?.brand?.name ?? "—"}
       </Text>
       <Text fontSize="3xl" fontWeight="800" mb={4}>
-        Product Name
+        {/* Product name */}
+        {isLoading ? "Loading..." : product?.name ?? "Product"}
       </Text>
       <Dialog.Root size="full">
         <Flex justify="center">
           <Carousel.Root slideCount={items.length} maxW="2xl" gap="4" w="100%">
-            {/* Product Hero */}
+            {/* Product images carousel (click image to open full-screen dialog). */}
             <Carousel.Control justifyContent="center" gap="4" width="full">
               <Carousel.PrevTrigger asChild>
                 <IconButton size="xs" variant="outline">
@@ -148,15 +192,22 @@ const Product = () => {
       {/* price + rating */}
       <HStack justify="space-between" align="center" mt={4}>
         <Text fontSize="xl" fontWeight="700">
-          $129.00
+          {/* Price */}
+          {isLoading ? "—" : `$${Number(product?.price ?? 0).toFixed(2)}`}
         </Text>
         <HStack gap="2" align="center">
-          <RatingGroup.Root readOnly count={5} defaultValue={3} size="sm">
+          {/* Average rating and number of voters */}
+          <RatingGroup.Root
+            readOnly
+            count={5}
+            value={Number(product?.rating?.score ?? 0)}
+            size="sm"
+          >
             <RatingGroup.HiddenInput />
             <RatingGroup.Control />
           </RatingGroup.Root>
           <Text fontSize="sm" color="gray.500">
-            (4652)
+            ({isLoading ? "—" : String(product?.rating?.voters ?? 0)})
           </Text>
         </HStack>
       </HStack>
@@ -184,24 +235,10 @@ const Product = () => {
               Description
             </Text>
             <Text fontSize="sm" color="gray.600">
-              This product is built with premium materials and designed for
-              everyday comfort. It offers reliable performance, clean styling,
-              and a durable finish that stands up to regular use and daily wear.
-            </Text>
-            <Text fontSize="sm" color="gray.600">
-              The design focuses on usability and durability, with carefully
-              selected components that feel solid in hand. The finish resists
-              smudges and scratches, keeping it looking fresh over time.
-            </Text>
-            <Text fontSize="sm" color="gray.600">
-              Ideal for daily routines, it balances quality and value with a
-              thoughtful design. Easy to maintain and made to last, it fits
-              seamlessly into any setup and complements a wide range of styles.
-            </Text>
-            <Text fontSize="sm" color="gray.600">
-              Whether for work, travel, or home use, it delivers consistent
-              results with minimal effort. Built to be dependable, it is a
-              practical choice for anyone who wants both function and style.
+              {/* Description text */}
+              {isLoading
+                ? "Loading description..."
+                : product?.description ?? "No description available."}
             </Text>
           </Stack>
         </Collapsible.Content>
@@ -225,6 +262,7 @@ const Product = () => {
         <Text fontSize="md" fontWeight="700">
           Write a Review
         </Text>
+        {/* This is UI-only for now (no POST to backend wired yet). */}
         <RatingGroup.Root
           count={5}
           size="sm"
@@ -243,76 +281,32 @@ const Product = () => {
       {/* reviews */}
       <Stack mt={8} gap={4}>
         <Text fontSize="2xl" fontWeight="700">
-          Reviews ({rn})
+          Reviews ({isLoading ? "—" : reviewsLabel})
         </Text>
-        {reviews.map((review) => (
-          <ReviewCard
-            key={review.id}
-            name={review.name}
-            date={review.date}
-            rating={review.rating}
-            comment={review.comment}
-            avatarUrl={review.avatarUrl}
-          />
-        ))}
+        {/* Server preview: show latest reviews if present (fallback to empty state). */}
+        {isLoading ? (
+          <Text fontSize="sm" color="gray.500">
+            Loading reviews...
+          </Text>
+        ) : reviewsPreview.length > 0 ? (
+          reviewsPreview.map((review) => (
+            <ReviewCard
+              key={review?._id ?? review?.id}
+              name={review.name}
+              date={review?.createdAt ? new Date(review.createdAt).toLocaleDateString() : "—"}
+              rating={Number(review?.rating ?? 0)}
+              comment={review?.comment ?? ""}
+            />
+          ))
+        ) : (
+          <Text fontSize="sm" color="gray.500">
+            No reviews yet.
+          </Text>
+        )}
       </Stack>
     </Box>
   )
 }
-
-const items = [
-  {
-    label: "Mountain Landscape",
-    url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&h=900&q=80",
-  },
-  {
-    label: "Forest Path",
-    url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&h=900&q=80",
-  },
-  {
-    label: "Ocean Waves",
-    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&h=900&q=80",
-  },
-  {
-    label: "Desert Dunes",
-    url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&h=900&q=80",
-  },
-  {
-    label: "Sunset Lake",
-    url: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?auto=format&fit=crop&q=80&w=2070",
-  },
-]
-
-const reviews = [
-  {
-    id: 1,
-    name: "Oshigaki Kisame",
-    date: "Mar 12, 2026",
-    rating: 5,
-    comment:
-      "Great quality and very comfortable to use daily. The finish feels premium and holds up well.",
-    avatarUrl: "https://i.pravatar.cc/150?img=12",
-  },
-  {
-    id: 2,
-    name: "Mira Ibrahim",
-    date: "Feb 28, 2026",
-    rating: 4,
-    comment:
-      "Solid product with a clean design. Shipping was fast and packaging was neat.",
-    avatarUrl: "https://i.pravatar.cc/150?img=47",
-  },
-  {
-    id: 3,
-    name: "Adel Hassan",
-    date: "Jan 16, 2026",
-    rating: 3,
-    comment:
-      "Good overall, though I wish the instructions were clearer. Still a decent buy.",
-    avatarUrl: "https://i.pravatar.cc/150?img=33",
-  },
-]
-
 
 const CarouselThumbnails = ({ items }) => {
   const carousel = useCarouselContext()

@@ -58,6 +58,11 @@ export const useCatalogFilters = ({
     const rating = ratingStr === null ? Number.NaN : Number(ratingStr)
     const minRating = Number.isFinite(rating) ? clamp(Math.round(rating), 0, 5) : 0
 
+    // Pagination: default to page 1 when missing/invalid.
+    const pageStr = params.get("page")
+    const pageNumRaw = pageStr === null ? Number.NaN : Number(pageStr)
+    const page = Number.isFinite(pageNumRaw) ? Math.max(1, Math.floor(pageNumRaw)) : 1
+
     const sortStr = params.get("sort")
     const sort = sortStr && isValidSortJson(sortStr) ? sortStr : defaultSort
 
@@ -66,6 +71,7 @@ export const useCatalogFilters = ({
       selectedCategories,
       priceRange: [nextMin, nextMax],
       minRating,
+      page,
       sort,
     }
   }, [
@@ -103,6 +109,18 @@ export const useCatalogFilters = ({
         next.delete("sort")
       }
 
+      // Normalize pagination:
+      // - Keep page out of the URL when it's 1 (cleaner URLs).
+      // - Remove invalid values rather than sending them to the backend.
+      const nextPageRaw = next.get("page")
+      if (!nextPageRaw) {
+        // no-op
+      } else {
+        const parsed = Number(nextPageRaw)
+        if (!Number.isFinite(parsed) || parsed <= 1) next.delete("page")
+        else next.set("page", String(Math.floor(parsed)))
+      }
+
       // Always keep numeric filters present in the URL.
       if (!next.has("minPrice")) next.set("minPrice", String(filters.priceRange[0]))
       if (!next.has("maxPrice")) next.set("maxPrice", String(filters.priceRange[1]))
@@ -125,6 +143,8 @@ export const useCatalogFilters = ({
     (brands) => {
       const value = serializeQueryList(uniqueSorted(brands))
       updateQuery((sp) => {
+        // Reset pagination when filters change.
+        sp.delete("page")
         if (value) sp.set("brand", value)
         else sp.delete("brand")
       })
@@ -136,6 +156,7 @@ export const useCatalogFilters = ({
     (categories) => {
       const value = serializeQueryList(uniqueSorted(categories))
       updateQuery((sp) => {
+        sp.delete("page")
         if (value) sp.set("category", value)
         else sp.delete("category")
       })
@@ -147,6 +168,7 @@ export const useCatalogFilters = ({
     (range) => {
       const [minP, maxP] = range
       updateQuery((sp) => {
+        sp.delete("page")
         sp.set("minPrice", String(minP))
         sp.set("maxPrice", String(maxP))
       })
@@ -157,6 +179,7 @@ export const useCatalogFilters = ({
   const setMinRating = useCallback(
     (rating) => {
       updateQuery((sp) => {
+        sp.delete("page")
         sp.set("minRating", String(rating))
       })
     },
@@ -166,6 +189,7 @@ export const useCatalogFilters = ({
   const setSort = useCallback(
     (sortValue) => {
       updateQuery((sp) => {
+        sp.delete("page")
         if (!sortValue || sortValue === defaultSort) sp.delete("sort")
         else sp.set("sort", String(sortValue))
       })
@@ -173,11 +197,23 @@ export const useCatalogFilters = ({
     [defaultSort, updateQuery]
   )
 
+  const setPage = useCallback(
+    (page) => {
+      updateQuery((sp) => {
+        const next = Math.max(1, Math.floor(Number(page) || 1))
+        if (next <= 1) sp.delete("page")
+        else sp.set("page", String(next))
+      })
+    },
+    [updateQuery]
+  )
+
   const resetFilters = useCallback(() => {
     updateQuery((sp) => {
       sp.delete("brand")
       sp.delete("category")
       sp.delete("sort")
+      sp.delete("page")
       sp.set("minPrice", String(sliderMin))
       sp.set("maxPrice", String(sliderMax))
       sp.set("minRating", "0")
@@ -192,6 +228,7 @@ export const useCatalogFilters = ({
     setPriceRange,
     setMinRating,
     setSort,
+    setPage,
     resetFilters,
     defaultSort,
   }
