@@ -15,6 +15,17 @@ export const useCatalogFilters = ({
   // `searchParams` is not referentially stable; use a string key for memo deps.
   const searchKey = searchParams.toString()
 
+  const defaultSort = useMemo(() => JSON.stringify({ createdAt: -1 }), [])
+  const isValidSortJson = useCallback((value) => {
+    if (!value) return false
+    try {
+      JSON.parse(value)
+      return true
+    } catch {
+      return false
+    }
+  }, [])
+
   const filters = useMemo(() => {
     // Read params from a stable snapshot string to avoid dependency churn.
     const params = new URLSearchParams(searchKey)
@@ -47,13 +58,25 @@ export const useCatalogFilters = ({
     const rating = ratingStr === null ? Number.NaN : Number(ratingStr)
     const minRating = Number.isFinite(rating) ? clamp(Math.round(rating), 0, 5) : 0
 
+    const sortStr = params.get("sort")
+    const sort = sortStr && isValidSortJson(sortStr) ? sortStr : defaultSort
+
     return {
       selectedBrands,
       selectedCategories,
       priceRange: [nextMin, nextMax],
       minRating,
+      sort,
     }
-  }, [searchKey, sliderMax, sliderMin, sliderMinStepsBetweenThumbs, sliderStep])
+  }, [
+    defaultSort,
+    isValidSortJson,
+    searchKey,
+    sliderMax,
+    sliderMin,
+    sliderMinStepsBetweenThumbs,
+    sliderStep,
+  ])
 
   // Single place to mutate the query string.
   // Note: we keep numeric filters present so the backend always receives explicit bounds.
@@ -70,6 +93,16 @@ export const useCatalogFilters = ({
         if (serialized) next.set(key, serialized)
       }
 
+      // Normalize sort:
+      // - Remove invalid JSON to avoid backend JSON.parse errors.
+      // - Remove default sort from the URL (shorter URLs; backend already defaults to newest).
+      const nextSort = next.get("sort")
+      if (!nextSort) {
+        // no-op
+      } else if (!isValidSortJson(nextSort) || nextSort === defaultSort) {
+        next.delete("sort")
+      }
+
       // Always keep numeric filters present in the URL.
       if (!next.has("minPrice")) next.set("minPrice", String(filters.priceRange[0]))
       if (!next.has("maxPrice")) next.set("maxPrice", String(filters.priceRange[1]))
@@ -78,7 +111,14 @@ export const useCatalogFilters = ({
       const nextKey = next.toString()
       if (nextKey !== searchKey) setSearchParams(next, { replace })
     },
-    [filters.minRating, filters.priceRange, searchKey, setSearchParams]
+    [
+      defaultSort,
+      filters.minRating,
+      filters.priceRange,
+      isValidSortJson,
+      searchKey,
+      setSearchParams,
+    ]
   )
 
   const setBrands = useCallback(
@@ -123,6 +163,27 @@ export const useCatalogFilters = ({
     [updateQuery]
   )
 
+  const setSort = useCallback(
+    (sortValue) => {
+      updateQuery((sp) => {
+        if (!sortValue || sortValue === defaultSort) sp.delete("sort")
+        else sp.set("sort", String(sortValue))
+      })
+    },
+    [defaultSort, updateQuery]
+  )
+
+  const resetFilters = useCallback(() => {
+    updateQuery((sp) => {
+      sp.delete("brand")
+      sp.delete("category")
+      sp.delete("sort")
+      sp.set("minPrice", String(sliderMin))
+      sp.set("maxPrice", String(sliderMax))
+      sp.set("minRating", "0")
+    })
+  }, [sliderMax, sliderMin, updateQuery])
+
   return {
     filters,
     updateQuery,
@@ -130,5 +191,8 @@ export const useCatalogFilters = ({
     setCategories,
     setPriceRange,
     setMinRating,
+    setSort,
+    resetFilters,
+    defaultSort,
   }
 }

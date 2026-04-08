@@ -2,7 +2,23 @@
 // - Left side: filter controls (brand/category/price/rating)
 // - Right side: product list/grid (via `ProductList`) or an empty state
 // - All filters are stored in the URL query string so the page is shareable and the backend can read `request.query`.
-import { Box, Checkbox, EmptyState, HStack, Separator, Slider, Stack, Text, RatingGroup, VStack, SimpleGrid } from "@chakra-ui/react"
+import {
+  Box,
+  Button,
+  Checkbox,
+  EmptyState,
+  HStack,
+  Portal,
+  Select,
+  Separator,
+  Slider,
+  Stack,
+  Text,
+  RatingGroup,
+  VStack,
+  SimpleGrid,
+  createListCollection,
+} from "@chakra-ui/react"
 import { useMemo } from "react"
 import ProductList from "../components/ProductList"
 import { PiEmptyFill } from "react-icons/pi"
@@ -19,7 +35,8 @@ const Catalog = () => {
   const sliderStep = 1
   const sliderMinStepsBetweenThumbs = 1
 
-  const { filters, setBrands, setCategories, setPriceRange, setMinRating } = useCatalogFilters({
+  const { filters, setBrands, setCategories, setPriceRange, setMinRating, setSort, resetFilters, defaultSort } =
+    useCatalogFilters({
     sliderMin,
     sliderMax,
     sliderStep,
@@ -30,6 +47,7 @@ const Catalog = () => {
   const selectedCategories = filters.selectedCategories
   const priceRange = filters.priceRange
   const minRating = filters.minRating
+  const sort = filters.sort
 
   // Build the backend/API query object from current UI state.
   // IMPORTANT:
@@ -43,8 +61,9 @@ const Catalog = () => {
       minPrice: minP,
       maxPrice: maxP,
       minRating,
+      sort: sort === defaultSort ? undefined : sort,
     }
-  }, [selectedBrands, selectedCategories, priceRange, minRating])
+  }, [defaultSort, selectedBrands, selectedCategories, priceRange, minRating, sort])
 
   // Fetch products from the server (hook decides how/when to refetch).
   const { data, isLoading, isError, error } = useProducts(apiFilters)
@@ -102,6 +121,19 @@ const Catalog = () => {
     return options.sort((a, b) => a.label.localeCompare(b.label))
   }, [categoriesData, selectedCategories])
 
+  const sortCollection = useMemo(() => {
+    const items = [
+      { label: "Newest", value: JSON.stringify({ createdAt: -1 }) },
+      { label: "Oldest", value: JSON.stringify({ createdAt: 1 }) },
+      { label: "Rating: High → Low", value: JSON.stringify({ "rating.score": -1 }) },
+      { label: "Rating: Low → High", value: JSON.stringify({ "rating.score": 1 }) },
+      { label: "Price: High → Low", value: JSON.stringify({ price: -1 }) },
+      { label: "Price: Low → High", value: JSON.stringify({ price: 1 }) },
+    ]
+
+    return createListCollection({ items })
+  }, [])
+
   // Page UI.
   // - Outer container sets a consistent max width (similar to the Order page).
   // - Main area is a responsive Stack: column on small screens, two columns on large screens.
@@ -130,6 +162,52 @@ const Catalog = () => {
           {/* Filters sidebar */}
           <Box w={{ base: "100%", lg: "340px" }} borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
             <Stack gap={5}>
+              <HStack justify="space-between" align="center">
+                <Text fontSize="lg" fontWeight="900">
+                  Filters
+                </Text>
+                <Button size="xs" variant="outline" onClick={resetFilters}>
+                  Clear
+                </Button>
+              </HStack>
+              <Separator />
+
+              {/* Sort filter */}
+              <Stack gap={2}>
+                <Text fontSize="md" fontWeight="800">
+                  Sort
+                </Text>
+                <Separator />
+                <Select.Root
+                  collection={sortCollection}
+                  size="sm"
+                  value={sort ? [sort] : [defaultSort]}
+                  onValueChange={(details) => setSort(details.value[0] ?? defaultSort)}
+                >
+                  <Select.HiddenSelect />
+                  <Select.Control>
+                    <Select.Trigger>
+                      <Select.ValueText placeholder="Select sort" />
+                    </Select.Trigger>
+                    <Select.IndicatorGroup>
+                      <Select.Indicator />
+                    </Select.IndicatorGroup>
+                  </Select.Control>
+                  <Portal>
+                    <Select.Positioner>
+                      <Select.Content>
+                        {sortCollection.items.map((item) => (
+                          <Select.Item item={item} key={item.value}>
+                            {item.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Portal>
+                </Select.Root>
+              </Stack>
+
               {/* Brands filter (multi-select) */}
               <Stack gap={2}>
                 <HStack justify="space-between">
