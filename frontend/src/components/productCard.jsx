@@ -3,6 +3,8 @@ import { FaStar } from 'react-icons/fa'
 import { LuMinus, LuPlus } from "react-icons/lu"
 import { ICON_SIZE } from '../constants/ui'
 import { useNavigate } from "react-router-dom"
+import { useAddToCart } from "../hooks/useCart"
+import { getToken } from "../APIs/http"
 
 const ProductCard = ({
   data,
@@ -27,6 +29,22 @@ const ProductCard = ({
   const goToProduct = () => {
     if (!isClickable) return
     navigate(`/product/${productId}`)
+  }
+
+  // Mutations are safe to create per-card instance; React Query dedupes network and we invalidate the cart query on success.
+  const addToCartMutation = useAddToCart()
+
+  const onAddToCart = (e) => {
+    // Prevent card navigation when clicking the button.
+    e.stopPropagation()
+
+    if (!productId) return
+    if (!getToken()) {
+      navigate("/login")
+      return
+    }
+
+    addToCartMutation.mutate({ productId, quantity: 1 })
   }
 
   const title = data?.title ?? data?.name ?? "Product"
@@ -115,13 +133,25 @@ const ProductCard = ({
 
       {variant === "cart" ? (
         <HStack justify="space-between" align="center">
-          <IconButton size="xs" variant="outline" aria-label="Decrease">
+          <IconButton
+            size="xs"
+            variant="outline"
+            aria-label="Decrease"
+            onClick={() => onDecrease?.()}
+            disabled={!onDecrease}
+          >
             <LuMinus size={ICON_SIZE} />
           </IconButton>
           <Text fontSize="xs" fontWeight="600">
             Qty: {quantity}
           </Text>
-          <IconButton size="xs" variant="outline" aria-label="Increase">
+          <IconButton
+            size="xs"
+            variant="outline"
+            aria-label="Increase"
+            onClick={() => onIncrease?.()}
+            disabled={!onIncrease}
+          >
             <LuPlus size={ICON_SIZE} />
           </IconButton>
         </HStack>
@@ -159,8 +189,14 @@ const ProductCard = ({
       ) : (
         <HStack>
           {/* Stop propagation so clicking these buttons doesn't trigger card navigation. */}
-          <Button size="xs" variant="outline" flex="1" onClick={(e) => e.stopPropagation()}>
-            Add to cart
+          <Button
+            size="xs"
+            variant="outline"
+            flex="1"
+            onClick={onAddToCart}
+            disabled={addToCartMutation.isPending}
+          >
+            {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
           </Button>
           <Button size="xs" colorScheme="teal" flex="1" onClick={(e) => e.stopPropagation()}>
             Buy now

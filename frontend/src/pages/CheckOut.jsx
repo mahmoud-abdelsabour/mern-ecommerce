@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  EmptyState,
+  Flex,
   HStack,
   IconButton,
   Portal,
@@ -9,46 +11,58 @@ import {
   Separator,
   Stack,
   Text,
+  VStack,
   createListCollection,
 } from "@chakra-ui/react"
 import { useMemo, useState } from "react"
-import { LuPlus } from "react-icons/lu"
+import { LuPlus, LuShoppingCart } from "react-icons/lu"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
 import ProductList from "../components/ProductList"
 import AddressForm from "../components/AddressForm"
+import { useCart } from "../hooks/useCart"
+import { getToken } from "../APIs/http"
+import { useCreateOrder } from "../hooks/useOrders"
 
 const formatMoney = (value) => `$${Number(value ?? 0).toFixed(2)}`
 
-const initialItems = [
-  {
-    id: "p-1",
-    title: "Wireless Headphones",
-    price: 129,
-    quantity: 1,
-    brand: "Nimbus",
-    category: "Electronics",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
-  },
-  {
-    id: "p-2",
-    title: "Smart Watch",
-    price: 199,
-    quantity: 2,
-    brand: "Vertex",
-    category: "Wearables",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
-  },
-  {
-    id: "p-3",
-    title: "Running Shoes",
-    price: 89,
-    quantity: 1,
-    brand: "Atlas",
-    category: "Footwear",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
-  },
-]
-
 const CheckOut = () => {
+  const navigate = useNavigate()
+
+  const token = getToken()
+  const isLoggedIn = Boolean(token)
+
+  const {
+    data: cartData,
+    isLoading: isCartLoading,
+    isError: isCartError,
+    error: cartError,
+  } = useCart()
+  const cart = useMemo(() => cartData ?? [], [cartData])
+
+  // Map cart items into the shared ProductCard/ProductList shape.
+  const items = useMemo(() => {
+    return cart.map((item) => {
+      const product = item?.product
+      return {
+        id: product?.id ?? product?._id ?? item?.product,
+        title: product?.name ?? "Product",
+        price: product?.price ?? 0,
+        rating: product?.rating?.score ?? 0,
+        brand: "â€”",
+        category: "â€”",
+        image: product?.photos?.[0],
+        quantity: item?.quantity ?? 1,
+      }
+    })
+  }, [cart])
+
+  const createOrderMutation = useCreateOrder({
+    onSuccess: (createdOrder) => {
+      const id = createdOrder?.id ?? createdOrder?._id
+      if (id) navigate(`/order/${id}`, { replace: true })
+    },
+  })
+
   const [paymentMethod, setPaymentMethod] = useState("")
 
   const [savedAddresses, setSavedAddresses] = useState([
@@ -103,17 +117,18 @@ const CheckOut = () => {
   }, [savedAddresses])
 
   const subtotal = useMemo(() => {
-    return initialItems.reduce(
+    return items.reduce(
       (sum, item) => sum + Number(item.price ?? 0) * Number(item.quantity ?? 1),
       0
     )
-  }, [])
+  }, [items])
 
   const shippingPrice = 25
   const codFees = paymentMethod === "COD" ? 10 : 0
   const total = subtotal + shippingPrice + codFees
 
-  const canCheckout = Boolean(paymentMethod) && Boolean(selectedAddressId) && hasSavedAddresses
+  const canCheckout =
+    items.length > 0 && Boolean(paymentMethod) && Boolean(selectedAddressId) && hasSavedAddresses
 
   const onSaveAddress = () => {
     const required = [
@@ -166,6 +181,99 @@ const CheckOut = () => {
 
   const updateAddressDraft = (patch) => setAddressDraft((prev) => ({ ...prev, ...patch }))
 
+  const onPlaceOrder = () => {
+    if (!selectedAddress) return
+
+    // Backend expects `{ products: [{ product, quantity }], shippingInfo }`.
+    // We use the current cart snapshot so the order matches what the user sees.
+    const products = items.map((i) => ({
+      product: i.id,
+      quantity: Number(i.quantity ?? 1),
+    }))
+
+    const shippingInfo = {
+      firstName: selectedAddress.firstName,
+      lastName: selectedAddress.lastName,
+      phone: selectedAddress.phone,
+      address: selectedAddress.address,
+    }
+
+    createOrderMutation.mutate({ products, shippingInfo })
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <Flex minH="70vh" align="center" justify="center" px={4}>
+        <EmptyState.Root size={"lg"}>
+          <EmptyState.Content>
+            <EmptyState.Indicator>
+              <LuShoppingCart />
+            </EmptyState.Indicator>
+            <VStack textAlign="center">
+              <EmptyState.Title>Login required</EmptyState.Title>
+              <EmptyState.Description>Login to checkout your cart items.</EmptyState.Description>
+              <Button as={RouterLink} to="/login">
+                Go to Login
+              </Button>
+            </VStack>
+          </EmptyState.Content>
+        </EmptyState.Root>
+      </Flex>
+    )
+  }
+
+  if (isCartLoading) {
+    return (
+      <Flex minH="50vh" align="center" justify="center" px={4}>
+        <Text color="gray.500">Loading checkout...</Text>
+      </Flex>
+    )
+  }
+
+  if (isCartError) {
+    return (
+      <Flex minH="70vh" align="center" justify="center" px={4}>
+        <EmptyState.Root size={"lg"}>
+          <EmptyState.Content>
+            <EmptyState.Indicator>
+              <LuShoppingCart />
+            </EmptyState.Indicator>
+            <VStack textAlign="center">
+              <EmptyState.Title>Couldn&apos;t load your cart</EmptyState.Title>
+              <EmptyState.Description>
+                {cartError?.response?.data?.message ?? cartError?.message ?? "Unknown error"}
+              </EmptyState.Description>
+              <Button as={RouterLink} to="/cart">
+                Back to cart
+              </Button>
+            </VStack>
+          </EmptyState.Content>
+        </EmptyState.Root>
+      </Flex>
+    )
+  }
+
+  if (items.length === 0) {
+    return (
+      <Flex minH="70vh" align="center" justify="center" px={4}>
+        <EmptyState.Root size={"lg"}>
+          <EmptyState.Content>
+            <EmptyState.Indicator>
+              <LuShoppingCart />
+            </EmptyState.Indicator>
+            <VStack textAlign="center">
+              <EmptyState.Title>Your cart is empty</EmptyState.Title>
+              <EmptyState.Description>Add products to your cart before checkout.</EmptyState.Description>
+              <Button as={RouterLink} to="/catalog">
+                Start Shopping
+              </Button>
+            </VStack>
+          </EmptyState.Content>
+        </EmptyState.Root>
+      </Flex>
+    )
+  }
+
   return (
     <Box maxW="1200px" mx="auto" px={4} py={8}>
       <Stack gap={6}>
@@ -182,7 +290,7 @@ const CheckOut = () => {
           <Text fontSize="lg" fontWeight="800">
             Products
           </Text>
-          <ProductList items={initialItems} variant="order" />
+          <ProductList items={items} variant="order" />
         </Stack>
 
         <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
@@ -298,7 +406,7 @@ const CheckOut = () => {
         </Box>
 
         <ReceiptSection
-          items={initialItems}
+          items={items}
           subtotal={subtotal}
           shippingPrice={shippingPrice}
           codFees={codFees}
@@ -306,8 +414,22 @@ const CheckOut = () => {
           paymentMethod={paymentMethod || "—"}
         />
 
-        <Button size="lg" colorScheme="teal" disabled={!canCheckout}>
-          Checkout
+        {createOrderMutation.isError && (
+          <Text fontSize="sm" color="red.500">
+            Failed to place order:{" "}
+            {createOrderMutation.error?.response?.data?.message ??
+              createOrderMutation.error?.message ??
+              "Unknown error"}
+          </Text>
+        )}
+
+        <Button
+          size="lg"
+          colorScheme="teal"
+          disabled={!canCheckout || createOrderMutation.isPending}
+          onClick={onPlaceOrder}
+        >
+          {createOrderMutation.isPending ? "Placing..." : "Place order"}
         </Button>
       </Stack>
     </Box>

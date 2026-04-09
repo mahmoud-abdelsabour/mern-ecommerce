@@ -17,6 +17,14 @@ const placeOrder = async data => {
         const { products, shippingInfo, user } = data
         const userId = user.id
 
+        // The frontend may only send address + name + phone.
+        // Ensure required fields are present using the authenticated user record.
+        const normalizedShippingInfo = {
+            ...(shippingInfo || {}),
+            username: shippingInfo?.username || user.username,
+            email: shippingInfo?.email || user.email,
+        }
+
         let totalPrice = 0
         const orderProducts = []
 
@@ -53,7 +61,7 @@ const placeOrder = async data => {
         const order = new Order({
             products: orderProducts,
             userId,
-            shippingInfo,
+            shippingInfo: normalizedShippingInfo,
             totalPrice,
         })
 

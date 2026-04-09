@@ -14,8 +14,9 @@ const createOrderSchema = Joi.object({
     shippingInfo: Joi.object({
         firstName: Joi.string().trim().required(),
         lastName: Joi.string().trim().required(),
-        username: Joi.string().trim().required(),
-        email: Joi.string().email().required(),
+        // These are derived from the authenticated user on the server if omitted.
+        username: Joi.string().trim(),
+        email: Joi.string().email(),
         phone: Joi.string().trim().required(),
         address: Joi.object({
             country: Joi.string().trim().required(),

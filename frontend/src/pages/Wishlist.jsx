@@ -1,140 +1,97 @@
-import { FaHeartBroken } from "react-icons/fa";
-import { EmptyState, VStack, Flex, Button, Box } from "@chakra-ui/react"
+import { Box, Button, EmptyState, Flex, Text, VStack } from "@chakra-ui/react"
+import { FaHeartBroken } from "react-icons/fa"
 import { Link as RouterLink } from "react-router-dom"
+import { useQueries } from "@tanstack/react-query"
 import ProductList from "../components/ProductList"
-
-const cartItems = [
-  {
-    id: 1,
-    title: "Wireless Headphones",
-    price: 129,
-    rating: 4.6,
-    brand: "Nimbus",
-    category: "Electronics",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
-    quantity: 1,
-  },
-  {
-    id: 2,
-    title: "Smart Watch",
-    price: 199,
-    rating: 4.4,
-    brand: "Vertex",
-    category: "Wearables",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
-    quantity: 2,
-  },
-  {
-    id: 3,
-    title: "Running Shoes",
-    price: 89,
-    rating: 4.2,
-    brand: "Atlas",
-    category: "Footwear",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
-    quantity: 1,
-  },
-  {
-    id: 4,
-    title: "Bluetooth Speaker",
-    price: 79,
-    rating: 4.1,
-    brand: "Lumen",
-    category: "Audio",
-    image: "https://images.unsplash.com/photo-1512446816042-444d6412670b?w=800&q=80",
-    quantity: 3,
-  },
-  {
-    id: 5,
-    title: "Gaming Mouse",
-    price: 59,
-    rating: 4.3,
-    brand: "Crest",
-    category: "Accessories",
-    image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&q=80",
-    quantity: 1,
-  },
-  {
-    id: 6,
-    title: "Hoodie Jacket",
-    price: 64,
-    rating: 4.0,
-    brand: "Aurora",
-    category: "Apparel",
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
-    quantity: 2,
-  },
-  {
-    id: 7,
-    title: "Travel Backpack",
-    price: 99,
-    rating: 4.5,
-    brand: "Solace",
-    category: "Bags",
-    image: "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800&q=80",
-    quantity: 1,
-  },
-  {
-    id: 8,
-    title: "LED Desk Lamp",
-    price: 39,
-    rating: 4.2,
-    brand: "Vertex",
-    category: "Home",
-    image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80",
-    quantity: 1,
-  },
-  {
-    id: 9,
-    title: "Wireless Charger",
-    price: 29,
-    rating: 4.0,
-    brand: "Nimbus",
-    category: "Electronics",
-    image: "https://images.unsplash.com/photo-1518441902117-f7d38f5f4d9f?w=800&q=80",
-    quantity: 2,
-  },
-  {
-    id: 10,
-    title: "Stainless Bottle",
-    price: 24,
-    rating: 4.4,
-    brand: "Atlas",
-    category: "Lifestyle",
-    image: "https://images.unsplash.com/photo-1526401485004-2aa7f3b8f7da?w=800&q=80",
-    quantity: 1,
-  },
-]
+import { useWishlist } from "../hooks/useWishlist"
+import { getToken } from "../APIs/http"
+import productsApi from "../APIs/products.api"
 
 const Wishlist = () => {
-    const hasItems = cartItems.length > 0
+  const token = getToken()
+  const isLoggedIn = Boolean(token)
 
+  const { data, isLoading, isError, error } = useWishlist()
+  const wishlistIds = data ?? []
+
+  const productQueries = useQueries({
+    queries: wishlistIds.map((id) => ({
+      queryKey: ["product", id],
+      queryFn: () => productsApi.getProductById(id),
+      enabled: Boolean(isLoggedIn) && Boolean(id),
+      staleTime: 1000 * 60 * 2,
+    })),
+  })
+
+  const isProductsLoading = productQueries.some((q) => q.isLoading)
+  const products = productQueries.map((q) => q.data?.product).filter(Boolean)
+
+  const items = products.map((p) => ({
+    id: p?.id ?? p?._id,
+    title: p?.name ?? "Product",
+    price: p?.price ?? 0,
+    rating: p?.rating?.score ?? 0,
+    brand: p?.brand?.name ?? "—",
+    category: p?.category?.name ?? "—",
+    image: p?.photos?.[0],
+  }))
+
+  if (!isLoggedIn) {
     return (
-        <Box maxW="1200px" mx="auto" px={4} py={8}>
-        {hasItems ? (
-            <ProductList items={cartItems} />
-        ) : (
-            <Flex minH="70vh" align="center" justify="center">
-            <EmptyState.Root size={"lg"}>
-                <EmptyState.Content>
-                <EmptyState.Indicator>
-                    <FaHeartBroken />
-                </EmptyState.Indicator>
-                <VStack textAlign="center">
-                    <EmptyState.Title>Your Wishlist is empty</EmptyState.Title>
-                    <EmptyState.Description>
-                    Explore our products and add items to your Wishlist
-                    </EmptyState.Description>
-                    <Button as={RouterLink} to="/">
-                    Start Shopping
-                    </Button>
-                </VStack>
-                </EmptyState.Content>
-            </EmptyState.Root>
-            </Flex>
-        )}
-        </Box>
-        
+      <Flex minH="70vh" align="center" justify="center" px={4}>
+        <EmptyState.Root size={"lg"}>
+          <EmptyState.Content>
+            <EmptyState.Indicator>
+              <FaHeartBroken />
+            </EmptyState.Indicator>
+            <VStack textAlign="center">
+              <EmptyState.Title>Login required</EmptyState.Title>
+              <EmptyState.Description>Login to view your wishlist.</EmptyState.Description>
+              <Button as={RouterLink} to="/login">
+                Go to Login
+              </Button>
+            </VStack>
+          </EmptyState.Content>
+        </EmptyState.Root>
+      </Flex>
     )
+  }
+
+  return (
+    <Box maxW="1200px" mx="auto" px={4} py={8}>
+      {isError && (
+        <Text fontSize="sm" color="red.500" mb={4}>
+          Failed to load wishlist: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
+        </Text>
+      )}
+
+      {isLoading || isProductsLoading ? (
+        <Flex minH="50vh" align="center" justify="center">
+          <Text color="gray.500">Loading wishlist...</Text>
+        </Flex>
+      ) : items.length > 0 ? (
+        <ProductList items={items} />
+      ) : (
+        <Flex minH="70vh" align="center" justify="center">
+          <EmptyState.Root size={"lg"}>
+            <EmptyState.Content>
+              <EmptyState.Indicator>
+                <FaHeartBroken />
+              </EmptyState.Indicator>
+              <VStack textAlign="center">
+                <EmptyState.Title>Your Wishlist is empty</EmptyState.Title>
+                <EmptyState.Description>Explore our products and add items to your Wishlist</EmptyState.Description>
+                <Button as={RouterLink} to="/catalog">
+                  Start Shopping
+                </Button>
+              </VStack>
+            </EmptyState.Content>
+          </EmptyState.Root>
+        </Flex>
+      )}
+    </Box>
+  )
 }
+
 export default Wishlist
+

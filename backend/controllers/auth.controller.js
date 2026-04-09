@@ -9,9 +9,11 @@ const login = async (request, response) => {
     const { token, user } = await authService.login(request.body)
     response.status(200).send({
         token,
+        id: user.id,
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
+        profilePhoto: user.profilePhoto ?? null,
     })
 }
 

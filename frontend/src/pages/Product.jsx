@@ -20,8 +20,10 @@ import {
 } from "@chakra-ui/react"
 import { LuChevronLeft, LuChevronRight, LuChevronDown } from "react-icons/lu"
 import ReviewCard from "../components/ReviewCard"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { useProductById } from "../hooks/useProducts"
+import { useAddToCart } from "../hooks/useCart"
+import { getToken } from "../APIs/http"
 
 
 const Product = () => {
@@ -30,6 +32,7 @@ const Product = () => {
 
   // Read the `:productId` route param from `/product/:productId`.
   const { productId } = useParams()
+  const navigate = useNavigate()
 
   // Fetch the real product data from the backend.
   // Response shape: `{ product, reviewsPreview, hasMoreReviews }`.
@@ -60,6 +63,18 @@ const Product = () => {
 
   // Display a short reviews count (e.g. "3" or "3+" when there are more).
   const reviewsLabel = `${reviewsPreview.length}${hasMoreReviews ? "+" : ""}`
+
+  const addToCartMutation = useAddToCart()
+
+  const onAddToCart = () => {
+    const id = product?.id ?? product?._id ?? productId
+    if (!id) return
+    if (!getToken()) {
+      navigate("/login")
+      return
+    }
+    addToCartMutation.mutate({ productId: id, quantity: 1 })
+  }
 
   return (
     <Box maxW="1200px" mx="auto" px={4} mt={6} pb={10}>
@@ -214,8 +229,14 @@ const Product = () => {
       
       {/*buying buttons */}
       <HStack mt={3} gap={3} justify="center" mb={6}>
-        <Button variant="outline" size="sm" minW="140px">
-          Add to cart
+        <Button
+          variant="outline"
+          size="sm"
+          minW="140px"
+          onClick={onAddToCart}
+          disabled={isLoading || addToCartMutation.isPending || !product}
+        >
+          {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
         </Button>
         <Button colorScheme="teal" size="sm" minW="140px">
           Buy now

@@ -8,6 +8,7 @@ const createToken = user => {
             id: user._id,
             tokenVersion: user.tokenVersion,
             role: user.role,
+            photo: user.profilePhoto
         },
         config.JWT_SECRET,
         { expiresIn: config.JWT_EXPIRES_IN }

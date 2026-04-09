@@ -1,12 +1,15 @@
-import { Badge, Box, Separator, HStack, Stack, Text, Button, Timeline } from "@chakra-ui/react"
-import { useState } from "react"
+import { Badge, Box, Button, EmptyState, Flex, Separator, HStack, Stack, Text, Timeline, VStack } from "@chakra-ui/react"
 import { FaClock } from "react-icons/fa"
 import { MdCancel, MdLocalShipping, MdOutlineDoneOutline } from "react-icons/md"
 import { RiRefund2Line } from "react-icons/ri"
 import { GrReturn } from "react-icons/gr"
 import { LuCheck, LuPackage, LuShip } from "react-icons/lu"
+import { GoListUnordered } from "react-icons/go"
+import { Link as RouterLink, useParams } from "react-router-dom"
 import ProductList from "../components/ProductList"
 import AddressCard from "../components/AddressCard"
+import { useCancelOrder, useOrderById } from "../hooks/useOrders"
+import { getToken } from "../APIs/http"
 
 const formatMoney = (value) => `$${Number(value ?? 0).toFixed(2)}`
 const formatDate = (value) => {
@@ -20,65 +23,88 @@ const formatDate = (value) => {
   })
 }
 
-const initialOrder = {
-  id: "ORD-10021",
-  createdAt: "2026-04-04T10:30:00.000Z",
-  paymentMethod: "COD",
-  deliveryStatus: "shipped",
-  shippedAt: null,
-  deliveredAt: null,
-  shippingPrice: 25,
-  codFees: 10,
-  shippingInfo: {
-    firstName: "Mahmoud",
-    lastName: "Ahmed",
-    phone: "+20 100 000 0000",
-    address: {
-      country: "Egypt",
-      city: "Cairo",
-      postalcode: "11311",
-      street: "Tahrir St.",
-      building: "12B",
-      floor: 3,
-      special_mark: "Near the metro station",
-    },
-  },
-  products: [
-    {
-      product: "p-1",
-      quantity: 1,
-      priceAtPurchase: 129,
-      name: "Wireless Headphones",
-      description: "High-quality wireless headphones",
-      photos: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"],
-      brand: "Nimbus",
-      category: "Electronics",
-    },
-    {
-      product: "p-2",
-      quantity: 2,
-      priceAtPurchase: 199,
-      name: "Smart Watch",
-      description: "Smart watch with fitness tracking",
-      photos: ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80"],
-      brand: "Vertex",
-      category: "Wearables",
-    },
-    {
-      product: "p-3",
-      quantity: 1,
-      priceAtPurchase: 89,
-      name: "Running Shoes",
-      description: "Lightweight running shoes",
-      photos: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80"],
-      brand: "Atlas",
-      category: "Footwear",
-    },
-  ],
-}
-
 const Order = () => {
-  const [order, setOrder] = useState(initialOrder)
+  const token = getToken()
+  const isLoggedIn = Boolean(token)
+
+  const { orderId } = useParams()
+
+  const { data: order, isLoading, isError, error } = useOrderById(orderId)
+
+  const cancelMutation = useCancelOrder()
+
+  if (!isLoggedIn) {
+    return (
+      <Flex minH="70vh" align="center" justify="center" px={4}>
+        <EmptyState.Root size={"lg"}>
+          <EmptyState.Content>
+            <EmptyState.Indicator>
+              <GoListUnordered />
+            </EmptyState.Indicator>
+            <VStack textAlign="center">
+              <EmptyState.Title>Login required</EmptyState.Title>
+              <EmptyState.Description>Login to view your order details.</EmptyState.Description>
+              <Button as={RouterLink} to="/login">
+                Go to Login
+              </Button>
+            </VStack>
+          </EmptyState.Content>
+        </EmptyState.Root>
+      </Flex>
+    )
+  }
+
+  if (!orderId) {
+    return (
+      <Flex minH="70vh" align="center" justify="center" px={4}>
+        <EmptyState.Root size={"lg"}>
+          <EmptyState.Content>
+            <EmptyState.Indicator>
+              <GoListUnordered />
+            </EmptyState.Indicator>
+            <VStack textAlign="center">
+              <EmptyState.Title>Missing order id</EmptyState.Title>
+              <EmptyState.Description>Open an order from your orders list.</EmptyState.Description>
+              <Button as={RouterLink} to="/orders">
+                Go to Orders
+              </Button>
+            </VStack>
+          </EmptyState.Content>
+        </EmptyState.Root>
+      </Flex>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <Flex minH="50vh" align="center" justify="center" px={4}>
+        <Text color="gray.500">Loading order...</Text>
+      </Flex>
+    )
+  }
+
+  if (isError) {
+    return (
+      <Flex minH="70vh" align="center" justify="center" px={4}>
+        <EmptyState.Root size={"lg"}>
+          <EmptyState.Content>
+            <EmptyState.Indicator>
+              <GoListUnordered />
+            </EmptyState.Indicator>
+            <VStack textAlign="center">
+              <EmptyState.Title>Couldn&apos;t load order</EmptyState.Title>
+              <EmptyState.Description>
+                {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
+              </EmptyState.Description>
+              <Button as={RouterLink} to="/orders">
+                Back to Orders
+              </Button>
+            </VStack>
+          </EmptyState.Content>
+        </EmptyState.Root>
+      </Flex>
+    )
+  }
 
   const items = (order?.products ?? []).map((p, index) => ({
     id: p?.product ?? `${index}`,
@@ -95,21 +121,25 @@ const Order = () => {
     0
   )
 
-  const shippingPrice = Number(order?.shippingPrice ?? 0)
-  const codFees = Number(order?.codFees ?? 0)
-  const total = subtotal + shippingPrice + codFees
+  // Current backend order model returns `totalPrice` (products subtotal).
+  // Shipping/COD are not modeled yet, so we show them as 0 for now.
+  const shippingPrice = 0
+  const codFees = 0
+  const total = Number(order?.totalPrice ?? subtotal) + shippingPrice + codFees
 
   const canCancel = String(order?.deliveryStatus ?? "").toLowerCase() === "pending"
   const canReturn = String(order?.deliveryStatus ?? "").toLowerCase() === "delivered"
 
   const onCancelOrder = () => {
     if (!canCancel) return
-    setOrder((prev) => ({ ...prev, deliveryStatus: "cancelled" }))
+    const id = order?.id ?? order?._id
+    if (!id) return
+    cancelMutation.mutate(id)
   }
 
   const onReturnOrder = () => {
     if (!canReturn) return
-    setOrder((prev) => ({ ...prev, deliveryStatus: "return requested" }))
+    // Return flow is handled on `/order/return` (not wired here yet).
   }
 
   return (
@@ -145,14 +175,19 @@ const Order = () => {
             codFees={codFees}
             subtotal={subtotal}
             total={total}
-            paymentMethod={order?.paymentMethod ?? "COD"}
+            paymentMethod={"â€”"}
           />
         </Stack>
 
         <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
           <Stack gap={2}>
             <HStack>
-              <Button flex="1" colorScheme="red" disabled={!canCancel} onClick={onCancelOrder}>
+              <Button
+                flex="1"
+                colorScheme="red"
+                disabled={!canCancel || cancelMutation.isPending}
+                onClick={onCancelOrder}
+              >
                 Cancel Order
               </Button>
               <Button flex="1" colorScheme="orange" disabled={!canReturn} onClick={onReturnOrder}>
