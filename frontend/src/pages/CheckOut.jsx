@@ -16,20 +16,26 @@ import {
 } from "@chakra-ui/react"
 import { useMemo, useState } from "react"
 import { LuPlus, LuShoppingCart } from "react-icons/lu"
-import { Link as RouterLink, useNavigate } from "react-router-dom"
+import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom"
 import ProductList from "../components/ProductList"
 import AddressForm from "../components/AddressForm"
 import { useCart } from "../hooks/useCart"
 import { getToken } from "../APIs/http"
 import { useCreateOrder } from "../hooks/useOrders"
+import { useProductById } from "../hooks/useProducts"
 
 const formatMoney = (value) => `$${Number(value ?? 0).toFixed(2)}`
 
 const CheckOut = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const token = getToken()
   const isLoggedIn = Boolean(token)
+
+  // Optional "buy now" flow: checkout with a single product instead of the whole cart.
+  const buyNowProductId = searchParams.get("buyNow") || ""
+  const isBuyNow = Boolean(buyNowProductId)
 
   const {
     data: cartData,
@@ -39,8 +45,34 @@ const CheckOut = () => {
   } = useCart()
   const cart = useMemo(() => cartData ?? [], [cartData])
 
+  const {
+    data: buyNowData,
+    isLoading: isBuyNowLoading,
+    isError: isBuyNowError,
+    error: buyNowError,
+  } = useProductById(buyNowProductId, { enabled: isLoggedIn && isBuyNow })
+
+  const buyNowProduct = buyNowData?.product ?? null
+
   // Map cart items into the shared ProductCard/ProductList shape.
   const items = useMemo(() => {
+    // Buy-now checkout: render a single product line (qty defaults to 1).
+    if (isBuyNow) {
+      if (!buyNowProduct) return []
+      return [
+        {
+          id: buyNowProduct?.id ?? buyNowProduct?._id ?? buyNowProductId,
+          title: buyNowProduct?.name ?? "Product",
+          price: buyNowProduct?.price ?? 0,
+          rating: buyNowProduct?.rating?.score ?? 0,
+          brand: buyNowProduct?.brand?.name ?? "—",
+          category: buyNowProduct?.category?.name ?? "—",
+          image: buyNowProduct?.photos?.[0],
+          quantity: 1,
+        },
+      ]
+    }
+
     return cart.map((item) => {
       const product = item?.product
       return {
@@ -54,7 +86,7 @@ const CheckOut = () => {
         quantity: item?.quantity ?? 1,
       }
     })
-  }, [cart])
+  }, [buyNowProduct, buyNowProductId, cart, isBuyNow])
 
   const createOrderMutation = useCreateOrder({
     onSuccess: (createdOrder) => {
@@ -211,7 +243,7 @@ const CheckOut = () => {
             </EmptyState.Indicator>
             <VStack textAlign="center">
               <EmptyState.Title>Login required</EmptyState.Title>
-              <EmptyState.Description>Login to checkout your cart items.</EmptyState.Description>
+              <EmptyState.Description>Login to checkout.</EmptyState.Description>
               <Button as={RouterLink} to="/login">
                 Go to Login
               </Button>
@@ -222,7 +254,7 @@ const CheckOut = () => {
     )
   }
 
-  if (isCartLoading) {
+  if (isBuyNow ? isBuyNowLoading : isCartLoading) {
     return (
       <Flex minH="50vh" align="center" justify="center" px={4}>
         <Text color="gray.500">Loading checkout...</Text>
@@ -230,7 +262,7 @@ const CheckOut = () => {
     )
   }
 
-  if (isCartError) {
+  if (isBuyNow ? isBuyNowError : isCartError) {
     return (
       <Flex minH="70vh" align="center" justify="center" px={4}>
         <EmptyState.Root size={"lg"}>
@@ -239,12 +271,16 @@ const CheckOut = () => {
               <LuShoppingCart />
             </EmptyState.Indicator>
             <VStack textAlign="center">
-              <EmptyState.Title>Couldn&apos;t load your cart</EmptyState.Title>
+              <EmptyState.Title>
+                {isBuyNow ? "Couldn't load this product" : "Couldn't load your cart"}
+              </EmptyState.Title>
               <EmptyState.Description>
-                {cartError?.response?.data?.message ?? cartError?.message ?? "Unknown error"}
+                {isBuyNow
+                  ? buyNowError?.response?.data?.message ?? buyNowError?.message ?? "Unknown error"
+                  : cartError?.response?.data?.message ?? cartError?.message ?? "Unknown error"}
               </EmptyState.Description>
-              <Button as={RouterLink} to="/cart">
-                Back to cart
+              <Button as={RouterLink} to={isBuyNow ? "/catalog" : "/cart"}>
+                {isBuyNow ? "Back to catalog" : "Back to cart"}
               </Button>
             </VStack>
           </EmptyState.Content>
@@ -262,8 +298,14 @@ const CheckOut = () => {
               <LuShoppingCart />
             </EmptyState.Indicator>
             <VStack textAlign="center">
-              <EmptyState.Title>Your cart is empty</EmptyState.Title>
-              <EmptyState.Description>Add products to your cart before checkout.</EmptyState.Description>
+              <EmptyState.Title>
+                {isBuyNow ? "This product is unavailable" : "Your cart is empty"}
+              </EmptyState.Title>
+              <EmptyState.Description>
+                {isBuyNow
+                  ? "Try choosing another product."
+                  : "Add products to your cart before checkout."}
+              </EmptyState.Description>
               <Button as={RouterLink} to="/catalog">
                 Start Shopping
               </Button>

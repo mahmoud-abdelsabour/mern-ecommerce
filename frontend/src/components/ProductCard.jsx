@@ -61,6 +61,20 @@ const ProductCard = ({
     addToCartMutation.mutate({ productId, quantity: 1 })
   }
 
+  const onBuyNow = (e) => {
+    // Prevent card navigation when clicking the button.
+    e.stopPropagation()
+
+    if (!productId) return
+    if (!getToken()) {
+      navigate("/login")
+      return
+    }
+
+    // Checkout can render a single-product "buy now" flow via query param.
+    navigate(`/order/check-out?buyNow=${encodeURIComponent(productId)}`)
+  }
+
   const isLoggedIn = Boolean(getToken())
 
   // Determine whether this product is already in the wishlist.
@@ -342,7 +356,7 @@ const ProductCard = ({
               {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
             </Button>
           )}
-          <Button size="xs" colorScheme="teal" flex="1" onClick={(e) => e.stopPropagation()}>
+          <Button size="xs" colorScheme="teal" flex="1" onClick={onBuyNow}>
             Buy now
           </Button>
         </HStack>

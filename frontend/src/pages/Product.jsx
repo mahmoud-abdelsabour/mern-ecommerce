@@ -135,6 +135,17 @@ const Product = () => {
     }
   }
 
+  const onBuyNow = () => {
+    if (!normalizedProductId) return
+
+    if (!isLoggedIn) {
+      navigate("/login")
+      return
+    }
+
+    navigate(`/order/check-out?buyNow=${encodeURIComponent(normalizedProductId)}`)
+  }
+
   return (
     <Box maxW="1200px" mx="auto" px={4} mt={6} pb={10}>
       {/* Show request errors (instead of silently rendering an empty product). */}
@@ -360,7 +371,13 @@ const Product = () => {
             {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
           </Button>
         )}
-        <Button colorScheme="teal" size="sm" minW="140px">
+        <Button
+          colorScheme="teal"
+          size="sm"
+          minW="140px"
+          onClick={onBuyNow}
+          disabled={isLoading || !product}
+        >
           Buy now
         </Button>
       </HStack>
