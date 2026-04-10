@@ -8,6 +8,7 @@ import { FaChevronDown } from "react-icons/fa";
 import { ICON_SIZE } from "../constants/ui";
 import { useBrands } from "../hooks/useBrands";
 import { useCategories } from "../hooks/useCategories";
+import { clearStoredUser, getStoredUser } from "../utils/authStorage";
 
 const Nav = () => {
     const navigate = useNavigate()
@@ -16,13 +17,7 @@ const Nav = () => {
 
     // Read the logged-in user from localStorage (set on login).
     // Shape: `{ token, username, firstName, lastName, profilePhoto }`.
-    let storedUser = null
-    try {
-        const raw = localStorage.getItem("user")
-        storedUser = raw ? JSON.parse(raw) : null
-    } catch {
-        storedUser = null
-    }
+    const storedUser = getStoredUser()
 
     const displayName =
         storedUser?.firstName || storedUser?.lastName
@@ -30,7 +25,8 @@ const Nav = () => {
             : storedUser?.username ?? "Guest"
 
     const onLogout = () => {
-        localStorage.removeItem("user")
+        // Clear auth state and redirect to login (mirrors token-expiry behavior).
+        clearStoredUser()
         navigate("/login", { replace: true })
     }
 

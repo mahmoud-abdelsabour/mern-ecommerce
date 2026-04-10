@@ -1,12 +1,9 @@
+import { getStoredUser } from "../utils/authStorage"
+
 const getToken = () => {
-  try {
-    const raw = localStorage.getItem("user")
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return parsed?.token ?? null
-  } catch {
-    return null
-  }
+  // Read token from our centralized auth storage helper.
+  const user = getStoredUser()
+  return user?.token ?? null
 }
 
 const getAuthConfig = () => {
@@ -16,4 +13,3 @@ const getAuthConfig = () => {
 }
 
 export { getToken, getAuthConfig }
-

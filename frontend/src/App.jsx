@@ -19,8 +19,11 @@ import Profile from './pages/Profile'
 import EditProfile from './pages/EditProfile'
 import ChangePassword from './pages/ChangePassword'
 import ChangeEmail from './pages/ChangeEmail'
+import { useAuthAutoLogout } from './hooks/useAuthAutoLogout'
 
 const App = () => {
+  // Keeps client auth state in sync with backend (auto-logout on token expiry / 401).
+  useAuthAutoLogout()
   return(
     <Flex direction="column" minH="100vh">
       <Nav />

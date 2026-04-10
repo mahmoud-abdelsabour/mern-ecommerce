@@ -4,6 +4,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom"
 import GlobalNotification from "../../components/GlobalNotification"
 import { useLogin } from "../../hooks/useAuth"
 import { initialLoginFormState, loginFormReducer } from "../../utils/forms/loginFormState"
+import { setStoredUser } from "../../utils/authStorage"
 
 const Login = () => {
   const navigate = useNavigate()
@@ -17,7 +18,8 @@ const Login = () => {
     onSuccess: (result) => {
       // Persist token so `getAuthConfig()` can attach it automatically.
       // Backend returns: `{ token, username, firstName, lastName }`.
-      localStorage.setItem("user", JSON.stringify(result))
+      // Also triggers auth-change listeners (e.g. auto-logout timer scheduling).
+      setStoredUser(result)
       navigate("/", { replace: true })
     },
     onError: (err) => {
@@ -113,4 +115,3 @@ const Login = () => {
 }
 
 export default Login
-
