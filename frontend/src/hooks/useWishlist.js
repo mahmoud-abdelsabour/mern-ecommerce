@@ -94,9 +94,28 @@ export const useClearWishlist = (options = {}) => {
 
   return useMutation({
     mutationFn: () => wishlistApi.clearWishlist(),
+    // Optimistic update so UI clears instantly.
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["wishlist"] })
+
+      const previous = queryClient.getQueryData(["wishlist"])
+      queryClient.setQueryData(["wishlist"], [])
+      return { previous }
+    },
+    onError: (error, variables, context) => {
+      // Roll back optimistic update if the request fails.
+      if (context?.previous !== undefined) {
+        queryClient.setQueryData(["wishlist"], context.previous)
+      }
+      options.onError?.(error, variables, context)
+    },
     onSuccess: async (data, variables, context) => {
-      await queryClient.invalidateQueries({ queryKey: ["wishlist"] })
       options.onSuccess?.(data, variables, context)
+    },
+    onSettled: async (...args) => {
+      // Ensure server is the source of truth after optimistic update.
+      await queryClient.invalidateQueries({ queryKey: ["wishlist"] })
+      options.onSettled?.(...args)
     },
     ...options,
   })

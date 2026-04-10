@@ -4,7 +4,7 @@ import { LuMinus, LuPlus } from "react-icons/lu"
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md"
 import { ICON_SIZE } from '../constants/ui'
 import { useNavigate } from "react-router-dom"
-import { useAddToCart } from "../hooks/useCart"
+import { useAddToCart, useCart, useDecrementCartItem } from "../hooks/useCart"
 import { getToken } from "../APIs/http"
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from "../hooks/useWishlist"
 
@@ -23,9 +23,10 @@ const ProductCard = ({
   // This id is used to navigate to the single-product page.
   const productId = data?.id ?? data?._id
 
-  // Only the default storefront card is clickable.
-  // Other variants (cart/order/return) use the card as a UI container with controls.
-  const isClickable = variant === "default" && Boolean(productId)
+  // Product cards are always clickable (navigate to product page) when an id exists,
+  // regardless of the `variant` (cart/return/order/default/etc).
+  // Interactive controls inside the card stop propagation to avoid unwanted navigation.
+  const isClickable = Boolean(productId)
 
   // Navigate to the product details page.
   const goToProduct = () => {
@@ -35,6 +36,12 @@ const ProductCard = ({
 
   // Mutations are safe to create per-card instance; React Query dedupes network and we invalidate the cart query on success.
   const addToCartMutation = useAddToCart()
+  const decrementCartMutation = useDecrementCartItem()
+
+  // Cart state is global (React Query) and shared across all cards.
+  // We use it to render quantity controls when the item is already in the cart.
+  const { data: cartData } = useCart()
+  const cartItems = Array.isArray(cartData) ? cartData : []
 
   // Wishlist state is global (React Query) but safe to read in each card; all cards share the same cache.
   const { data: wishlistIds } = useWishlist()
@@ -86,6 +93,30 @@ const ProductCard = ({
     }
   }
 
+  // Find the current cart quantity for this product (0 means not in cart).
+  const cartQuantity = (() => {
+    if (!productId) return 0
+    const match = cartItems.find((item) => {
+      const itemProductId = item?.product?._id ?? item?.product?.id ?? item?.product
+      return String(itemProductId) === String(productId)
+    })
+    return Number(match?.quantity ?? 0) || 0
+  })()
+
+  const onIncrementCart = (e) => {
+    // Prevent card navigation when clicking the button.
+    e.stopPropagation()
+    if (!productId) return
+    addToCartMutation.mutate({ productId, quantity: 1 })
+  }
+
+  const onDecrementCart = (e) => {
+    // Prevent card navigation when clicking the button.
+    e.stopPropagation()
+    if (!productId) return
+    decrementCartMutation.mutate({ productId, amount: 1 })
+  }
+
   const title = data?.title ?? data?.name ?? "Product"
   const brand = data?.brand ?? "—"
   const category = data?.category ?? "—"
@@ -124,9 +155,9 @@ const ProductCard = ({
       _hover={isClickable ? { borderColor: "gray.300" } : undefined}
     >
       <Box position="relative" w="100%" aspectRatio={1}>
-        {variant === "default" && (
+        {Boolean(productId) && (
           <Box position="absolute" top="2" right="2" zIndex="1">
-            {/* Wishlist toggle (top-right). Selectable boxed heart icon. */}
+            {/* Wishlist toggle (top-right). Selectable boxed heart icon (shown for all variants). */}
             <Box
               as="button"
               type="button"
@@ -161,7 +192,7 @@ const ProductCard = ({
           </Box>
         )}
         {variant === "return" && (
-          <Box position="absolute" top="2" left="2" zIndex="1">
+          <Box position="absolute" top="2" left="2" zIndex="1" onClick={(e) => e.stopPropagation()}>
             {/* Return flow: allow selecting items from a list of products. */}
             <Checkbox.Root
               checked={Boolean(selected)}
@@ -212,19 +243,25 @@ const ProductCard = ({
             size="xs"
             variant="outline"
             aria-label="Decrease"
-            onClick={() => onDecrease?.()}
+            onClick={(e) => {
+              e.stopPropagation()
+              onDecrease?.()
+            }}
             disabled={!onDecrease}
           >
             <LuMinus size={ICON_SIZE} />
           </IconButton>
           <Text fontSize="xs" fontWeight="600">
-            Qty: {quantity}
+            {quantity}
           </Text>
           <IconButton
             size="xs"
             variant="outline"
             aria-label="Increase"
-            onClick={() => onIncrease?.()}
+            onClick={(e) => {
+              e.stopPropagation()
+              onIncrease?.()
+            }}
             disabled={!onIncrease}
           >
             <LuPlus size={ICON_SIZE} />
@@ -236,7 +273,10 @@ const ProductCard = ({
             size="xs"
             variant="outline"
             aria-label="Decrease"
-            onClick={() => onDecrease?.()}
+            onClick={(e) => {
+              e.stopPropagation()
+              onDecrease?.()
+            }}
           >
             <LuMinus size={ICON_SIZE} />
           </IconButton>
@@ -247,7 +287,10 @@ const ProductCard = ({
             size="xs"
             variant="outline"
             aria-label="Increase"
-            onClick={() => onIncrease?.()}
+            onClick={(e) => {
+              e.stopPropagation()
+              onIncrease?.()
+            }}
           >
             <LuPlus size={ICON_SIZE} />
           </IconButton>
@@ -264,15 +307,41 @@ const ProductCard = ({
       ) : (
         <HStack>
           {/* Stop propagation so clicking these buttons doesn't trigger card navigation. */}
-          <Button
-            size="xs"
-            variant="outline"
-            flex="1"
-            onClick={onAddToCart}
-            disabled={addToCartMutation.isPending}
-          >
-            {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
-          </Button>
+          {cartQuantity > 0 ? (
+            <HStack flex="1" justify="space-between" align="center">
+              <IconButton
+                size="xs"
+                variant="outline"
+                aria-label="Decrease"
+                onClick={onDecrementCart}
+                disabled={decrementCartMutation.isPending}
+              >
+                <LuMinus size={ICON_SIZE} />
+              </IconButton>
+              <Text fontSize="xs" fontWeight="600">
+                {cartQuantity}
+              </Text>
+              <IconButton
+                size="xs"
+                variant="outline"
+                aria-label="Increase"
+                onClick={onIncrementCart}
+                disabled={addToCartMutation.isPending}
+              >
+                <LuPlus size={ICON_SIZE} />
+              </IconButton>
+            </HStack>
+          ) : (
+            <Button
+              size="xs"
+              variant="outline"
+              flex="1"
+              onClick={onAddToCart}
+              disabled={addToCartMutation.isPending}
+            >
+              {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
+            </Button>
+          )}
           <Button size="xs" colorScheme="teal" flex="1" onClick={(e) => e.stopPropagation()}>
             Buy now
           </Button>

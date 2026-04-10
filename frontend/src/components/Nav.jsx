@@ -9,11 +9,19 @@ import { ICON_SIZE } from "../constants/ui";
 import { useBrands } from "../hooks/useBrands";
 import { useCategories } from "../hooks/useCategories";
 import { clearStoredUser, getStoredUser } from "../utils/authStorage";
+import { useCart } from "../hooks/useCart";
 
 const Nav = () => {
     const navigate = useNavigate()
     const { data: brandsData, isLoading: brandsLoading } = useBrands()
     const { data: categoriesData, isLoading: categoriesLoading } = useCategories()
+    const { data: cartData } = useCart()
+
+    // Sum cart item quantities for a simple badge count on the cart icon.
+    // Hide the badge when the cart is empty (show nothing instead of 0).
+    const cartCount = Array.isArray(cartData)
+      ? cartData.reduce((sum, item) => sum + Number(item?.quantity ?? 0), 0)
+      : 0
 
     // Read the logged-in user from localStorage (set on login).
     // Shape: `{ token, username, firstName, lastName, profilePhoto }`.
@@ -123,8 +131,29 @@ const Nav = () => {
                 </HStack>
 
                 <HStack spacing={3}>
-                    <Link as={RouterLink} to="/cart" >
+                    <Link as={RouterLink} to="/cart" position="relative">
                         <FaCartShopping size={ICON_SIZE} />
+                        {cartCount > 0 && (
+                          <Box
+                            position="absolute"
+                            top="-2"
+                            right="-2"
+                            minW="18px"
+                            h="18px"
+                            px="1"
+                            bg="teal.500"
+                            color="white"
+                            rounded="full"
+                            fontSize="xs"
+                            fontWeight="700"
+                            display="inline-flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            lineHeight="1"
+                          >
+                            {cartCount}
+                          </Box>
+                        )}
                     </Link>
                     <Link as={RouterLink} to="/wishlist">
                         <MdFavorite size={ICON_SIZE} />

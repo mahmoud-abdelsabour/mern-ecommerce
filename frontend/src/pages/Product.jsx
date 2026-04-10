@@ -7,6 +7,7 @@ import {
   Dialog,
   Flex,
   HStack,
+  Icon,
   IconButton,
   Image,
   Portal,
@@ -18,12 +19,15 @@ import {
   Collapsible,
   Textarea,
 } from "@chakra-ui/react"
-import { LuChevronLeft, LuChevronRight, LuChevronDown } from "react-icons/lu"
+import { LuChevronLeft, LuChevronRight, LuChevronDown, LuMinus, LuPlus } from "react-icons/lu"
+import { MdFavorite, MdFavoriteBorder } from "react-icons/md"
 import ReviewCard from "../components/ReviewCard"
 import { useNavigate, useParams } from "react-router-dom"
 import { useProductById } from "../hooks/useProducts"
-import { useAddToCart } from "../hooks/useCart"
+import { useAddToCart, useCart, useDecrementCartItem } from "../hooks/useCart"
 import { getToken } from "../APIs/http"
+import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from "../hooks/useWishlist"
+import { ICON_SIZE } from "../constants/ui"
 
 
 const Product = () => {
@@ -65,15 +69,70 @@ const Product = () => {
   const reviewsLabel = `${reviewsPreview.length}${hasMoreReviews ? "+" : ""}`
 
   const addToCartMutation = useAddToCart()
+  const decrementCartMutation = useDecrementCartItem()
+
+  // Wishlist state for the current product.
+  const { data: wishlistIds } = useWishlist()
+  const addToWishlistMutation = useAddToWishlist()
+  const removeFromWishlistMutation = useRemoveFromWishlist()
+
+  // Cart state for the current product (to show qty controls instead of "Add to cart").
+  const { data: cartData } = useCart()
+  const cartItems = Array.isArray(cartData) ? cartData : []
+
+  const normalizedProductId = product?.id ?? product?._id ?? productId
+  const isLoggedIn = Boolean(getToken())
+
+  const cartQuantity = (() => {
+    if (!normalizedProductId) return 0
+    const match = cartItems.find((item) => {
+      const itemProductId = item?.product?._id ?? item?.product?.id ?? item?.product
+      return String(itemProductId) === String(normalizedProductId)
+    })
+    return Number(match?.quantity ?? 0) || 0
+  })()
+
+  const isInWishlist = Boolean(
+    isLoggedIn &&
+      normalizedProductId &&
+      Array.isArray(wishlistIds) &&
+      wishlistIds.some((id) => String(id) === String(normalizedProductId))
+  )
+
+  const wishlistIsBusy = addToWishlistMutation.isPending || removeFromWishlistMutation.isPending
 
   const onAddToCart = () => {
-    const id = product?.id ?? product?._id ?? productId
-    if (!id) return
+    if (!normalizedProductId) return
     if (!getToken()) {
       navigate("/login")
       return
     }
-    addToCartMutation.mutate({ productId: id, quantity: 1 })
+    addToCartMutation.mutate({ productId: normalizedProductId, quantity: 1 })
+  }
+
+  const onIncrementCart = () => {
+    if (!normalizedProductId) return
+    addToCartMutation.mutate({ productId: normalizedProductId, quantity: 1 })
+  }
+
+  const onDecrementCart = () => {
+    if (!normalizedProductId) return
+    decrementCartMutation.mutate({ productId: normalizedProductId, amount: 1 })
+  }
+
+  const onToggleWishlist = () => {
+    if (!normalizedProductId) return
+
+    if (!isLoggedIn) {
+      navigate("/login")
+      return
+    }
+
+    if (isInWishlist) {
+      removeFromWishlistMutation.mutate(normalizedProductId)
+    } else {
+      addToWishlistMutation.mutate(normalizedProductId)
+    }
   }
 
   return (
@@ -94,7 +153,43 @@ const Product = () => {
       </Text>
       <Dialog.Root size="full">
         <Flex justify="center">
-          <Carousel.Root slideCount={items.length} maxW="2xl" gap="4" w="100%">
+          <Box position="relative" maxW="2xl" w="100%">
+            <Box position="absolute" top="2" right="2" zIndex="1">
+              {/* Wishlist toggle (top-right). Selectable boxed heart icon. */}
+              <Box
+                as="button"
+                type="button"
+                aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                onClick={onToggleWishlist}
+                disabled={wishlistIsBusy || isLoading || !product}
+                w="10"
+                h="10"
+                display="inline-flex"
+                alignItems="center"
+                justifyContent="center"
+                rounded="md"
+                borderWidth="1px"
+                borderColor={isInWishlist ? "red.500" : "gray.200"}
+                bg={isInWishlist ? "red.50" : "whiteAlpha.900"}
+                _hover={
+                  wishlistIsBusy
+                    ? undefined
+                    : { borderColor: isInWishlist ? "red.600" : "gray.300" }
+                }
+                _active={wishlistIsBusy ? undefined : { transform: "scale(0.98)" }}
+                cursor={wishlistIsBusy ? "not-allowed" : "pointer"}
+              >
+                <Icon color={isInWishlist ? "red.500" : "gray.600"}>
+                  {isInWishlist ? (
+                    <MdFavorite size={ICON_SIZE} />
+                  ) : (
+                    <MdFavoriteBorder size={ICON_SIZE} />
+                  )}
+                </Icon>
+              </Box>
+            </Box>
+
+            <Carousel.Root slideCount={items.length} maxW="2xl" gap="4" w="100%">
             {/* Product images carousel (click image to open full-screen dialog). */}
             <Carousel.Control justifyContent="center" gap="4" width="full">
               <Carousel.PrevTrigger asChild>
@@ -149,7 +244,8 @@ const Product = () => {
                 </Carousel.Indicator>
               ))}
             </Carousel.IndicatorGroup>
-          </Carousel.Root>
+            </Carousel.Root>
+          </Box>
         </Flex>
 
         <Portal>
@@ -229,15 +325,41 @@ const Product = () => {
       
       {/*buying buttons */}
       <HStack mt={3} gap={3} justify="center" mb={6}>
-        <Button
-          variant="outline"
-          size="sm"
-          minW="140px"
-          onClick={onAddToCart}
-          disabled={isLoading || addToCartMutation.isPending || !product}
-        >
-          {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
-        </Button>
+        {cartQuantity > 0 ? (
+          <HStack minW="140px" justify="space-between" align="center">
+            <IconButton
+              size="sm"
+              variant="outline"
+              aria-label="Decrease"
+              onClick={onDecrementCart}
+              disabled={isLoading || decrementCartMutation.isPending || !product}
+            >
+              <LuMinus size={ICON_SIZE} />
+            </IconButton>
+            <Text fontSize="sm" fontWeight="700">
+              Qty: {cartQuantity}
+            </Text>
+            <IconButton
+              size="sm"
+              variant="outline"
+              aria-label="Increase"
+              onClick={onIncrementCart}
+              disabled={isLoading || addToCartMutation.isPending || !product}
+            >
+              <LuPlus size={ICON_SIZE} />
+            </IconButton>
+          </HStack>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            minW="140px"
+            onClick={onAddToCart}
+            disabled={isLoading || addToCartMutation.isPending || !product}
+          >
+            {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
+          </Button>
+        )}
         <Button colorScheme="teal" size="sm" minW="140px">
           Buy now
         </Button>

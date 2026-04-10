@@ -1,9 +1,9 @@
-import { Box, Button, EmptyState, Flex, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, EmptyState, Flex, HStack, Text, VStack } from "@chakra-ui/react"
 import { FaHeartBroken } from "react-icons/fa"
 import { Link as RouterLink } from "react-router-dom"
 import { useQueries } from "@tanstack/react-query"
 import ProductList from "../components/ProductList"
-import { useWishlist } from "../hooks/useWishlist"
+import { useClearWishlist, useWishlist } from "../hooks/useWishlist"
 import { getToken } from "../APIs/http"
 import productsApi from "../APIs/products.api"
 
@@ -12,6 +12,7 @@ const Wishlist = () => {
   const isLoggedIn = Boolean(token)
 
   const { data, isLoading, isError, error } = useWishlist()
+  const clearWishlistMutation = useClearWishlist()
   const wishlistIds = data ?? []
 
   const productQueries = useQueries({
@@ -59,6 +60,21 @@ const Wishlist = () => {
 
   return (
     <Box maxW="1200px" mx="auto" px={4} py={8}>
+      <HStack justify="space-between" align="center" mb={4}>
+        <Text fontSize="lg" fontWeight="700">
+          Wishlist
+        </Text>
+        <Button
+          size="sm"
+          variant="outline"
+          colorScheme="red"
+          onClick={() => clearWishlistMutation.mutate()}
+          disabled={clearWishlistMutation.isPending || wishlistIds.length === 0}
+        >
+          {clearWishlistMutation.isPending ? "Clearing..." : "Clear wishlist"}
+        </Button>
+      </HStack>
+
       {isError && (
         <Text fontSize="sm" color="red.500" mb={4}>
           Failed to load wishlist: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
@@ -94,4 +110,3 @@ const Wishlist = () => {
 }
 
 export default Wishlist
-
