@@ -22,9 +22,33 @@ export const useAddToWishlist = (options = {}) => {
 
   return useMutation({
     mutationFn: (productId) => wishlistApi.addToWishlist(productId),
+    // Optimistic update so the heart icon toggles instantly across the app.
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries({ queryKey: ["wishlist"] })
+
+      const previous = queryClient.getQueryData(["wishlist"])
+      const prevIds = Array.isArray(previous) ? previous : []
+      const nextIds = prevIds.some((id) => String(id) === String(productId))
+        ? prevIds
+        : [...prevIds, productId]
+
+      queryClient.setQueryData(["wishlist"], nextIds)
+      return { previous }
+    },
+    onError: (error, variables, context) => {
+      // Roll back optimistic update if the request fails.
+      if (context?.previous !== undefined) {
+        queryClient.setQueryData(["wishlist"], context.previous)
+      }
+      options.onError?.(error, variables, context)
+    },
     onSuccess: async (data, variables, context) => {
-      await queryClient.invalidateQueries({ queryKey: ["wishlist"] })
       options.onSuccess?.(data, variables, context)
+    },
+    onSettled: async (...args) => {
+      // Ensure server is the source of truth after optimistic update.
+      await queryClient.invalidateQueries({ queryKey: ["wishlist"] })
+      options.onSettled?.(...args)
     },
     ...options,
   })
@@ -35,9 +59,31 @@ export const useRemoveFromWishlist = (options = {}) => {
 
   return useMutation({
     mutationFn: (productId) => wishlistApi.removeFromWishlist(productId),
+    // Optimistic update so the heart icon toggles instantly across the app.
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries({ queryKey: ["wishlist"] })
+
+      const previous = queryClient.getQueryData(["wishlist"])
+      const prevIds = Array.isArray(previous) ? previous : []
+      const nextIds = prevIds.filter((id) => String(id) !== String(productId))
+
+      queryClient.setQueryData(["wishlist"], nextIds)
+      return { previous }
+    },
+    onError: (error, variables, context) => {
+      // Roll back optimistic update if the request fails.
+      if (context?.previous !== undefined) {
+        queryClient.setQueryData(["wishlist"], context.previous)
+      }
+      options.onError?.(error, variables, context)
+    },
     onSuccess: async (data, variables, context) => {
-      await queryClient.invalidateQueries({ queryKey: ["wishlist"] })
       options.onSuccess?.(data, variables, context)
+    },
+    onSettled: async (...args) => {
+      // Ensure server is the source of truth after optimistic update.
+      await queryClient.invalidateQueries({ queryKey: ["wishlist"] })
+      options.onSettled?.(...args)
     },
     ...options,
   })

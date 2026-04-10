@@ -1,10 +1,12 @@
 import { Box, Stack, Image, HStack, Icon, Text, Button, IconButton, Checkbox } from '@chakra-ui/react'
 import { FaStar } from 'react-icons/fa'
 import { LuMinus, LuPlus } from "react-icons/lu"
+import { MdFavorite, MdFavoriteBorder } from "react-icons/md"
 import { ICON_SIZE } from '../constants/ui'
 import { useNavigate } from "react-router-dom"
 import { useAddToCart } from "../hooks/useCart"
 import { getToken } from "../APIs/http"
+import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from "../hooks/useWishlist"
 
 const ProductCard = ({
   data,
@@ -34,6 +36,11 @@ const ProductCard = ({
   // Mutations are safe to create per-card instance; React Query dedupes network and we invalidate the cart query on success.
   const addToCartMutation = useAddToCart()
 
+  // Wishlist state is global (React Query) but safe to read in each card; all cards share the same cache.
+  const { data: wishlistIds } = useWishlist()
+  const addToWishlistMutation = useAddToWishlist()
+  const removeFromWishlistMutation = useRemoveFromWishlist()
+
   const onAddToCart = (e) => {
     // Prevent card navigation when clicking the button.
     e.stopPropagation()
@@ -45,6 +52,38 @@ const ProductCard = ({
     }
 
     addToCartMutation.mutate({ productId, quantity: 1 })
+  }
+
+  const isLoggedIn = Boolean(getToken())
+
+  // Determine whether this product is already in the wishlist.
+  // Backend returns wishlist as an array of product IDs.
+  const isInWishlist = Boolean(
+    isLoggedIn &&
+      productId &&
+      Array.isArray(wishlistIds) &&
+      wishlistIds.some((id) => String(id) === String(productId))
+  )
+
+  const wishlistIsBusy = addToWishlistMutation.isPending || removeFromWishlistMutation.isPending
+
+  const onToggleWishlist = (e) => {
+    // Prevent card navigation when clicking the wishlist button.
+    e.stopPropagation()
+
+    if (!productId) return
+
+    // Wishlist is auth-protected; redirect to login if the user isn't logged in.
+    if (!isLoggedIn) {
+      navigate("/login")
+      return
+    }
+
+    if (isInWishlist) {
+      removeFromWishlistMutation.mutate(productId)
+    } else {
+      addToWishlistMutation.mutate(productId)
+    }
   }
 
   const title = data?.title ?? data?.name ?? "Product"
@@ -85,6 +124,42 @@ const ProductCard = ({
       _hover={isClickable ? { borderColor: "gray.300" } : undefined}
     >
       <Box position="relative" w="100%" aspectRatio={1}>
+        {variant === "default" && (
+          <Box position="absolute" top="2" right="2" zIndex="1">
+            {/* Wishlist toggle (top-right). Selectable boxed heart icon. */}
+            <Box
+              as="button"
+              type="button"
+              aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={onToggleWishlist}
+              disabled={wishlistIsBusy}
+              w="8"
+              h="8"
+              display="inline-flex"
+              alignItems="center"
+              justifyContent="center"
+              rounded="md"
+              borderWidth="1px"
+              borderColor={isInWishlist ? "red.500" : "gray.200"}
+              bg={isInWishlist ? "red.50" : "whiteAlpha.900"}
+              _hover={
+                wishlistIsBusy
+                  ? undefined
+                  : { borderColor: isInWishlist ? "red.600" : "gray.300" }
+              }
+              _active={wishlistIsBusy ? undefined : { transform: "scale(0.98)" }}
+              cursor={wishlistIsBusy ? "not-allowed" : "pointer"}
+            >
+              <Icon color={isInWishlist ? "red.500" : "gray.600"}>
+                {isInWishlist ? (
+                  <MdFavorite size={ICON_SIZE} />
+                ) : (
+                  <MdFavoriteBorder size={ICON_SIZE} />
+                )}
+              </Icon>
+            </Box>
+          </Box>
+        )}
         {variant === "return" && (
           <Box position="absolute" top="2" left="2" zIndex="1">
             {/* Return flow: allow selecting items from a list of products. */}
