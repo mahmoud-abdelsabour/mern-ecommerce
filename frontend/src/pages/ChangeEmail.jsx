@@ -5,6 +5,7 @@ import GlobalNotification from "../components/GlobalNotification"
 import { getToken } from "../APIs/http"
 import { useUpdateProfile } from "../hooks/useUser"
 import { clearStoredUser } from "../utils/authStorage"
+import { setFlash } from "../utils/flashStorage"
 
 const ChangeEmail = () => {
   const navigate = useNavigate()
@@ -24,10 +25,8 @@ const ChangeEmail = () => {
       // Backend increments `tokenVersion` when email changes, which invalidates the current JWT.
       // Log out and force re-login so the user gets a fresh token.
       clearStoredUser()
-      navigate("/login", { 
-        replace: true, 
-        state: { flash: { status: "success", title: "Email updated successfully." }
-      }})
+      setFlash({ status: "success", title: "Email updated successfully." })
+      navigate("/login", { replace: true })
     },
   })
 

@@ -10,17 +10,16 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react"
-import { useEffect, useMemo } from "react"
+import { useEffect, useState } from "react"
 import { HiUpload } from "react-icons/hi"
-import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { getToken } from "../APIs/http"
 import { useMe } from "../hooks/useUser"
 import GlobalNotification from "../components/GlobalNotification"
+import { consumeFlash } from "../utils/flashStorage"
 
 const Profile = () => {
   const navigate = useNavigate()
-  const location = useLocation()
-  const FLASH_SECONDS = 5
 
   const token = getToken()
   const isLoggedIn = Boolean(token)
@@ -34,15 +33,7 @@ const Profile = () => {
   }, [isLoggedIn, navigate])
 
   // One-time flash message (e.g. after updating profile/password/email).
-  const flash = useMemo(() => location.state?.flash ?? null, [location.state])
-  useEffect(() => {
-    if (!flash) return
-    // Clear the flash state after the notification has had time to display.
-    const id = setTimeout(() => {
-      navigate(location.pathname, { replace: true, state: null })
-    }, FLASH_SECONDS * 1000)
-    return () => clearTimeout(id)
-  }, [FLASH_SECONDS, flash, location.pathname, navigate])
+  const [flash] = useState(() => consumeFlash())
 
   if (!isLoggedIn) return null
 

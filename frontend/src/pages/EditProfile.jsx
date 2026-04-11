@@ -4,6 +4,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom"
 import GlobalNotification from "../components/GlobalNotification"
 import { getToken } from "../APIs/http"
 import { useMe, useUpdateProfile } from "../hooks/useUser"
+import { setFlash } from "../utils/flashStorage"
 
 const EditProfileForm = ({ initialForm }) => {
   const navigate = useNavigate()
@@ -27,9 +28,9 @@ const EditProfileForm = ({ initialForm }) => {
   const updateProfileMutation = useUpdateProfile({
     onSuccess: () => {
       // After updating, navigate back to profile and show a success notification there.
+      setFlash({ status: "success", title: "Profile updated successfully." })
       navigate("/me", {
         replace: true,
-        state: { flash: { status: "success", title: "Profile updated successfully." } },
       })
     },
   })

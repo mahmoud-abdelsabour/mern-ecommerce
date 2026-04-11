@@ -6,6 +6,7 @@ import { getStoredUser } from "../utils/authStorage"
 import { getToken } from "../APIs/http"
 import { useUpdatePassword } from "../hooks/useAuth"
 import { clearStoredUser } from "../utils/authStorage"
+import { setFlash } from "../utils/flashStorage"
 
 const ChangePassword = () => {
   const navigate = useNavigate()
@@ -52,9 +53,9 @@ const ChangePassword = () => {
   const updatePasswordMutation = useUpdatePassword({
     onSuccess: () => {
       clearStoredUser()
+      setFlash({ status: "success", title: "Password updated successfully." })
       navigate("/login", {
         replace: true,
-        state: { flash: { status: "success", title: "Password updated successfully." } },
       })
     },
   })
