@@ -11,7 +11,9 @@ const updateProfileSchema = Joi.object({
         .pattern(/^01[0125][0-9]{8}$/)
         .min(11)
         .trim(),
-    profilePhoto: Joi.string().trim().allow(null, ''),
+    profilePhoto: Joi.alternatives()
+        .try(Joi.string().uri({ scheme: ['http', 'https'] }), Joi.valid(null, ''))
+        .messages({ 'alternatives.match': 'profilePhoto must be a valid http(s) URL' }),
 }).min(1)
 
 const createAddressSchema = Joi.object({

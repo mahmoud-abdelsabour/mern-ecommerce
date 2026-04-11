@@ -4,7 +4,6 @@ import {
   Button,
   CloseButton,
   Dialog,
-  FileUpload,
   Flex,
   HStack,
   IconButton,
@@ -17,10 +16,17 @@ import { useEffect, useRef, useState } from "react"
 import { HiPencil, HiPlus, HiTrash, HiUpload } from "react-icons/hi"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { getToken } from "../APIs/http"
-import { useCreateAddress, useDeleteAddress, useMe, useUpdateAddress } from "../hooks/useUser"
+import {
+  useCreateAddress,
+  useDeleteAddress,
+  useMe,
+  useUpdateAddress,
+  useUpdateProfile,
+} from "../hooks/useUser"
 import GlobalNotification from "../components/GlobalNotification"
 import { consumeFlash } from "../utils/flashStorage"
 import AddressForm from "../components/AddressForm"
+import { uploadProfileImageToCloudinary } from "../utils/cloudinaryUpload"
 
 const createEmptyAddressDraft = () => {
   return {
@@ -116,6 +122,20 @@ const Profile = () => {
     },
   })
 
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
+
+  const updateProfileMutation = useUpdateProfile({
+    onError: (err) => {
+      showNotice(
+        "error",
+        err?.response?.data?.message ??
+          err?.response?.data?.error ??
+          err?.message ??
+          "Failed to save profile photo"
+      )
+    },
+  })
+
   const deleteAddressMutation = useDeleteAddress({
     onSuccess: (result) => {
       showNotice("info", result?.message ?? "Address deleted successfully.")
@@ -132,6 +152,30 @@ const Profile = () => {
 
   const addressFormBusy = createAddressMutation.isPending || updateAddressMutation.isPending
   const deleteBusy = deleteAddressMutation.isPending
+  const photoBusy = isUploadingPhoto || updateProfileMutation.isPending
+
+  const onProfilePhotoChange = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ""
+    if (!file) return
+
+    setIsUploadingPhoto(true)
+    try {
+      const url = await uploadProfileImageToCloudinary(file)
+      updateProfileMutation.mutate(
+        { profilePhoto: url },
+        {
+          onSuccess: () => {
+            showNotice("success", "Profile photo updated.")
+          },
+          onSettled: () => setIsUploadingPhoto(false),
+        }
+      )
+    } catch (err) {
+      setIsUploadingPhoto(false)
+      showNotice("error", err?.message ?? "Could not upload photo")
+    }
+  }
 
   const onSubmitAddress = () => {
     const payload = {
@@ -157,6 +201,7 @@ const Profile = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingAddress, setDeletingAddress] = useState(null)
   const cancelRef = useRef(null)
+  const photoInputRef = useRef(null)
 
   const onAskDelete = (address) => {
     setDeletingAddress(address)
@@ -235,15 +280,29 @@ const Profile = () => {
               </Text>
             </Stack>
 
-            <FileUpload.Root>
-              <FileUpload.HiddenInput />
-              <FileUpload.Trigger asChild>
-                <Button variant="outline" size="sm" alignSelf="flex-start">
-                  <HiUpload /> Upload photo
-                </Button>
-              </FileUpload.Trigger>
-              <FileUpload.List />
-            </FileUpload.Root>
+            <input
+              ref={photoInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              style={{ display: "none" }}
+              aria-hidden
+              onChange={onProfilePhotoChange}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              alignSelf="flex-start"
+              loading={photoBusy}
+              disabled={photoBusy}
+              aria-label="Upload profile photo"
+              onClick={() => photoInputRef.current?.click()}
+            >
+              <HiUpload /> Upload photo
+            </Button>
+            <Text fontSize="xs" color="gray.500">
+              JPEG, PNG, WebP, or GIF · max 5 MB · hosted on Cloudinary
+            </Text>
           </Stack>
         </Box>
 

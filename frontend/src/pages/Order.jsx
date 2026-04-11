@@ -142,10 +142,7 @@ const Order = () => {
     cancelMutation.mutate(id)
   }
 
-  const onReturnOrder = () => {
-    if (!canReturn) return
-    // Return flow is handled on `/order/return` (not wired here yet).
-  }
+  const orderRouteId = order?.id ?? order?._id
 
   return (
     <Box maxW="1200px" mx="auto" px={4} py={8}>
@@ -199,7 +196,14 @@ const Order = () => {
               >
                 Cancel Order
               </Button>
-              <Button flex="1" colorScheme="orange" disabled={!canReturn} onClick={onReturnOrder}>
+              <Button
+                flex="1"
+                as={RouterLink}
+                to={orderRouteId ? `/order/${orderRouteId}/return` : "#"}
+                colorPalette="orange"
+                disabled={!canReturn || !orderRouteId}
+                pointerEvents={!canReturn || !orderRouteId ? "none" : "auto"}
+              >
                 Return
               </Button>
             </HStack>
