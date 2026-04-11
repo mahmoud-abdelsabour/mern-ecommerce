@@ -5,6 +5,7 @@ import { clearStoredUser, getStoredUser, onAuthChanged } from "../utils/authStor
 import { getJwtExpirationMs } from "../utils/jwt"
 
 const LOGIN_PATH = "/login"
+const IS_DEV = Boolean(import.meta?.env?.DEV)
 
 export const useAuthAutoLogout = () => {
   const navigate = useNavigate()
@@ -75,10 +76,21 @@ export const useAuthAutoLogout = () => {
       (error) => {
         const status = error?.response?.status
         const url = String(error?.config?.url ?? "")
+        const method = String(error?.config?.method ?? "").toUpperCase()
+        const currentPath = locationRef.current?.pathname
 
         // Don't hijack login/register failures.
         const isAuthLoginOrRegister =
           url.includes("/api/auth/login") || url.includes("/api/auth/register")
+
+        if (IS_DEV && status === 401 && !isAuthLoginOrRegister) {
+          console.warn("[auth] 401 detected", {
+            method,
+            url,
+            currentPath,
+            response: error?.response?.data ?? null,
+          })
+        }
 
         if (status === 401 && !isAuthLoginOrRegister) {
           // Server-side auth mismatch (expired/invalid token) — clear client state.

@@ -1,26 +1,52 @@
 import { Box, Button, Field, Fieldset, Flex, HStack, Input, Stack, Text } from "@chakra-ui/react"
-import { useMemo, useState } from "react"
-import { Link as RouterLink } from "react-router-dom"
+import { useEffect, useMemo, useState } from "react"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
+import GlobalNotification from "../components/GlobalNotification"
+import { getToken } from "../APIs/http"
+import { useUpdateProfile } from "../hooks/useUser"
+import { clearStoredUser } from "../utils/authStorage"
 
 const ChangeEmail = () => {
+  const navigate = useNavigate()
+  const token = getToken()
+  const isLoggedIn = Boolean(token)
+
   const [form, setForm] = useState({
     newEmail: "",
-    password: "",
   })
 
   const canSubmit = useMemo(() => {
-    return String(form.newEmail).trim() && String(form.password).trim()
+    return String(form.newEmail).trim()
   }, [form])
+
+  const updateProfileMutation = useUpdateProfile({
+    onSuccess: () => {
+      // Backend increments `tokenVersion` when email changes, which invalidates the current JWT.
+      // Log out and force re-login so the user gets a fresh token.
+      clearStoredUser()
+      navigate("/login", { 
+        replace: true, 
+        state: { flash: { status: "success", title: "Email updated successfully." }
+      }})
+    },
+  })
 
   const onSubmit = (e) => {
     e.preventDefault()
     if (!canSubmit) return
-    console.log("Change email", { newEmail: form.newEmail, password: "***" })
+    updateProfileMutation.mutate({ email: String(form.newEmail ?? "").trim() })
   }
+
+  // Protect route: redirect to login if not authenticated.
+  useEffect(() => {
+    if (!isLoggedIn) navigate("/login", { replace: true })
+  }, [isLoggedIn, navigate])
+
+  if (!isLoggedIn) return null
 
   return (
     <Flex minH="70vh" align="center" justify="center" px={4} py={8}>
-      <Box w="100%" maxW="520px">
+      <Box as="form" onSubmit={onSubmit} w="100%" maxW="520px">
         <Fieldset.Root size="lg">
           <Stack mb={4}>
             <Fieldset.Legend>Change Email</Fieldset.Legend>
@@ -29,7 +55,17 @@ const ChangeEmail = () => {
             </Text>
           </Stack>
 
-          <Fieldset.Content as="form" onSubmit={onSubmit}>
+          <Fieldset.Content>
+            <GlobalNotification
+              status="error"
+              title={
+                updateProfileMutation.isError
+                  ? updateProfileMutation.error?.response?.data?.message ??
+                    updateProfileMutation.error?.message ??
+                    "Failed to update email"
+                  : null
+              }
+            />
             <Field.Root>
               <Field.Label>New email</Field.Label>
               <Input
@@ -37,15 +73,7 @@ const ChangeEmail = () => {
                 placeholder="you@example.com"
                 value={form.newEmail}
                 onChange={(e) => setForm((p) => ({ ...p, newEmail: e.target.value }))}
-              />
-            </Field.Root>
-
-            <Field.Root>
-              <Field.Label>Password</Field.Label>
-              <Input
-                type="password"
-                value={form.password}
-                onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
+                disabled={updateProfileMutation.isPending}
               />
             </Field.Root>
 
@@ -53,8 +81,12 @@ const ChangeEmail = () => {
               <Button as={RouterLink} to="/me/edit" variant="outline">
                 Back
               </Button>
-              <Button type="submit" colorScheme="teal" disabled={!canSubmit}>
-                Update email
+              <Button
+                type="submit"
+                colorScheme="teal"
+                disabled={!canSubmit || updateProfileMutation.isPending}
+              >
+                {updateProfileMutation.isPending ? "Updating..." : "Update email"}
               </Button>
             </HStack>
           </Fieldset.Content>
@@ -65,4 +97,3 @@ const ChangeEmail = () => {
 }
 
 export default ChangeEmail
-

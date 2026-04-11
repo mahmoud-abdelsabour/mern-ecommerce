@@ -52,7 +52,17 @@ const updatePassword = async data => {
     try {
         const { currentPassword, newPassword, user } = data
 
-        await passwordCompare(currentPassword, user.passwordHash)
+        try {
+            await passwordCompare(currentPassword, user.passwordHash)
+        } catch (error) {
+            // When the user is already authenticated, a wrong current password is a
+            // validation/business error, not an auth-token error. Returning 400 avoids
+            // client auto-logout behavior that triggers on 401.
+            if (error?.statusCode === 401) {
+                throw Object.assign(new Error('invalid current password'), { statusCode: 400 })
+            }
+            throw error
+        }
 
         const passwordHash = await hashingValue(newPassword, 10)
 

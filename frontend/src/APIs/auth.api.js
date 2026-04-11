@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getAuthConfig } from "../apis/http"
+import { getAuthConfig } from "./http"
 
 const baseURL = '/api/auth'
 
@@ -13,8 +13,12 @@ const login = async (credentials) => {
     return response.data
 }
 
-const updatePassword = async (currentPWD, newPWD) => {
-    const response = await axios.patch(`${baseURL}/update-password`, {currentPWD, newPWD}, getAuthConfig())
+const updatePassword = async ({ userId, currentPassword, newPassword }) => {
+    const response = await axios.patch(
+        `${baseURL}/users/${userId}/update-password`,
+        { currentPassword, newPassword },
+        getAuthConfig()
+    )
     return response.data
 }
 

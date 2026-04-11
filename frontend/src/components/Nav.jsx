@@ -8,8 +8,9 @@ import { FaChevronDown } from "react-icons/fa";
 import { ICON_SIZE } from "../constants/ui";
 import { useBrands } from "../hooks/useBrands";
 import { useCategories } from "../hooks/useCategories";
-import { clearStoredUser, getStoredUser } from "../utils/authStorage";
+import { clearStoredUser } from "../utils/authStorage";
 import { useCart } from "../hooks/useCart";
+import { useStoredUser } from "../hooks/useStoredUser";
 
 const Nav = () => {
     const navigate = useNavigate()
@@ -25,7 +26,7 @@ const Nav = () => {
 
     // Read the logged-in user from localStorage (set on login).
     // Shape: `{ token, username, firstName, lastName, profilePhoto }`.
-    const storedUser = getStoredUser()
+    const storedUser = useStoredUser()
 
     const displayName =
         storedUser?.firstName || storedUser?.lastName

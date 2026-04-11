@@ -10,14 +10,17 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { HiUpload } from "react-icons/hi"
-import { Link as RouterLink, useNavigate } from "react-router-dom"
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom"
 import { getToken } from "../APIs/http"
 import { useMe } from "../hooks/useUser"
+import GlobalNotification from "../components/GlobalNotification"
 
 const Profile = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const FLASH_SECONDS = 5
 
   const token = getToken()
   const isLoggedIn = Boolean(token)
@@ -29,6 +32,17 @@ const Profile = () => {
   useEffect(() => {
     if (!isLoggedIn) navigate("/login", { replace: true })
   }, [isLoggedIn, navigate])
+
+  // One-time flash message (e.g. after updating profile/password/email).
+  const flash = useMemo(() => location.state?.flash ?? null, [location.state])
+  useEffect(() => {
+    if (!flash) return
+    // Clear the flash state after the notification has had time to display.
+    const id = setTimeout(() => {
+      navigate(location.pathname, { replace: true, state: null })
+    }, FLASH_SECONDS * 1000)
+    return () => clearTimeout(id)
+  }, [FLASH_SECONDS, flash, location.pathname, navigate])
 
   if (!isLoggedIn) return null
 
@@ -56,6 +70,10 @@ const Profile = () => {
   return (
     <Box maxW="1200px" mx="auto" px={4} py={8} w="100%">
       <Stack gap={6}>
+        <GlobalNotification
+          status={flash?.status ?? "info"}
+          title={flash?.title}
+        />
         <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4} w="100%">
           <Stack gap={3}>
             <Text fontSize="lg" fontWeight="800">
@@ -159,4 +177,3 @@ const Profile = () => {
 }
 
 export default Profile
-

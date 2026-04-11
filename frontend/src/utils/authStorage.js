@@ -3,6 +3,9 @@ const USER_KEY = "user"
 // without relying on React state or forcing a full reload.
 const AUTH_CHANGED_EVENT = "auth:changed"
 
+let cachedRaw = null
+let cachedUser = null
+
 const safeJsonParse = (value) => {
   try {
     return JSON.parse(value)
@@ -13,20 +16,36 @@ const safeJsonParse = (value) => {
 
 const getStoredUser = () => {
   // Centralized read to keep the "shape" of stored auth consistent everywhere.
-  const raw = localStorage.getItem(USER_KEY)
-  if (!raw) return null
-  return safeJsonParse(raw)
+  let raw = null
+  try {
+    raw = localStorage.getItem(USER_KEY)
+  } catch {
+    raw = null
+  }
+
+  // IMPORTANT: `useSyncExternalStore` requires a cached snapshot — if we parse JSON
+  // every call, it creates a new object reference and can cause render loops.
+  if (raw === cachedRaw) return cachedUser
+
+  cachedRaw = raw
+  cachedUser = raw ? safeJsonParse(raw) : null
+  return cachedUser
 }
 
 const setStoredUser = (user) => {
   // Persist current user + token and notify any listeners (e.g. auto-logout timer).
-  localStorage.setItem(USER_KEY, JSON.stringify(user))
+  const raw = JSON.stringify(user)
+  localStorage.setItem(USER_KEY, raw)
+  cachedRaw = raw
+  cachedUser = user
   window.dispatchEvent(new Event(AUTH_CHANGED_EVENT))
 }
 
 const clearStoredUser = () => {
   // Remove auth state and notify listeners so UI can react immediately.
   localStorage.removeItem(USER_KEY)
+  cachedRaw = null
+  cachedUser = null
   window.dispatchEvent(new Event(AUTH_CHANGED_EVENT))
 }
 

@@ -1,8 +1,19 @@
 import { Box, Button, Field, Fieldset, Flex, HStack, Input, Stack, Text } from "@chakra-ui/react"
-import { useMemo, useState } from "react"
-import { Link as RouterLink } from "react-router-dom"
+import { useEffect, useMemo, useState } from "react"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
+import GlobalNotification from "../components/GlobalNotification"
+import { getStoredUser } from "../utils/authStorage"
+import { getToken } from "../APIs/http"
+import { useUpdatePassword } from "../hooks/useAuth"
+import { clearStoredUser } from "../utils/authStorage"
 
 const ChangePassword = () => {
+  const navigate = useNavigate()
+  const token = getToken()
+  const isLoggedIn = Boolean(token)
+  const storedUser = getStoredUser()
+  const userId = storedUser?.id ?? storedUser?._id ?? null
+
   const [form, setForm] = useState({
     oldPassword: "",
     newPassword: "",
@@ -29,12 +40,35 @@ const ChangePassword = () => {
   const onSubmit = (e) => {
     e.preventDefault()
     if (!canSubmit) return
-    console.log("Change password", { oldPassword: "***", newPassword: "***" })
+    if (!userId) return
+
+    updatePasswordMutation.mutate({
+      userId,
+      currentPassword: String(form.oldPassword ?? ""),
+      newPassword: String(form.newPassword ?? ""),
+    })
   }
+
+  const updatePasswordMutation = useUpdatePassword({
+    onSuccess: () => {
+      clearStoredUser()
+      navigate("/login", {
+        replace: true,
+        state: { flash: { status: "success", title: "Password updated successfully." } },
+      })
+    },
+  })
+
+  // Protect route: redirect to login if not authenticated.
+  useEffect(() => {
+    if (!isLoggedIn) navigate("/login", { replace: true })
+  }, [isLoggedIn, navigate])
+
+  if (!isLoggedIn) return null
 
   return (
     <Flex minH="70vh" align="center" justify="center" px={4} py={8}>
-      <Box w="100%" maxW="520px">
+      <Box as="form" onSubmit={onSubmit} w="100%" maxW="520px">
         <Fieldset.Root size="lg">
           <Stack mb={4}>
             <Fieldset.Legend>Change Password</Fieldset.Legend>
@@ -43,13 +77,25 @@ const ChangePassword = () => {
             </Text>
           </Stack>
 
-          <Fieldset.Content as="form" onSubmit={onSubmit}>
+          <Fieldset.Content>
+            <GlobalNotification
+              status="error"
+              title={
+                updatePasswordMutation.isError
+                  ? updatePasswordMutation.error?.response?.data?.message ??
+                    updatePasswordMutation.error?.response?.data?.error ??
+                    updatePasswordMutation.error?.message ??
+                    "Failed to update password"
+                  : null
+              }
+            />
             <Field.Root>
               <Field.Label>Old password</Field.Label>
               <Input
                 type="password"
                 value={form.oldPassword}
                 onChange={(e) => setForm((p) => ({ ...p, oldPassword: e.target.value }))}
+                disabled={updatePasswordMutation.isPending}
               />
             </Field.Root>
 
@@ -59,6 +105,7 @@ const ChangePassword = () => {
                 type="password"
                 value={form.newPassword}
                 onChange={(e) => setForm((p) => ({ ...p, newPassword: e.target.value }))}
+                disabled={updatePasswordMutation.isPending}
               />
             </Field.Root>
 
@@ -68,6 +115,7 @@ const ChangePassword = () => {
                 type="password"
                 value={form.confirmNewPassword}
                 onChange={(e) => setForm((p) => ({ ...p, confirmNewPassword: e.target.value }))}
+                disabled={updatePasswordMutation.isPending}
               />
               {mismatch && (
                 <Text fontSize="xs" color="red.500" mt={1}>
@@ -80,8 +128,12 @@ const ChangePassword = () => {
               <Button as={RouterLink} to="/me/edit" variant="outline">
                 Back
               </Button>
-              <Button type="submit" colorScheme="teal" disabled={!canSubmit}>
-                Update password
+              <Button
+                type="submit"
+                colorScheme="teal"
+                disabled={!canSubmit || updatePasswordMutation.isPending || !userId}
+              >
+                {updatePasswordMutation.isPending ? "Updating..." : "Update password"}
               </Button>
             </HStack>
           </Fieldset.Content>
@@ -92,4 +144,3 @@ const ChangePassword = () => {
 }
 
 export default ChangePassword
-

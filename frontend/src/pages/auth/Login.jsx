@@ -1,6 +1,6 @@
 import { Box, Button, Field, Fieldset, Flex, Input, Stack, Text } from "@chakra-ui/react"
-import { useReducer } from "react"
-import { Link as RouterLink, useNavigate } from "react-router-dom"
+import { useEffect, useMemo, useReducer } from "react"
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom"
 import GlobalNotification from "../../components/GlobalNotification"
 import { useLogin } from "../../hooks/useAuth"
 import { initialLoginFormState, loginFormReducer } from "../../utils/forms/loginFormState"
@@ -8,11 +8,21 @@ import { setStoredUser } from "../../utils/authStorage"
 
 const Login = () => {
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [state, dispatch] = useReducer(loginFormReducer, initialLoginFormState)
   const { values, fieldErrors, formError } = state
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  const flash = useMemo(() => location.state?.flash ?? null, [location.state])
+  useEffect(() => {
+    if (!flash) return
+    const id = setTimeout(() => {
+      navigate(location.pathname, { replace: true, state: null })
+    }, 5000)
+    return () => clearTimeout(id)
+  }, [flash, location.pathname, navigate])
 
   const loginMutation = useLogin({
     onSuccess: (result) => {
@@ -63,6 +73,7 @@ const Login = () => {
           </Stack>
 
           <Fieldset.Content>
+            <GlobalNotification status={flash?.status ?? "info"} title={flash?.title} />
             <GlobalNotification status="error" title={formError} />
 
             <Field.Root invalid={Boolean(fieldErrors.email)}>

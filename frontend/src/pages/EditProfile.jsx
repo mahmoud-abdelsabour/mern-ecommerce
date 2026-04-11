@@ -1,14 +1,18 @@
 import { Box, Button, Field, Fieldset, Flex, HStack, Input, Stack, Text } from "@chakra-ui/react"
-import { useMemo, useState } from "react"
-import { Link as RouterLink } from "react-router-dom"
+import { useEffect, useMemo, useState } from "react"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
+import GlobalNotification from "../components/GlobalNotification"
+import { getToken } from "../APIs/http"
+import { useMe, useUpdateProfile } from "../hooks/useUser"
 
-const EditProfile = () => {
+const EditProfileForm = ({ initialForm }) => {
+  const navigate = useNavigate()
+
   const [form, setForm] = useState({
-    firstName: "Mahmoud",
-    lastName: "Ahmed",
-    username: "mahmoud",
-    email: "mahmoud@example.com",
-    phone: "+20 100 000 0000",
+    firstName: initialForm.firstName,
+    lastName: initialForm.lastName,
+    username: initialForm.username,
+    phone: initialForm.phone,
   })
 
   const canSave = useMemo(() => {
@@ -16,20 +20,34 @@ const EditProfile = () => {
       String(form.firstName).trim() &&
       String(form.lastName).trim() &&
       String(form.username).trim() &&
-      String(form.email).trim() &&
       String(form.phone).trim()
     )
   }, [form])
 
+  const updateProfileMutation = useUpdateProfile({
+    onSuccess: () => {
+      // After updating, navigate back to profile and show a success notification there.
+      navigate("/me", {
+        replace: true,
+        state: { flash: { status: "success", title: "Profile updated successfully." } },
+      })
+    },
+  })
+
   const onSubmit = (e) => {
     e.preventDefault()
     if (!canSave) return
-    console.log("Update profile", form)
+    updateProfileMutation.mutate({
+      firstName: String(form.firstName ?? "").trim(),
+      lastName: String(form.lastName ?? "").trim(),
+      username: String(form.username ?? "").trim(),
+      phone: String(form.phone ?? "").trim(),
+    })
   }
 
   return (
     <Flex minH="70vh" align="center" justify="center" px={4} py={8}>
-      <Box w="100%" maxW="520px">
+      <Box as="form" onSubmit={onSubmit} w="100%" maxW="520px">
         <Fieldset.Root size="lg">
           <Stack mb={4}>
             <Fieldset.Legend>Edit Profile</Fieldset.Legend>
@@ -38,13 +56,24 @@ const EditProfile = () => {
             </Text>
           </Stack>
 
-          <Fieldset.Content as="form" onSubmit={onSubmit}>
+          <Fieldset.Content>
+            <GlobalNotification
+              status="error"
+              title={
+                updateProfileMutation.isError
+                  ? updateProfileMutation.error?.response?.data?.message ??
+                    updateProfileMutation.error?.message ??
+                    "Failed to update profile"
+                  : null
+              }
+            />
             <HStack gap={3} flexWrap="wrap">
               <Field.Root flex="1" minW="220px">
                 <Field.Label>First name</Field.Label>
                 <Input
                   value={form.firstName}
                   onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))}
+                  disabled={updateProfileMutation.isPending}
                 />
               </Field.Root>
               <Field.Root flex="1" minW="220px">
@@ -52,6 +81,7 @@ const EditProfile = () => {
                 <Input
                   value={form.lastName}
                   onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))}
+                  disabled={updateProfileMutation.isPending}
                 />
               </Field.Root>
             </HStack>
@@ -61,15 +91,7 @@ const EditProfile = () => {
               <Input
                 value={form.username}
                 onChange={(e) => setForm((p) => ({ ...p, username: e.target.value }))}
-              />
-            </Field.Root>
-
-            <Field.Root>
-              <Field.Label>Email</Field.Label>
-              <Input
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                disabled={updateProfileMutation.isPending}
               />
             </Field.Root>
 
@@ -78,6 +100,7 @@ const EditProfile = () => {
               <Input
                 value={form.phone}
                 onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                disabled={updateProfileMutation.isPending}
               />
             </Field.Root>
 
@@ -94,8 +117,8 @@ const EditProfile = () => {
                 <Button as={RouterLink} to="/me" variant="outline">
                   Back
                 </Button>
-                <Button type="submit" disabled={!canSave}>
-                  Save
+                <Button type="submit" disabled={!canSave || updateProfileMutation.isPending}>
+                  {updateProfileMutation.isPending ? "Saving..." : "Save"}
                 </Button>
               </HStack>
             </HStack>
@@ -104,6 +127,52 @@ const EditProfile = () => {
       </Box>
     </Flex>
   )
+}
+
+const EditProfile = () => {
+  const navigate = useNavigate()
+  const token = getToken()
+  const isLoggedIn = Boolean(token)
+
+  // Load current profile data to prefill the form.
+  const { data: me, isLoading, isError, error } = useMe()
+
+  // Protect route: redirect to login if not authenticated.
+  useEffect(() => {
+    if (!isLoggedIn) navigate("/login", { replace: true })
+  }, [isLoggedIn, navigate])
+
+  if (!isLoggedIn) return null
+
+  if (isLoading) {
+    return (
+      <Flex minH="50vh" align="center" justify="center" px={4}>
+        <Text color="gray.500">Loading profile...</Text>
+      </Flex>
+    )
+  }
+
+  if (isError) {
+    return (
+      <Flex minH="50vh" align="center" justify="center" px={4}>
+        <Text color="red.500" fontSize="sm">
+          Failed to load profile: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
+        </Text>
+      </Flex>
+    )
+  }
+
+  const initialForm = {
+    firstName: me?.firstName ?? "",
+    lastName: me?.lastName ?? "",
+    username: me?.username ?? "",
+    phone: me?.phone ?? "",
+  }
+
+  // Use a keyed child to reset form state when user data changes without setState-in-effect.
+  const key = me?.id ?? me?._id ?? "me"
+
+  return <EditProfileForm key={key} initialForm={initialForm} />
 }
 
 export default EditProfile

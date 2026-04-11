@@ -15,3 +15,10 @@ export const useLogin = (options = {}) => {
     ...options,
   })
 }
+
+export const useUpdatePassword = (options = {}) => {
+  return useMutation({
+    mutationFn: (payload) => authApi.updatePassword(payload),
+    ...options,
+  })
+}

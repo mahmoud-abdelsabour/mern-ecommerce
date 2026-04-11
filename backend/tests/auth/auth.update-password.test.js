@@ -60,7 +60,7 @@ describe('PATCH /api/auth/users/:id/update-password', () => {
                 currentPassword: 'WrongPass1@',
                 newPassword: 'Aa1@bbbb',
             })
-            .expect(401)
+            .expect(400)
 
         expect(response.body.message || response.body.error).toBeDefined()
     })
