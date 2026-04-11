@@ -27,6 +27,11 @@ const updateAddress = async (addressId, fields) => {
   return response.data
 }
 
+const deleteAddress = async (addressId) => {
+  const response = await axios.delete(`${baseURL}/me/addresses/${addressId}`, getAuthConfig())
+  return response.data
+}
+
 const deleteMe = async () => {
   const response = await axios.delete(`${baseURL}/me/delete`, getAuthConfig())
   return response.data
@@ -37,6 +42,6 @@ export default {
   updateProfile,
   createAddress,
   updateAddress,
+  deleteAddress,
   deleteMe,
 }
-

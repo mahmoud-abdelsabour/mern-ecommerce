@@ -50,6 +50,22 @@ const updateAddress = async (request, response) => {
     })
 }
 
+const deleteAddress = async (request, response) => {
+    const { user } = request
+    const { addressId } = request.params
+
+    if (!addressId) {
+        return response.status(400).json({ error: 'addressId is required' })
+    }
+
+    const updatedUser = await userService.deleteAddress({ addressId, user })
+
+    return response.status(200).json({
+        message: 'Address deleted successfully',
+        addresses: updatedUser.addresses,
+    })
+}
+
 const makeAdmin = async (request, response) => {
     const { userId } = request.params
     const user = await userService.makeAdmin({ userId })
@@ -68,6 +84,7 @@ module.exports = {
     updateProfile,
     createAddress,
     updateAddress,
+    deleteAddress,
     getUserProfile,
     makeAdmin,
     deleteUser,

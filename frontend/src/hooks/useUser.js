@@ -56,6 +56,12 @@ export const useCreateAddress = (options = {}) => {
     ...rest,
     mutationFn: (address) => usersApi.createAddress(address),
     onSuccess: async (data, variables, context) => {
+      if (Array.isArray(data?.addresses)) {
+        queryClient.setQueryData(["me"], (prev) => {
+          if (!prev) return prev
+          return { ...prev, addresses: data.addresses }
+        })
+      }
       await queryClient.invalidateQueries({ queryKey: ["me"] })
       onSuccess?.(data, variables, context)
     },
@@ -70,6 +76,32 @@ export const useUpdateAddress = (options = {}) => {
     ...rest,
     mutationFn: ({ addressId, fields }) => usersApi.updateAddress(addressId, fields),
     onSuccess: async (data, variables, context) => {
+      if (Array.isArray(data?.addresses)) {
+        queryClient.setQueryData(["me"], (prev) => {
+          if (!prev) return prev
+          return { ...prev, addresses: data.addresses }
+        })
+      }
+      await queryClient.invalidateQueries({ queryKey: ["me"] })
+      onSuccess?.(data, variables, context)
+    },
+  })
+}
+
+export const useDeleteAddress = (options = {}) => {
+  const queryClient = useQueryClient()
+  const { onSuccess, ...rest } = options
+
+  return useMutation({
+    ...rest,
+    mutationFn: (addressId) => usersApi.deleteAddress(addressId),
+    onSuccess: async (data, variables, context) => {
+      if (Array.isArray(data?.addresses)) {
+        queryClient.setQueryData(["me"], (prev) => {
+          if (!prev) return prev
+          return { ...prev, addresses: data.addresses }
+        })
+      }
       await queryClient.invalidateQueries({ queryKey: ["me"] })
       onSuccess?.(data, variables, context)
     },

@@ -159,6 +159,35 @@ router.patch(
 
 /**
  * @swagger
+ * /api/users/me/addresses/{addressId}:
+ *   delete:
+ *     summary: Delete an existing address
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: addressId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Updated user with addresses
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User or address not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.delete('/me/addresses/:addressId', auth, asyncWrapper(userController.deleteAddress))
+
+/**
+ * @swagger
  * /api/users/me/delete:
  *   delete:
  *     summary: Soft delete authenticated user account

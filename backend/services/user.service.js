@@ -85,6 +85,25 @@ const updateAddress = async data => {
     }
 }
 
+const deleteAddress = async data => {
+    try {
+        const { user, addressId } = data
+
+        if (!addressId) throw Object.assign(new Error('addressId is required'), { statusCode: 400 })
+
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: user.id, 'addresses._id': addressId },
+            { $pull: { addresses: { _id: addressId } } },
+            { new: true, runValidators: true, context: 'query' }
+        ).select('-passwordHash')
+
+        if (!updatedUser) throw Object.assign(new Error('user or address not found'), { statusCode: 404 })
+        return updatedUser
+    } catch (error) {
+        throw error
+    }
+}
+
 const getUser = async data => {
     try {
         const { userId } = data
@@ -372,6 +391,7 @@ module.exports = {
     updateProfile,
     createAddress,
     updateAddress,
+    deleteAddress,
     getUser,
     makeAdmin,
     deleteUser,
