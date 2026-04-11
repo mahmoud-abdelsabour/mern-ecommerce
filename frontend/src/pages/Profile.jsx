@@ -10,7 +10,6 @@ import {
   IconButton,
   Portal,
   Separator,
-  SimpleGrid,
   Stack,
   Text,
 } from "@chakra-ui/react"
@@ -21,7 +20,7 @@ import { getToken } from "../APIs/http"
 import { useCreateAddress, useDeleteAddress, useMe, useUpdateAddress } from "../hooks/useUser"
 import GlobalNotification from "../components/GlobalNotification"
 import { consumeFlash } from "../utils/flashStorage"
-import SavedAddressForm from "../components/SavedAddressForm"
+import AddressForm from "../components/AddressForm"
 
 const createEmptyAddressDraft = () => {
   return {
@@ -267,7 +266,7 @@ const Profile = () => {
             <Separator />
 
             {addressFormOpen && (
-              <SavedAddressForm
+              <AddressForm
                 title={addressFormMode === "edit" ? "Edit address" : "Add address"}
                 draft={addressDraft}
                 onChange={(patch) => setAddressDraft((p) => ({ ...p, ...patch }))}
@@ -283,7 +282,7 @@ const Profile = () => {
                 No saved addresses yet.
               </Text>
             ) : (
-              <SimpleGrid columns={{ base: 1, md: 2 }} gap={3}>
+              <Stack gap={3}>
                 {addresses.map((a) => (
                   <Box
                     key={a?._id ?? a?.id ?? a?.address_name ?? JSON.stringify(a)}
@@ -330,7 +329,7 @@ const Profile = () => {
                     </Stack>
                   </Box>
                 ))}
-              </SimpleGrid>
+              </Stack>
             )}
           </Stack>
         </Box>

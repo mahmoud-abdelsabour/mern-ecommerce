@@ -41,42 +41,45 @@ export const useOrderById = (orderId, options = {}) => {
 
 export const useCreateOrder = (options = {}) => {
   const queryClient = useQueryClient()
+  const { onSuccess: userOnSuccess, ...rest } = options
 
   return useMutation({
+    ...rest,
     mutationFn: ({ products, shippingInfo }) => ordersApi.createOrder({ products, shippingInfo }),
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({ queryKey: ["orders"] })
       await queryClient.invalidateQueries({ queryKey: ["cart"] })
-      options.onSuccess?.(data, variables, context)
+      await userOnSuccess?.(data, variables, context)
     },
-    ...options,
   })
 }
 
 export const useCancelOrder = (options = {}) => {
   const queryClient = useQueryClient()
+  const { onSuccess: userOnSuccess, ...rest } = options
 
   return useMutation({
+    ...rest,
     mutationFn: (orderId) => ordersApi.cancelOrder(orderId),
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({ queryKey: ["orders"] })
       if (variables) await queryClient.invalidateQueries({ queryKey: ["order", variables] })
-      options.onSuccess?.(data, variables, context)
+      await userOnSuccess?.(data, variables, context)
     },
-    ...options,
   })
 }
 
 export const useRequestReturn = (options = {}) => {
   const queryClient = useQueryClient()
+  const { onSuccess: userOnSuccess, ...rest } = options
 
   return useMutation({
+    ...rest,
     mutationFn: ({ orderId, returnedItems }) => ordersApi.requestReturn(orderId, { returnedItems }),
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({ queryKey: ["orders"] })
       if (variables?.orderId) await queryClient.invalidateQueries({ queryKey: ["order", variables.orderId] })
-      options.onSuccess?.(data, variables, context)
+      await userOnSuccess?.(data, variables, context)
     },
-    ...options,
   })
 }

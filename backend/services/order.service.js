@@ -1,6 +1,40 @@
 const mongoose = require('mongoose')
 const Order = require('../models/order.model')
 const Product = require('../models/product.model')
+const Brand = require('../models/brand.model')
+const Category = require('../models/category.model')
+
+const OBJECT_ID_HEX = /^[a-fA-F0-9]{24}$/
+
+const snapshotBrandCategory = product => {
+    const b = product.brand
+    const c = product.category
+    const brandName = b && typeof b === 'object' && b.name != null ? String(b.name) : String(b ?? '')
+    const categoryName = c && typeof c === 'object' && c.name != null ? String(c.name) : String(c ?? '')
+    return { brandName, categoryName }
+}
+
+const resolveStoredLabel = async (value, Model) => {
+    if (value == null || value === '') return '—'
+    const s = String(value).trim()
+    if (!OBJECT_ID_HEX.test(s)) return s
+    const doc = await Model.findById(s).select('name').lean()
+    return doc?.name ?? '—'
+}
+
+const enrichOrderProducts = async order => {
+    if (!order?.products?.length) return order
+    // Use `toJSON()` so the same transform runs as `res.json(order)` (adds `id`, drops `_id`).
+    const plain = typeof order.toJSON === 'function' ? order.toJSON() : order.toObject ? order.toObject() : { ...order }
+    const products = await Promise.all(
+        plain.products.map(async p => ({
+            ...p,
+            brand: await resolveStoredLabel(p.brand, Brand),
+            category: await resolveStoredLabel(p.category, Category),
+        }))
+    )
+    return { ...plain, products }
+}
 
 //  expected data (Request Body)
 //  {
@@ -44,6 +78,12 @@ const placeOrder = async data => {
                 throw Object.assign(new Error('not enough stock'), { statusCode: 409 })
             }
 
+            await product.populate([
+                { path: 'brand', select: 'name' },
+                { path: 'category', select: 'name' },
+            ])
+            const { brandName, categoryName } = snapshotBrandCategory(product)
+
             orderProducts.push({
                 product: product.id,
                 quantity: item.quantity,
@@ -51,8 +91,8 @@ const placeOrder = async data => {
                 name: product.name,
                 description: product.description,
                 photos: product.photos,
-                brand: product.brand,
-                category: product.category,
+                brand: brandName,
+                category: categoryName,
             })
 
             totalPrice += product.price * item.quantity
@@ -117,7 +157,7 @@ const getOrderById = async data => {
         if (!order) {
             throw Object.assign(new Error('order not found'), { statusCode: 404 })
         }
-        return order
+        return enrichOrderProducts(order)
     } catch (error) {
         throw error
     }

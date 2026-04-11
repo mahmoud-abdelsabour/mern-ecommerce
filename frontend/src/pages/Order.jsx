@@ -6,10 +6,13 @@ import { GrReturn } from "react-icons/gr"
 import { LuCheck, LuPackage, LuShip } from "react-icons/lu"
 import { GoListUnordered } from "react-icons/go"
 import { Link as RouterLink, useParams } from "react-router-dom"
+import { useState } from "react"
 import ProductList from "../components/ProductList"
 import AddressCard from "../components/AddressCard"
+import GlobalNotification from "../components/GlobalNotification"
 import { useCancelOrder, useOrderById } from "../hooks/useOrders"
 import { getToken } from "../APIs/http"
+import { consumeFlash } from "../utils/flashStorage"
 
 const formatMoney = (value) => `$${Number(value ?? 0).toFixed(2)}`
 const formatDate = (value) => {
@@ -32,6 +35,8 @@ const Order = () => {
   const { data: order, isLoading, isError, error } = useOrderById(orderId)
 
   const cancelMutation = useCancelOrder()
+
+  const [checkoutFlash] = useState(() => consumeFlash())
 
   if (!isLoggedIn) {
     return (
@@ -145,12 +150,16 @@ const Order = () => {
   return (
     <Box maxW="1200px" mx="auto" px={4} py={8}>
       <Stack gap={6}>
+        <GlobalNotification
+          status={checkoutFlash?.status ?? "info"}
+          title={checkoutFlash?.title}
+        />
         <Stack gap={1}>
           <Text fontSize="2xl" fontWeight="900">
             Order
           </Text>
           <Text fontSize="sm" color="gray.500">
-            {order?.id ?? "—"}
+            {order?.id ?? order?._id ?? "—"}
           </Text>
         </Stack>
 
@@ -175,7 +184,7 @@ const Order = () => {
             codFees={codFees}
             subtotal={subtotal}
             total={total}
-            paymentMethod={"â€”"}
+            paymentMethod="COD"
           />
         </Stack>
 
@@ -211,6 +220,12 @@ export default Order
 const OrderTimelineCard = ({ createdAt, shippedAt, deliveredAt, deliveryStatus }) => {
   const status = String(deliveryStatus ?? "").toLowerCase()
   const isCancelled = status === "cancelled"
+  // Refunds/returns only happen after the customer received the order; show as delivered in the timeline.
+  const impliesDelivered =
+    status === "delivered" ||
+    status === "refunded" ||
+    status === "returned" ||
+    status === "return requested"
 
   const confirmedDate = formatDate(createdAt)
   const shippedDate = formatDate(shippedAt)
@@ -271,7 +286,7 @@ const OrderTimelineCard = ({ createdAt, shippedAt, deliveredAt, deliveryStatus }
               <Timeline.Title textStyle="sm">Order Delivered</Timeline.Title>
               <Timeline.Description>{deliveredDate}</Timeline.Description>
               <Text textStyle="sm">
-                {status === "delivered" ? "Delivered successfully." : "Not delivered yet."}
+                {impliesDelivered ? "Delivered successfully." : "Not delivered yet."}
               </Text>
             </Timeline.Content>
           </Timeline.Item>

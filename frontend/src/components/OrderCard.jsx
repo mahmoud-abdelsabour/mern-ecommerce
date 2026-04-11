@@ -1,4 +1,5 @@
 import { Badge, Box, HStack, Image, Stack, Text } from "@chakra-ui/react"
+import { Link as RouterLink } from "react-router-dom"
 import { TbBrandCashapp } from "react-icons/tb"
 import { FaClock } from "react-icons/fa"
 import { MdLocalShipping, MdOutlineDoneOutline, MdCancel } from "react-icons/md"
@@ -9,9 +10,32 @@ const OrderCard = ({ order }) => {
   const items = order?.items ?? []
   const firstImage = items[0]?.image
   const secondImage = items[1]?.image
+  const orderId = order?.id ?? order?._id
+  const to = orderId != null && orderId !== "" ? `/order/${orderId}` : null
 
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+    <Box
+      {...(to ? { as: RouterLink, to } : {})}
+      display="block"
+      borderWidth="1px"
+      borderColor="gray.200"
+      rounded="md"
+      p={4}
+      cursor={to ? "pointer" : "default"}
+      textDecoration="none"
+      color="inherit"
+      transition="border-color 0.15s ease, box-shadow 0.15s ease"
+      _hover={
+        to
+          ? { borderColor: "gray.300", boxShadow: "sm" }
+          : undefined
+      }
+      _focusVisible={
+        to
+          ? { outline: "2px solid", outlineColor: "teal.500", outlineOffset: "2px" }
+          : undefined
+      }
+    >
       <HStack spacing={3} align="start">
         <HStack spacing={2}>
           {firstImage && (

@@ -14,15 +14,18 @@ import {
   VStack,
   createListCollection,
 } from "@chakra-ui/react"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { LuPlus, LuShoppingCart } from "react-icons/lu"
 import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom"
 import ProductList from "../components/ProductList"
 import AddressForm from "../components/AddressForm"
+import GlobalNotification from "../components/GlobalNotification"
 import { useCart } from "../hooks/useCart"
 import { getToken } from "../APIs/http"
 import { useCreateOrder } from "../hooks/useOrders"
 import { useProductById } from "../hooks/useProducts"
+import { useCreateAddress, useMe } from "../hooks/useUser"
+import { setFlash } from "../utils/flashStorage"
 
 const formatMoney = (value) => `$${Number(value ?? 0).toFixed(2)}`
 
@@ -91,41 +94,50 @@ const CheckOut = () => {
   const createOrderMutation = useCreateOrder({
     onSuccess: (createdOrder) => {
       const id = createdOrder?.id ?? createdOrder?._id
-      if (id) navigate(`/order/${id}`, { replace: true })
+      if (id) {
+        setFlash({
+          status: "success",
+          title: "Order placed successfully.",
+        })
+        navigate(`/order/${id}`, { replace: true })
+      }
     },
   })
 
+  const { data: me, isLoading: isMeLoading } = useMe()
+
   const [paymentMethod, setPaymentMethod] = useState("")
 
-  const [savedAddresses, setSavedAddresses] = useState([
-    {
-      id: "addr-1",
-      firstName: "Mahmoud",
-      lastName: "Ahmed",
-      phone: "+20 100 000 0000",
-      address: {
-        country: "Egypt",
-        city: "Cairo",
-        postalcode: "11311",
-        street: "Tahrir St.",
-        building: "12B",
-        floor: 3,
-        special_mark: "Near the metro station",
-      },
-    },
-  ])
+  const [notice, setNotice] = useState(null)
+  const showNotice = (status, title) => setNotice({ id: Date.now(), status, title })
 
-  const hasSavedAddresses = savedAddresses.length > 0
-
-  const [selectedAddressId, setSelectedAddressId] = useState(
-    hasSavedAddresses ? savedAddresses[0].id : ""
+  const addresses = useMemo(
+    () => (Array.isArray(me?.addresses) ? me.addresses : []),
+    [me?.addresses]
   )
 
-  const [showAddressForm, setShowAddressForm] = useState(!hasSavedAddresses)
+  const hasSavedAddresses = addresses.length > 0
+
+  const [selectedAddressId, setSelectedAddressId] = useState("")
+
+  const [showAddressForm, setShowAddressForm] = useState(false)
+
+  useEffect(() => {
+    if (isMeLoading) return
+    if (!hasSavedAddresses) {
+      setShowAddressForm(true)
+      setSelectedAddressId("")
+      return
+    }
+    setSelectedAddressId((prev) => {
+      const ids = addresses.map((a) => String(a._id ?? a.id))
+      if (prev && ids.includes(prev)) return prev
+      return ids[0] ?? ""
+    })
+  }, [isMeLoading, hasSavedAddresses, addresses])
+
   const [addressDraft, setAddressDraft] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
+    address_name: "",
     country: "",
     city: "",
     postalcode: "",
@@ -136,17 +148,52 @@ const CheckOut = () => {
   })
 
   const selectedAddress = useMemo(() => {
-    return savedAddresses.find((a) => a.id === selectedAddressId) ?? null
-  }, [savedAddresses, selectedAddressId])
+    return (
+      addresses.find((a) => String(a._id ?? a.id) === selectedAddressId) ?? null
+    )
+  }, [addresses, selectedAddressId])
 
   const addressCollection = useMemo(() => {
     return createListCollection({
-      items: savedAddresses.map((a) => ({
-        label: `${a.address.city} • ${a.address.street} • ${a.address.building}`,
-        value: a.id,
+      items: addresses.map((a) => ({
+        label: (a?.address_name ?? "").trim() ? a.address_name : "Unnamed address",
+        value: String(a._id ?? a.id),
       })),
     })
-  }, [savedAddresses])
+  }, [addresses])
+
+  const createAddressMutation = useCreateAddress({
+    onSuccess: (data, variables) => {
+      showNotice("success", data?.message ?? "Address added successfully.")
+      setShowAddressForm(false)
+      setAddressDraft({
+        address_name: "",
+        country: "",
+        city: "",
+        postalcode: "",
+        street: "",
+        building: "",
+        floor: "",
+        special_mark: "",
+      })
+      const list = data?.addresses
+      if (Array.isArray(list) && list.length > 0) {
+        // New address is appended last by the server.
+        const last = list[list.length - 1]
+        const id = last?._id ?? last?.id
+        if (id) setSelectedAddressId(String(id))
+      }
+    },
+    onError: (err) => {
+      showNotice(
+        "error",
+        err?.response?.data?.message ??
+          err?.response?.data?.error ??
+          err?.message ??
+          "Failed to save address"
+      )
+    },
+  })
 
   const subtotal = useMemo(() => {
     return items.reduce(
@@ -159,14 +206,19 @@ const CheckOut = () => {
   const codFees = paymentMethod === "COD" ? 10 : 0
   const total = subtotal + shippingPrice + codFees
 
+  const hasValidSelection =
+    Boolean(selectedAddressId) &&
+    addresses.some((a) => String(a._id ?? a.id) === selectedAddressId)
+
   const canCheckout =
-    items.length > 0 && Boolean(paymentMethod) && Boolean(selectedAddressId) && hasSavedAddresses
+    items.length > 0 &&
+    Boolean(paymentMethod) &&
+    hasValidSelection &&
+    Boolean(me?.firstName && me?.lastName && me?.phone)
 
   const onSaveAddress = () => {
     const required = [
-      "firstName",
-      "lastName",
-      "phone",
+      "address_name",
       "country",
       "city",
       "postalcode",
@@ -177,57 +229,45 @@ const CheckOut = () => {
     const missing = required.some((key) => String(addressDraft[key] ?? "").trim() === "")
     if (missing) return
 
-    const id = `addr-${Date.now()}`
-    const newAddress = {
-      id,
-      firstName: addressDraft.firstName.trim(),
-      lastName: addressDraft.lastName.trim(),
-      phone: addressDraft.phone.trim(),
-      address: {
-        country: addressDraft.country.trim(),
-        city: addressDraft.city.trim(),
-        postalcode: addressDraft.postalcode.trim(),
-        street: addressDraft.street.trim(),
-        building: addressDraft.building.trim(),
-        floor: Number(addressDraft.floor),
-        special_mark: addressDraft.special_mark.trim(),
-      },
+    const payload = {
+      address_name: String(addressDraft.address_name ?? "").trim(),
+      country: String(addressDraft.country ?? "").trim(),
+      city: String(addressDraft.city ?? "").trim(),
+      postalcode: String(addressDraft.postalcode ?? "").trim(),
+      street: String(addressDraft.street ?? "").trim(),
+      building: String(addressDraft.building ?? "").trim(),
+      floor: Number(addressDraft.floor),
+      special_mark: String(addressDraft.special_mark ?? "").trim(),
     }
 
-    setSavedAddresses((prev) => [...prev, newAddress])
-    setSelectedAddressId(id)
-    setShowAddressForm(false)
-    setAddressDraft({
-      firstName: "",
-      lastName: "",
-      phone: "",
-      country: "",
-      city: "",
-      postalcode: "",
-      street: "",
-      building: "",
-      floor: "",
-      special_mark: "",
-    })
+    createAddressMutation.mutate(payload)
   }
 
   const updateAddressDraft = (patch) => setAddressDraft((prev) => ({ ...prev, ...patch }))
 
   const onPlaceOrder = () => {
-    if (!selectedAddress) return
+    if (!selectedAddress || !me) return
 
     // Backend expects `{ products: [{ product, quantity }], shippingInfo }`.
-    // We use the current cart snapshot so the order matches what the user sees.
+    // Contact fields come from the authenticated user; delivery lines from the saved address.
     const products = items.map((i) => ({
       product: i.id,
       quantity: Number(i.quantity ?? 1),
     }))
 
     const shippingInfo = {
-      firstName: selectedAddress.firstName,
-      lastName: selectedAddress.lastName,
-      phone: selectedAddress.phone,
-      address: selectedAddress.address,
+      firstName: me.firstName,
+      lastName: me.lastName,
+      phone: me.phone,
+      address: {
+        country: selectedAddress.country,
+        city: selectedAddress.city,
+        postalcode: selectedAddress.postalcode,
+        street: selectedAddress.street,
+        building: selectedAddress.building,
+        floor: Number(selectedAddress.floor),
+        special_mark: selectedAddress.special_mark ?? "",
+      },
     }
 
     createOrderMutation.mutate({ products, shippingInfo })
@@ -254,7 +294,7 @@ const CheckOut = () => {
     )
   }
 
-  if (isBuyNow ? isBuyNowLoading : isCartLoading) {
+  if ((isBuyNow ? isBuyNowLoading : isCartLoading) || isMeLoading) {
     return (
       <Flex minH="50vh" align="center" justify="center" px={4}>
         <Text color="gray.500">Loading checkout...</Text>
@@ -316,9 +356,17 @@ const CheckOut = () => {
     )
   }
 
+  const addressFormBusy = createAddressMutation.isPending
+
   return (
     <Box maxW="1200px" mx="auto" px={4} py={8}>
       <Stack gap={6}>
+        <GlobalNotification
+          key={notice?.id}
+          status={notice?.status ?? "info"}
+          title={notice?.title}
+        />
+
         <Stack gap={1}>
           <Text fontSize="2xl" fontWeight="900">
             Checkout
@@ -377,14 +425,14 @@ const CheckOut = () => {
                   size="sm"
                   w={{ base: "100%", sm: "360px" }}
                   disabled={!hasSavedAddresses}
-                  value={selectedAddressId ? [selectedAddressId] : []}
+                  value={hasSavedAddresses && selectedAddressId ? [selectedAddressId] : []}
                   onValueChange={(details) => setSelectedAddressId(details.value[0] ?? "")}
                 >
                   <Select.HiddenSelect />
                   <Select.Control>
                     <Select.Trigger>
                       <Select.ValueText
-                        placeholder={hasSavedAddresses ? "Select address" : "No addresses"}
+                        placeholder={hasSavedAddresses ? "Select address" : "[NONE]"}
                       />
                     </Select.Trigger>
                     <Select.IndicatorGroup>
@@ -410,6 +458,7 @@ const CheckOut = () => {
                   size="sm"
                   variant="outline"
                   onClick={() => setShowAddressForm((v) => !v)}
+                  disabled={addressFormBusy}
                 >
                   <LuPlus />
                 </IconButton>
@@ -420,10 +469,9 @@ const CheckOut = () => {
 
             {selectedAddress && (
               <Text fontSize="sm" color="gray.600">
-                {selectedAddress.firstName} {selectedAddress.lastName} • {selectedAddress.phone} •{" "}
-                {selectedAddress.address.country}, {selectedAddress.address.city},{" "}
-                {selectedAddress.address.street} {selectedAddress.address.building}, floor{" "}
-                {selectedAddress.address.floor}
+                {me?.firstName} {me?.lastName} • {me?.phone} • {selectedAddress.address_name} •{" "}
+                {selectedAddress.country}, {selectedAddress.city}, {selectedAddress.street}{" "}
+                {selectedAddress.building}, floor {selectedAddress.floor}
               </Text>
             )}
 
@@ -436,6 +484,7 @@ const CheckOut = () => {
                   onSubmit={onSaveAddress}
                   submitLabel="Save address"
                   onCancel={hasSavedAddresses ? () => setShowAddressForm(false) : undefined}
+                  disabled={addressFormBusy}
                 />
                 {!hasSavedAddresses && (
                   <Text fontSize="xs" color="gray.500">
@@ -467,7 +516,7 @@ const CheckOut = () => {
 
         <Button
           size="lg"
-          colorScheme="teal"
+          colorPalette="teal"
           disabled={!canCheckout || createOrderMutation.isPending}
           onClick={onPlaceOrder}
         >
