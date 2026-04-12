@@ -49,7 +49,7 @@ const ChangeEmail = () => {
           <Stack mb={4}>
             <Fieldset.Legend>Change Email</Fieldset.Legend>
             <Text fontSize="sm" color="gray.500">
-              Enter your password to confirm changing your email.
+              Enter your new email address. You will be signed out after saving.
             </Text>
           </Stack>
 
