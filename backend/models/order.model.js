@@ -138,9 +138,9 @@ const orderSchema = mongoose.Schema(
                 {
                     product: mongoose.Schema.Types.ObjectId,
                     quantity: Number,
-                    reason: String,
                 },
             ],
+            reason: String,
             returnDate: Date,
         },
         deliveryStatus: {

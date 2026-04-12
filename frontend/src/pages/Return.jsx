@@ -117,12 +117,11 @@ const Return = () => {
       .map((i) => ({
         product: i.productId,
         quantity: Number(i.quantity ?? 1),
-        reason,
       }))
 
     if (returnedItems.length === 0) return
 
-    returnMutation.mutate({ orderId, returnedItems })
+    returnMutation.mutate({ orderId, returnedItems, reason })
   }
 
   if (!isLoggedIn) {

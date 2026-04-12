@@ -190,6 +190,10 @@ router.patch(
  *                 minItems: 1
  *                 items:
  *                   $ref: '#/components/schemas/ReturnItem'
+ *               reason:
+ *                 type: string
+ *                 maxLength: 300
+ *                 description: Optional single reason applied to the full return request
  *     responses:
  *       201:
  *         description: Return request submitted

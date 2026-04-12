@@ -30,10 +30,10 @@ const cancelOrder = async (orderId) => {
   return response.data
 }
 
-const requestReturn = async (orderId, { returnedItems }) => {
+const requestReturn = async (orderId, { returnedItems, reason }) => {
   const response = await axios.post(
     `${baseURL}/${orderId}/return`,
-    { returnedItems },
+    { returnedItems, reason },
     getAuthConfig()
   )
   return response.data

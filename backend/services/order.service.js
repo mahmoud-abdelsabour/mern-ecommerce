@@ -231,7 +231,7 @@ const cancelOrder = async data => {
 
 const requestReturn = async data => {
     try {
-        const { returnedItems, order } = data
+        const { returnedItems, order, reason = '' } = data
 
         if (!order) throw Object.assign(new Error('order not found'), { statusCode: 404 })
 
@@ -267,6 +267,7 @@ const requestReturn = async data => {
         order.deliveryStatus = 'return requested'
         order.returnInfo = {
             returnedItems,
+            reason: String(reason || '').trim().slice(0, 300),
             returnDate: null,
         }
 

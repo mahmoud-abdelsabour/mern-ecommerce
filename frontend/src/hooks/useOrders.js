@@ -86,7 +86,8 @@ export const useRequestReturn = (options = {}) => {
 
   return useMutation({
     ...rest,
-    mutationFn: ({ orderId, returnedItems }) => ordersApi.requestReturn(orderId, { returnedItems }),
+    mutationFn: ({ orderId, returnedItems, reason }) =>
+      ordersApi.requestReturn(orderId, { returnedItems, reason }),
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({ queryKey: ["orders"] })
       if (variables?.orderId) await queryClient.invalidateQueries({ queryKey: ["order", variables.orderId] })
