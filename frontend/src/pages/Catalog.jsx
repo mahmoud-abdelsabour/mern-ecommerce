@@ -94,6 +94,7 @@ const Catalog = () => {
   // Ensure we always work with an array, even if the response is missing/undefined.
   const products = data?.products ?? []
   const pagination = data?.pagination ?? null
+  const totalProducts = Number(pagination?.totalProducts ?? products.length ?? 0)
 
   // Transform backend products into the `ProductList` item shape.
   const items = products.map((p) => ({
@@ -172,7 +173,7 @@ const Catalog = () => {
           </Text>
           <Text fontSize="sm" color="gray.500">
             {/* While loading we show a placeholder label; otherwise show the current number of items */}
-            {isLoading || isFetching ? <Skeleton h="14px" w="160px" /> : `${data.pagination.totalProducts} products`}
+            {isLoading || isFetching ? <Skeleton h="14px" w="160px" /> : `${totalProducts} products`}
           </Text>
           {searchQuery ? (
             <Text fontSize="sm" color="gray.600">
