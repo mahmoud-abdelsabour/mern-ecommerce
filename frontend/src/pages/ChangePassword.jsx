@@ -1,16 +1,13 @@
 import { Box, Button, Field, Fieldset, Flex, HStack, Input, Stack, Text } from "@chakra-ui/react"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { getStoredUser } from "../utils/authStorage"
-import { getToken } from "../APIs/http"
 import { useUpdatePassword } from "../hooks/useAuth"
 import { clearStoredUser } from "../utils/authStorage"
 import { setFlash } from "../utils/flashStorage"
 
 const ChangePassword = () => {
   const navigate = useNavigate()
-  const token = getToken()
-  const isLoggedIn = Boolean(token)
   const storedUser = getStoredUser()
   const userId = storedUser?.id ?? storedUser?._id ?? null
 
@@ -58,13 +55,6 @@ const ChangePassword = () => {
       })
     },
   })
-
-  // Protect route: redirect to login if not authenticated.
-  useEffect(() => {
-    if (!isLoggedIn) navigate("/login", { replace: true })
-  }, [isLoggedIn, navigate])
-
-  if (!isLoggedIn) return null
 
   return (
     <Flex minH="70vh" align="center" justify="center" px={4} py={8}>

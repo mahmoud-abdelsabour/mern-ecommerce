@@ -1,7 +1,6 @@
 import { Box, Button, Field, Fieldset, Flex, HStack, Input, Skeleton, SkeletonText, Stack, Text } from "@chakra-ui/react"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
-import { getToken } from "../APIs/http"
 import { useMe, useUpdateProfile } from "../hooks/useUser"
 import { setFlash } from "../utils/flashStorage"
 
@@ -120,19 +119,8 @@ const EditProfileForm = ({ initialForm }) => {
 }
 
 const EditProfile = () => {
-  const navigate = useNavigate()
-  const token = getToken()
-  const isLoggedIn = Boolean(token)
-
   // Load current profile data to prefill the form.
   const { data: me, isLoading, isError, error } = useMe()
-
-  // Protect route: redirect to login if not authenticated.
-  useEffect(() => {
-    if (!isLoggedIn) navigate("/login", { replace: true })
-  }, [isLoggedIn, navigate])
-
-  if (!isLoggedIn) return null
 
   if (isLoading) {
     return (

@@ -15,10 +15,9 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { HiPencil, HiPlus, HiTrash, HiUpload } from "react-icons/hi"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
-import { getToken } from "../APIs/http"
 import {
   useCreateAddress,
   useDeleteMe,
@@ -49,19 +48,11 @@ const createEmptyAddressDraft = () => {
 const Profile = () => {
   const navigate = useNavigate()
 
-  const token = getToken()
-  const isLoggedIn = Boolean(token)
-
   // Fetch the authenticated user's actual profile from the backend.
   const { data: me, isLoading, isError, error } = useMe()
 
   const [notice, setNotice] = useState(null) // { id, status, title }
   const showNotice = (status, title) => setNotice({ id: Date.now(), status, title })
-
-  // If the user is not logged in, redirect to login (protect /me route).
-  useEffect(() => {
-    if (!isLoggedIn) navigate("/login", { replace: true })
-  }, [isLoggedIn, navigate])
 
   // One-time flash message (e.g. after updating profile/password/email).
   const [flash] = useState(() => consumeFlash())
@@ -194,8 +185,6 @@ const Profile = () => {
     setDeletingAddress(address)
     setDeleteDialogOpen(true)
   }
-
-  if (!isLoggedIn) return null
 
   if (isLoading) {
     return (

@@ -20,6 +20,7 @@ import Profile from './pages/Profile'
 import EditProfile from './pages/EditProfile'
 import ChangePassword from './pages/ChangePassword'
 import ChangeEmail from './pages/ChangeEmail'
+import ProtectedRoute from './components/ProtectedRoute'
 import { useAuthAutoLogout } from './hooks/useAuthAutoLogout'
 
 const App = () => {
@@ -41,11 +42,13 @@ const App = () => {
         <Route path='/order/:orderId' element={<Order />} />
         <Route path='/order/check-out' element={<CheckOut />} />
         <Route path='/order/:orderId/return' element={<Return />} />
-        <Route path='/me' element={<Profile />} />
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/me/edit' element={<EditProfile />} />
-        <Route path='/me/change-password' element={<ChangePassword />} />
-        <Route path='/me/change-email' element={<ChangeEmail />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path='/me' element={<Profile />} />
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/me/edit' element={<EditProfile />} />
+          <Route path='/me/change-password' element={<ChangePassword />} />
+          <Route path='/me/change-email' element={<ChangeEmail />} />
+        </Route>
         <Route path='*' element={<NotFound />} />
       </Routes>
       <Box flex="1" />
