@@ -26,6 +26,7 @@ import { useCreateOrder } from "../hooks/useOrders"
 import { useProductById } from "../hooks/useProducts"
 import { useCreateAddress, useMe } from "../hooks/useUser"
 import { setFlash } from "../utils/flashStorage"
+import { notify } from "../utils/notify"
 
 const formatMoney = (value) => `$${Number(value ?? 0).toFixed(2)}`
 
@@ -95,6 +96,7 @@ const CheckOut = () => {
     onSuccess: (createdOrder) => {
       const id = createdOrder?.id ?? createdOrder?._id
       if (id) {
+        notify.success("Order placed", "Redirecting to your order confirmation.")
         setFlash({
           status: "success",
           title: "Order placed successfully.",
@@ -163,7 +165,7 @@ const CheckOut = () => {
   }, [addresses])
 
   const createAddressMutation = useCreateAddress({
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       showNotice("success", data?.message ?? "Address added successfully.")
       setShowAddressForm(false)
       setAddressDraft({
@@ -183,15 +185,6 @@ const CheckOut = () => {
         const id = last?._id ?? last?.id
         if (id) setSelectedAddressId(String(id))
       }
-    },
-    onError: (err) => {
-      showNotice(
-        "error",
-        err?.response?.data?.message ??
-          err?.response?.data?.error ??
-          err?.message ??
-          "Failed to save address"
-      )
     },
   })
 
@@ -504,15 +497,6 @@ const CheckOut = () => {
           total={total}
           paymentMethod={paymentMethod || "—"}
         />
-
-        {createOrderMutation.isError && (
-          <Text fontSize="sm" color="red.500">
-            Failed to place order:{" "}
-            {createOrderMutation.error?.response?.data?.message ??
-              createOrderMutation.error?.message ??
-              "Unknown error"}
-          </Text>
-        )}
 
         <Button
           size="lg"

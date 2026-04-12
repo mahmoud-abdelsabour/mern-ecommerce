@@ -1,7 +1,6 @@
 import { Box, Button, Field, Fieldset, Flex, HStack, Input, Stack, Text } from "@chakra-ui/react"
 import { useEffect, useMemo, useState } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
-import GlobalNotification from "../components/GlobalNotification"
 import { getToken } from "../APIs/http"
 import { useUpdateProfile } from "../hooks/useUser"
 import { clearStoredUser } from "../utils/authStorage"
@@ -55,16 +54,6 @@ const ChangeEmail = () => {
           </Stack>
 
           <Fieldset.Content>
-            <GlobalNotification
-              status="error"
-              title={
-                updateProfileMutation.isError
-                  ? updateProfileMutation.error?.response?.data?.message ??
-                    updateProfileMutation.error?.message ??
-                    "Failed to update email"
-                  : null
-              }
-            />
             <Field.Root>
               <Field.Label>New email</Field.Label>
               <Input

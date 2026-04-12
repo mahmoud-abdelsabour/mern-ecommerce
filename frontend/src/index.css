@@ -7,8 +7,11 @@ body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   background: #fff;
   color: #111;
+  /* Do not clip position:fixed UI (e.g. toasts) that extend to the viewport edge */
+  overflow-x: visible;
 }
 
 #root {
   min-height: 100vh;
+  overflow: visible;
 }

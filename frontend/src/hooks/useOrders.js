@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import ordersApi from "../APIs/orders.api"
 import { getToken } from "../APIs/http"
+import { notify } from "../utils/notify"
 
 // Orders hooks (server state via React Query).
 // Orders are auth-protected, so queries are disabled when no token exists.
@@ -21,7 +22,7 @@ export const useOrders = (query = {}, options = {}) => {
     queryKey: ["orders", key],
     queryFn: () => ordersApi.getOrders(query),
     enabled,
-    keepPreviousData: true,
+    placeholderData: (prev) => prev,
     staleTime: 1000 * 30,
     ...options,
   })
@@ -41,7 +42,7 @@ export const useOrderById = (orderId, options = {}) => {
 
 export const useCreateOrder = (options = {}) => {
   const queryClient = useQueryClient()
-  const { onSuccess: userOnSuccess, ...rest } = options
+  const { onSuccess: userOnSuccess, onError: userOnError, ...rest } = options
 
   return useMutation({
     ...rest,
@@ -51,12 +52,16 @@ export const useCreateOrder = (options = {}) => {
       await queryClient.invalidateQueries({ queryKey: ["cart"] })
       await userOnSuccess?.(data, variables, context)
     },
+    onError: (error, variables, context) => {
+      notify.error("Could not place order", error)
+      userOnError?.(error, variables, context)
+    },
   })
 }
 
 export const useCancelOrder = (options = {}) => {
   const queryClient = useQueryClient()
-  const { onSuccess: userOnSuccess, ...rest } = options
+  const { onSuccess: userOnSuccess, onError: userOnError, ...rest } = options
 
   return useMutation({
     ...rest,
@@ -64,14 +69,19 @@ export const useCancelOrder = (options = {}) => {
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({ queryKey: ["orders"] })
       if (variables) await queryClient.invalidateQueries({ queryKey: ["order", variables] })
+      notify.success("Order cancelled")
       await userOnSuccess?.(data, variables, context)
+    },
+    onError: (error, variables, context) => {
+      notify.error("Could not cancel order", error)
+      userOnError?.(error, variables, context)
     },
   })
 }
 
 export const useRequestReturn = (options = {}) => {
   const queryClient = useQueryClient()
-  const { onSuccess: userOnSuccess, ...rest } = options
+  const { onSuccess: userOnSuccess, onError: userOnError, ...rest } = options
 
   return useMutation({
     ...rest,
@@ -80,6 +90,10 @@ export const useRequestReturn = (options = {}) => {
       await queryClient.invalidateQueries({ queryKey: ["orders"] })
       if (variables?.orderId) await queryClient.invalidateQueries({ queryKey: ["order", variables.orderId] })
       await userOnSuccess?.(data, variables, context)
+    },
+    onError: (error, variables, context) => {
+      notify.error("Return request failed", error)
+      userOnError?.(error, variables, context)
     },
   })
 }

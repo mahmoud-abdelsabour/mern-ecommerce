@@ -1,7 +1,6 @@
 import { Box, Button, Field, Fieldset, Flex, HStack, Input, Stack, Text } from "@chakra-ui/react"
 import { useEffect, useMemo, useState } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
-import GlobalNotification from "../components/GlobalNotification"
 import { getToken } from "../APIs/http"
 import { useMe, useUpdateProfile } from "../hooks/useUser"
 import { setFlash } from "../utils/flashStorage"
@@ -58,16 +57,6 @@ const EditProfileForm = ({ initialForm }) => {
           </Stack>
 
           <Fieldset.Content>
-            <GlobalNotification
-              status="error"
-              title={
-                updateProfileMutation.isError
-                  ? updateProfileMutation.error?.response?.data?.message ??
-                    updateProfileMutation.error?.message ??
-                    "Failed to update profile"
-                  : null
-              }
-            />
             <HStack gap={3} flexWrap="wrap">
               <Field.Root flex="1" minW="220px">
                 <Field.Label>First name</Field.Label>

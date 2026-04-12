@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import usersApi from "../APIs/users.api"
 import { getToken } from "../APIs/http"
 import { getStoredUser, setStoredUser } from "../utils/authStorage"
+import { notify } from "../utils/notify"
 
 // User/profile hooks (server state via React Query).
 
@@ -19,16 +20,14 @@ export const useMe = (options = {}) => {
 
 export const useUpdateProfile = (options = {}) => {
   const queryClient = useQueryClient()
-  const { onSuccess, ...rest } = options
+  const { onSuccess, onError, ...rest } = options
 
   return useMutation({
     ...rest,
     mutationFn: (fields) => usersApi.updateProfile(fields),
     onSuccess: async (data, variables, context) => {
-      // Immediately update cached "me" so pages (Profile/Nav) reflect changes without needing a refresh.
       queryClient.setQueryData(["me"], data)
 
-      // Keep localStorage "user" in sync for UI that reads from auth storage (e.g. navbar avatar/name).
       const existing = getStoredUser()
       if (existing?.token) {
         setStoredUser({
@@ -45,12 +44,16 @@ export const useUpdateProfile = (options = {}) => {
       await queryClient.invalidateQueries({ queryKey: ["me"] })
       onSuccess?.(data, variables, context)
     },
+    onError: (error, variables, context) => {
+      notify.error("Profile could not be saved", error)
+      onError?.(error, variables, context)
+    },
   })
 }
 
 export const useCreateAddress = (options = {}) => {
   const queryClient = useQueryClient()
-  const { onSuccess, ...rest } = options
+  const { onSuccess, onError, ...rest } = options
 
   return useMutation({
     ...rest,
@@ -65,12 +68,16 @@ export const useCreateAddress = (options = {}) => {
       await queryClient.invalidateQueries({ queryKey: ["me"] })
       onSuccess?.(data, variables, context)
     },
+    onError: (error, variables, context) => {
+      notify.error("Address could not be added", error)
+      onError?.(error, variables, context)
+    },
   })
 }
 
 export const useUpdateAddress = (options = {}) => {
   const queryClient = useQueryClient()
-  const { onSuccess, ...rest } = options
+  const { onSuccess, onError, ...rest } = options
 
   return useMutation({
     ...rest,
@@ -85,12 +92,16 @@ export const useUpdateAddress = (options = {}) => {
       await queryClient.invalidateQueries({ queryKey: ["me"] })
       onSuccess?.(data, variables, context)
     },
+    onError: (error, variables, context) => {
+      notify.error("Address could not be updated", error)
+      onError?.(error, variables, context)
+    },
   })
 }
 
 export const useDeleteAddress = (options = {}) => {
   const queryClient = useQueryClient()
-  const { onSuccess, ...rest } = options
+  const { onSuccess, onError, ...rest } = options
 
   return useMutation({
     ...rest,
@@ -105,20 +116,27 @@ export const useDeleteAddress = (options = {}) => {
       await queryClient.invalidateQueries({ queryKey: ["me"] })
       onSuccess?.(data, variables, context)
     },
+    onError: (error, variables, context) => {
+      notify.error("Address could not be removed", error)
+      onError?.(error, variables, context)
+    },
   })
 }
 
 export const useDeleteMe = (options = {}) => {
   const queryClient = useQueryClient()
-  const { onSuccess, ...rest } = options
+  const { onSuccess, onError, ...rest } = options
 
   return useMutation({
     ...rest,
     mutationFn: () => usersApi.deleteMe(),
     onSuccess: async (data, variables, context) => {
-      // User is gone; clear caches and let callers decide navigation.
       await queryClient.invalidateQueries({ queryKey: ["me"] })
       onSuccess?.(data, variables, context)
+    },
+    onError: (error, variables, context) => {
+      notify.error("Account could not be deleted", error)
+      onError?.(error, variables, context)
     },
   })
 }

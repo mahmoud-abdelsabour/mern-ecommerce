@@ -13,6 +13,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { useReducer } from "react"
 import { useRegister } from "../../hooks/useAuth"
 import GlobalNotification from "../../components/GlobalNotification"
+import { notify } from "../../utils/notify"
 import { initialRegisterFormState, registerFormReducer } from "../../utils/forms/registerFormState"
 import { validateRegisterForm } from "../../utils/forms/validateRegisterForm"
 
@@ -25,6 +26,7 @@ const Register = () => {
   // Keep the mutation logic in a hook, but keep UI errors local to this page.
   const registerMutation = useRegister({
     onSuccess: () => {
+      notify.success("Account created", "You can now sign in with your email and password.")
       navigate("/login", { replace: true })
     },
     onError: (err) => {

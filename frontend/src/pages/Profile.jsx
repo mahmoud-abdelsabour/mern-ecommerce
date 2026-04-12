@@ -101,12 +101,6 @@ const Profile = () => {
       showNotice("success", result?.message ?? "Address added successfully.")
       closeAddressForm()
     },
-    onError: (err) => {
-      showNotice(
-        "error",
-        err?.response?.data?.message ?? err?.response?.data?.error ?? err?.message ?? "Failed to add address"
-      )
-    },
   })
 
   const updateAddressMutation = useUpdateAddress({
@@ -114,39 +108,17 @@ const Profile = () => {
       showNotice("success", result?.message ?? "Address updated successfully.")
       closeAddressForm()
     },
-    onError: (err) => {
-      showNotice(
-        "error",
-        err?.response?.data?.message ?? err?.response?.data?.error ?? err?.message ?? "Failed to update address"
-      )
-    },
   })
 
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
 
-  const updateProfileMutation = useUpdateProfile({
-    onError: (err) => {
-      showNotice(
-        "error",
-        err?.response?.data?.message ??
-          err?.response?.data?.error ??
-          err?.message ??
-          "Failed to save profile photo"
-      )
-    },
-  })
+  const updateProfileMutation = useUpdateProfile({})
 
   const deleteAddressMutation = useDeleteAddress({
     onSuccess: (result) => {
       showNotice("info", result?.message ?? "Address deleted successfully.")
       setDeleteDialogOpen(false)
       setDeletingAddress(null)
-    },
-    onError: (err) => {
-      showNotice(
-        "error",
-        err?.response?.data?.message ?? err?.response?.data?.error ?? err?.message ?? "Failed to delete address"
-      )
     },
   })
 

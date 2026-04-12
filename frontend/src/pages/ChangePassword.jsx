@@ -1,7 +1,6 @@
 import { Box, Button, Field, Fieldset, Flex, HStack, Input, Stack, Text } from "@chakra-ui/react"
 import { useEffect, useMemo, useState } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
-import GlobalNotification from "../components/GlobalNotification"
 import { getStoredUser } from "../utils/authStorage"
 import { getToken } from "../APIs/http"
 import { useUpdatePassword } from "../hooks/useAuth"
@@ -79,17 +78,6 @@ const ChangePassword = () => {
           </Stack>
 
           <Fieldset.Content>
-            <GlobalNotification
-              status="error"
-              title={
-                updatePasswordMutation.isError
-                  ? updatePasswordMutation.error?.response?.data?.message ??
-                    updatePasswordMutation.error?.response?.data?.error ??
-                    updatePasswordMutation.error?.message ??
-                    "Failed to update password"
-                  : null
-              }
-            />
             <Field.Root>
               <Field.Label>Old password</Field.Label>
               <Input
