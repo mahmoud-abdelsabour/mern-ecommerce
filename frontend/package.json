@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run check:encoding",
+    "check:encoding": "node scripts/check-mojibake.js",
     "preview": "vite preview"
   },
   "dependencies": {

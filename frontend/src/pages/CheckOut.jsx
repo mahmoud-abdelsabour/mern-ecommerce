@@ -87,8 +87,8 @@ const CheckOut = () => {
         title: product?.name ?? "Product",
         price: product?.price ?? 0,
         rating: product?.rating?.score ?? 0,
-        brand: "â€”",
-        category: "â€”",
+        brand: "—",
+        category: "—",
         image: product?.photos?.[0],
         quantity: item?.quantity ?? 1,
       }
