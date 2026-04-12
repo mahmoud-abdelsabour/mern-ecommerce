@@ -21,15 +21,17 @@ import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { getToken } from "../APIs/http"
 import {
   useCreateAddress,
+  useDeleteMe,
   useDeleteAddress,
   useMe,
   useUpdateAddress,
   useUpdateProfile,
 } from "../hooks/useUser"
 import GlobalNotification from "../components/GlobalNotification"
-import { consumeFlash } from "../utils/flashStorage"
+import { consumeFlash, setFlash } from "../utils/flashStorage"
 import AddressForm from "../components/AddressForm"
 import { uploadProfileImageToCloudinary } from "../utils/cloudinaryUpload"
+import { clearStoredUser } from "../utils/authStorage"
 
 const createEmptyAddressDraft = () => {
   return {
@@ -125,6 +127,15 @@ const Profile = () => {
     },
   })
 
+  const deleteAccountMutation = useDeleteMe({
+    onSuccess: () => {
+      setDeleteAccountDialogOpen(false)
+      clearStoredUser()
+      setFlash({ status: "success", title: "Your account has been deleted." })
+      navigate("/login", { replace: true })
+    },
+  })
+
   const addressFormBusy = createAddressMutation.isPending || updateAddressMutation.isPending
   const deleteBusy = deleteAddressMutation.isPending
   const photoBusy = isUploadingPhoto || updateProfileMutation.isPending
@@ -175,6 +186,7 @@ const Profile = () => {
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingAddress, setDeletingAddress] = useState(null)
+  const [deleteAccountDialogOpen, setDeleteAccountDialogOpen] = useState(false)
   const cancelRef = useRef(null)
   const photoInputRef = useRef(null)
 
@@ -446,7 +458,64 @@ const Profile = () => {
           </Portal>
         </Dialog.Root>
 
-        <HStack justify="flex-end">
+        <Dialog.Root
+          role="alertdialog"
+          open={deleteAccountDialogOpen}
+          size="sm"
+          onOpenChange={(e) => setDeleteAccountDialogOpen(e.open)}
+          placement="center"
+        >
+          <Portal>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.CloseTrigger asChild>
+                  <CloseButton />
+                </Dialog.CloseTrigger>
+                <Dialog.Header>
+                  <Dialog.Title>Delete Account</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <Stack gap={2}>
+                    <Text>
+                      This action is permanent. Your account and profile data will be deleted.
+                    </Text>
+                    <Text fontSize="sm" color="red.500">
+                      You will be signed out immediately.
+                    </Text>
+                  </Stack>
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Button
+                    variant="outline"
+                    onClick={() => setDeleteAccountDialogOpen(false)}
+                    disabled={deleteAccountMutation.isPending}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    colorPalette="red"
+                    onClick={() => deleteAccountMutation.mutate()}
+                    loading={deleteAccountMutation.isPending}
+                    disabled={deleteAccountMutation.isPending}
+                  >
+                    Delete Account
+                  </Button>
+                </Dialog.Footer>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog.Root>
+
+        <HStack justify="space-between" flexWrap="wrap" gap={3}>
+          <Button
+            variant="outline"
+            colorPalette="red"
+            onClick={() => setDeleteAccountDialogOpen(true)}
+            disabled={deleteAccountMutation.isPending}
+          >
+            Delete account
+          </Button>
           <Button as={RouterLink} to="/me/edit" variant="outline">
             Edit profile
           </Button>
