@@ -40,8 +40,20 @@ const Nav = () => {
     }
 
     return(
-        <Box as="nav" borderBottom="1px solid" borderColor="gray.200" px={6} py={3}>
-            <Flex align="center" gap={4}>
+        <Box
+            as="nav"
+            position="sticky"
+            top={0}
+            zIndex={1100}
+            w="100%"
+            bg="white"
+            borderBottom="1px solid"
+            borderColor="gray.200"
+            boxShadow="0 1px 0 rgba(0, 0, 0, 0.04)"
+            px={{ base: 4, md: 6 }}
+            py={3}
+        >
+            <Flex align="center" gap={3} flexWrap="wrap" rowGap={2}>
                 <Link as={RouterLink} to="/" display="inline-flex" alignItems="center">
                     <img src={logo} alt="logo" style={{ height: 40, width: 'auto' }} />
                 </Link>
