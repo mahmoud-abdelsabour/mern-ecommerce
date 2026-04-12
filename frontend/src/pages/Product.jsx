@@ -25,6 +25,7 @@ import ReviewCard from "../components/ReviewCard"
 import { useNavigate, useParams } from "react-router-dom"
 import { useProductById } from "../hooks/useProducts"
 import { useAddToCart, useCart, useDecrementCartItem } from "../hooks/useCart"
+import { useCartDrawer } from "../hooks/useCartDrawer"
 import { getToken } from "../APIs/http"
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from "../hooks/useWishlist"
 import { ICON_SIZE } from "../constants/ui"
@@ -68,6 +69,7 @@ const Product = () => {
   // Display a short reviews count (e.g. "3" or "3+" when there are more).
   const reviewsLabel = `${reviewsPreview.length}${hasMoreReviews ? "+" : ""}`
 
+  const { openCartDrawer } = useCartDrawer()
   const addToCartMutation = useAddToCart()
   const decrementCartMutation = useDecrementCartItem()
 
@@ -107,7 +109,10 @@ const Product = () => {
       navigate("/login")
       return
     }
-    addToCartMutation.mutate({ productId: normalizedProductId, quantity: 1 })
+    addToCartMutation.mutate(
+      { productId: normalizedProductId, quantity: 1 },
+      { onSuccess: () => openCartDrawer() }
+    )
   }
 
   const onIncrementCart = () => {

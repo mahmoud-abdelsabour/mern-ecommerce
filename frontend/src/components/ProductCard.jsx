@@ -5,6 +5,7 @@ import { MdFavorite, MdFavoriteBorder } from "react-icons/md"
 import { ICON_SIZE } from '../constants/ui'
 import { useNavigate } from "react-router-dom"
 import { useAddToCart, useCart, useDecrementCartItem } from "../hooks/useCart"
+import { useCartDrawer } from "../hooks/useCartDrawer"
 import { getToken } from "../APIs/http"
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from "../hooks/useWishlist"
 
@@ -35,6 +36,7 @@ const ProductCard = ({
   }
 
   // Mutations are safe to create per-card instance; React Query dedupes network and we invalidate the cart query on success.
+  const { openCartDrawer } = useCartDrawer()
   const addToCartMutation = useAddToCart()
   const decrementCartMutation = useDecrementCartItem()
 
@@ -58,7 +60,10 @@ const ProductCard = ({
       return
     }
 
-    addToCartMutation.mutate({ productId, quantity: 1 })
+    addToCartMutation.mutate(
+      { productId, quantity: 1 },
+      { onSuccess: () => openCartDrawer() }
+    )
   }
 
   const onBuyNow = (e) => {

@@ -1,8 +1,19 @@
 const Product = require('../models/product.model')
 
+// `cart.product` is a ref to Product; Product itself refs Brand and Category.
+// Nested populate is required so clients receive `brand.name` / `category.name`, not raw ObjectIds.
+const populateCartProducts = user =>
+    user.populate({
+        path: 'cart.product',
+        populate: [
+            { path: 'brand', select: 'name slug' },
+            { path: 'category', select: 'name slug' },
+        ],
+    })
+
 const getCart = async ({ user }) => {
     try {
-        await user.populate('cart.product')
+        await populateCartProducts(user)
         return user.cart
     } catch (error) {
         throw error
@@ -32,6 +43,7 @@ const addToCart = async ({ productId, quantity = 1, user }) => {
         }
 
         await user.save()
+        await populateCartProducts(user)
 
         return user.cart
     } catch (error) {
@@ -49,6 +61,7 @@ const removeFromCart = async ({ productId, user }) => {
         }
 
         await user.save()
+        await populateCartProducts(user)
         return user.cart
     } catch (error) {
         throw error
@@ -70,6 +83,7 @@ const decrementCartItem = async ({ productId, user, amount = 1 }) => {
         }
 
         await user.save()
+        await populateCartProducts(user)
         return user.cart
     } catch (error) {
         throw error
