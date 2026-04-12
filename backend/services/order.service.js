@@ -120,29 +120,60 @@ const placeOrder = async data => {
     }
 }
 
+const ORDER_SORT_KEYS = new Set(['date-desc', 'date-asc', 'price-desc', 'price-asc'])
+
+const DELIVERY_FILTER_KEYS = new Set([
+    'pending',
+    'shipped',
+    'delivered',
+    'cancelled',
+    'return requested',
+    'returned',
+    'refunded',
+])
+
+const buildUserOrdersSort = sort => {
+    const key = String(sort || 'date-desc').toLowerCase()
+    if (!ORDER_SORT_KEYS.has(key)) {
+        return { createdAt: -1 }
+    }
+    if (key === 'date-asc') return { createdAt: 1 }
+    if (key === 'price-desc') return { totalPrice: -1, createdAt: -1 }
+    if (key === 'price-asc') return { totalPrice: 1, createdAt: -1 }
+    return { createdAt: -1 }
+}
+
 const getUserOrders = async data => {
     try {
-        const { userId, page, limit } = data
+        const { userId, page, limit, sort, deliveryStatus } = data
 
-        const pageNumber = Math.max(Number(page) || 1, 1)
         const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
+
+        const filter = { userId }
+        const statusKey = String(deliveryStatus || '').toLowerCase()
+        if (statusKey && statusKey !== 'all' && DELIVERY_FILTER_KEYS.has(statusKey)) {
+            filter.deliveryStatus = statusKey
+        }
+
+        const sortSpec = buildUserOrdersSort(sort)
+
+        const totalOrders = await Order.countDocuments(filter)
+        const totalPages = Math.max(1, Math.ceil(totalOrders / pageSize))
+
+        let pageNumber = Math.max(Number(page) || 1, 1)
+        if (pageNumber > totalPages) pageNumber = totalPages
+
         const skip = (pageNumber - 1) * pageSize
 
-        const [orders, totalOrders] = await Promise.all([
-            Order.find({ userId }).sort({ createdAt: -1 }).skip(skip).limit(limit),
-
-            Order.countDocuments({ userId }),
-        ])
-
-        const totalPages = Math.ceil(totalOrders / limit)
+        const orders = await Order.find(filter).sort(sortSpec).skip(skip).limit(pageSize)
 
         return {
             orders,
             pagination: {
                 totalOrders,
                 totalPages,
-                currentPage: page,
-                limit,
+                currentPage: pageNumber,
+                limit: pageSize,
                 hasMore: skip + orders.length < totalOrders,
             },
         }

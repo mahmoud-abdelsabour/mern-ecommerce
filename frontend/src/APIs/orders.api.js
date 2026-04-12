@@ -9,7 +9,10 @@ const createOrder = async ({ products, shippingInfo }) => {
 }
 
 const getOrders = async (query = {}) => {
-  const response = await axios.get(baseURL, { ...getAuthConfig(), params: query })
+  const params = Object.fromEntries(
+    Object.entries(query || {}).filter(([, v]) => v !== undefined && v !== null && v !== "")
+  )
+  const response = await axios.get(baseURL, { ...getAuthConfig(), params })
   return response.data
 }
 

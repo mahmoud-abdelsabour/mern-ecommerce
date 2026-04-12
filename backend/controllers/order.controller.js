@@ -10,7 +10,9 @@ const getOrders = async (request, response) => {
     const userId = request.user.id
     const page = Number(request.query.page) || 1
     const limit = Number(request.query.limit) || 10
-    const result = await orderService.getUserOrders({ userId, page, limit })
+    const sort = request.query.sort
+    const deliveryStatus = request.query.deliveryStatus
+    const result = await orderService.getUserOrders({ userId, page, limit, sort, deliveryStatus })
     return response.status(200).json(result)
 }
 
@@ -18,7 +20,9 @@ const getUserOrdersForAdmin = async (request, response) => {
     const { userId } = request.params
     const page = Number(request.query.page) || 1
     const limit = Number(request.query.limit) || 10
-    const result = await orderService.getUserOrders({ userId, page, limit })
+    const sort = request.query.sort
+    const deliveryStatus = request.query.deliveryStatus
+    const result = await orderService.getUserOrders({ userId, page, limit, sort, deliveryStatus })
     return response.status(200).json(result)
 }
 
