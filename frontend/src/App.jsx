@@ -38,7 +38,6 @@ const App = () => {
         <Route path='/cart' element={<Cart />} />
         <Route path='/wishlist' element={<Wishlist />} />
         <Route path='/orders' element={<Orders />} />
-        <Route path='/order' element={<Order />} />
         <Route path='/order/:orderId' element={<Order />} />
         <Route path='/order/check-out' element={<CheckOut />} />
         <Route path='/order/:orderId/return' element={<Return />} />
