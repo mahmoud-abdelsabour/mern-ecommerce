@@ -55,6 +55,7 @@ const Catalog = () => {
   const minRating = filters.minRating
   const sort = filters.sort
   const page = filters.page
+  const searchQuery = filters.search
 
   // Build the backend/API query object from current UI state.
   // IMPORTANT:
@@ -71,8 +72,19 @@ const Catalog = () => {
       sort: sort === defaultSort ? undefined : sort,
       page,
       limit: pageSize,
+      ...(searchQuery ? { search: searchQuery } : {}),
     }
-  }, [defaultSort, minRating, page, pageSize, priceRange, selectedBrands, selectedCategories, sort])
+  }, [
+    defaultSort,
+    minRating,
+    page,
+    pageSize,
+    priceRange,
+    searchQuery,
+    selectedBrands,
+    selectedCategories,
+    sort,
+  ])
 
   // Fetch products from the server (hook decides how/when to refetch).
   const { data, isLoading, isError, error } = useProducts(apiFilters)
@@ -160,6 +172,11 @@ const Catalog = () => {
             {/* While loading we show a placeholder label; otherwise show the current number of items */}
             {isLoading ? "Loading..." : `${data.pagination.totalProducts} products`}
           </Text>
+          {searchQuery ? (
+            <Text fontSize="sm" color="gray.600">
+              Results for &quot;{searchQuery}&quot;
+            </Text>
+          ) : null}
           {isError && (
             <Text fontSize="sm" color="red.500">
               Failed to load products: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}

@@ -66,6 +66,9 @@ export const useCatalogFilters = ({
     const sortStr = params.get("sort")
     const sort = sortStr && isValidSortJson(sortStr) ? sortStr : defaultSort
 
+    const searchRaw = params.get("search")
+    const search = searchRaw != null ? String(searchRaw).trim() : ""
+
     return {
       selectedBrands,
       selectedCategories,
@@ -73,6 +76,7 @@ export const useCatalogFilters = ({
       minRating,
       page,
       sort,
+      search,
     }
   }, [
     defaultSort,
@@ -107,6 +111,16 @@ export const useCatalogFilters = ({
         // no-op
       } else if (!isValidSortJson(nextSort) || nextSort === defaultSort) {
         next.delete("sort")
+      }
+
+      // Normalize search: trim; drop empty values from the URL.
+      const nextSearchRaw = next.get("search")
+      if (nextSearchRaw == null || nextSearchRaw === "") {
+        next.delete("search")
+      } else {
+        const trimmed = String(nextSearchRaw).trim()
+        if (!trimmed) next.delete("search")
+        else if (trimmed !== nextSearchRaw) next.set("search", trimmed)
       }
 
       // Normalize pagination:
@@ -197,6 +211,18 @@ export const useCatalogFilters = ({
     [defaultSort, updateQuery]
   )
 
+  const setSearch = useCallback(
+    (value) => {
+      const v = String(value ?? "").trim()
+      updateQuery((sp) => {
+        sp.delete("page")
+        if (v) sp.set("search", v)
+        else sp.delete("search")
+      })
+    },
+    [updateQuery]
+  )
+
   const setPage = useCallback(
     (page) => {
       updateQuery((sp) => {
@@ -214,6 +240,7 @@ export const useCatalogFilters = ({
       sp.delete("category")
       sp.delete("sort")
       sp.delete("page")
+      sp.delete("search")
       sp.set("minPrice", String(sliderMin))
       sp.set("maxPrice", String(sliderMax))
       sp.set("minRating", "0")
@@ -228,6 +255,7 @@ export const useCatalogFilters = ({
     setPriceRange,
     setMinRating,
     setSort,
+    setSearch,
     setPage,
     resetFilters,
     defaultSort,

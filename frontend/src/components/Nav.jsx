@@ -1,3 +1,4 @@
+import { useState } from "react"
 import logo from '../assets/logo.svg'
 import { Input, IconButton, Button, Menu, Portal, Avatar, HStack, Link, Flex, Box } from "@chakra-ui/react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
@@ -14,6 +15,14 @@ import { useStoredUser } from "../hooks/useStoredUser";
 
 const Nav = () => {
     const navigate = useNavigate()
+    const [searchDraft, setSearchDraft] = useState("")
+
+    const submitCatalogSearch = (e) => {
+        e.preventDefault()
+        const term = searchDraft.trim()
+        if (!term) return
+        navigate(`/catalog?search=${encodeURIComponent(term)}`)
+    }
     const { data: brandsData, isLoading: brandsLoading } = useBrands()
     const { data: categoriesData, isLoading: categoriesLoading } = useCategories()
     const { data: cartData } = useCart()
@@ -58,12 +67,18 @@ const Nav = () => {
                     <img src={logo} alt="logo" style={{ height: 40, width: 'auto' }} />
                 </Link>
 
-                <Box flex="1">
-                    <Input placeholder="Search" size="sm" width="100%" />
-                </Box>
-                    <IconButton aria-label="Search database" size="sm">
+                <HStack flex="1" minW={0} as="form" onSubmit={submitCatalogSearch} gap={2}>
+                    <Input
+                        placeholder="Search"
+                        size="sm"
+                        width="100%"
+                        value={searchDraft}
+                        onChange={(e) => setSearchDraft(e.target.value)}
+                    />
+                    <IconButton type="submit" aria-label="Search catalog" size="sm">
                         <LuSearch size={ICON_SIZE} />
                     </IconButton>
+                </HStack>
 
                 <HStack spacing={4}>
                     <Menu.Root>
