@@ -47,6 +47,8 @@ describe('GET /api/products/:productId/user-status', () => {
         expect(response.body.inCart).toBe(false)
         expect(response.body.cartQuantity).toBe(0)
         expect(response.body.inWishlist).toBe(false)
+        expect(response.body.hasReviewed).toBe(false)
+        expect(response.body.canReview).toBe(false)
     })
 
     it('returns true when product is in wishlist', async () => {

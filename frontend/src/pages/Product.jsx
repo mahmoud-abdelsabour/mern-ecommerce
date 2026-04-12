@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, useCallback } from "react"
 import {
   AspectRatio,
   Box,
@@ -21,9 +21,11 @@ import {
 } from "@chakra-ui/react"
 import { LuChevronLeft, LuChevronRight, LuChevronDown, LuMinus, LuPlus } from "react-icons/lu"
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md"
-import ReviewCard from "../components/ReviewCard"
-import { useNavigate, useParams } from "react-router-dom"
+import ReviewRow from "../components/ReviewRow"
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom"
 import { useProductById } from "../hooks/useProducts"
+import { useCreateReview, useProductUserStatus } from "../hooks/useProductReviews"
+import { notify } from "../utils/notify"
 import { useAddToCart, useCart, useDecrementCartItem } from "../hooks/useCart"
 import { useCartDrawer } from "../hooks/useCartDrawer"
 import { getToken } from "../APIs/http"
@@ -31,9 +33,11 @@ import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from "../hooks/u
 import { ICON_SIZE } from "../constants/ui"
 
 
+const MAX_REVIEW_COMMENT = 1000
+
 const Product = () => {
-  // Local UI state for the "Write a Review" section (UI-only for now).
   const [reviewRating, setReviewRating] = useState(0)
+  const [reviewComment, setReviewComment] = useState("")
 
   // Read the `:productId` route param from `/product/:productId`.
   const { productId } = useParams()
@@ -42,6 +46,9 @@ const Product = () => {
   // Fetch the real product data from the backend.
   // Response shape: `{ product, reviewsPreview, hasMoreReviews }`.
   const { data, isLoading, isError, error } = useProductById(productId)
+
+  const { data: userProductStatus, isLoading: userStatusLoading } = useProductUserStatus(productId)
+  const createReviewMutation = useCreateReview(productId)
 
   // Normalize the server response to predictable values for rendering.
   const product = data?.product ?? null
@@ -66,8 +73,9 @@ const Product = () => {
     }))
   }, [product])
 
-  // Display a short reviews count (e.g. "3" or "3+" when there are more).
-  const reviewsLabel = `${reviewsPreview.length}${hasMoreReviews ? "+" : ""}`
+  const reviewsCountLabel = isLoading
+    ? "—"
+    : String(product?.rating?.voters ?? reviewsPreview.length)
 
   const { openCartDrawer } = useCartDrawer()
   const addToCartMutation = useAddToCart()
@@ -150,6 +158,48 @@ const Product = () => {
 
     navigate(`/order/check-out?buyNow=${encodeURIComponent(normalizedProductId)}`)
   }
+
+  const onSubmitReview = useCallback(() => {
+    if (!productId) return
+    if (!isLoggedIn) {
+      navigate("/login")
+      return
+    }
+    if (createReviewMutation.isPending) return
+
+    const trimmed = reviewComment.trim()
+    if (trimmed.length > MAX_REVIEW_COMMENT) {
+      notify.warning(
+        "Comment too long",
+        `Please keep your comment under ${MAX_REVIEW_COMMENT} characters.`
+      )
+      return
+    }
+
+    const rating = Number(reviewRating)
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      notify.warning("Rating required", "Please choose a star rating from 1 to 5.")
+      return
+    }
+
+    createReviewMutation.mutate(
+      { rating, comment: trimmed },
+      {
+        onSuccess: () => {
+          notify.success("Review published", "Thank you for sharing your feedback.")
+          setReviewRating(0)
+          setReviewComment("")
+        },
+      }
+    )
+  }, [
+    productId,
+    isLoggedIn,
+    navigate,
+    reviewComment,
+    reviewRating,
+    createReviewMutation,
+  ])
 
   return (
     <Box maxW="1200px" mx="auto" px={4} mt={6} pb={10}>
@@ -425,44 +475,106 @@ const Product = () => {
       {/* add review */}
       <Stack mt={8} gap={3}>
         <Text fontSize="md" fontWeight="700">
-          Write a Review
+          Write a review
         </Text>
-        {/* This is UI-only for now (no POST to backend wired yet). */}
-        <RatingGroup.Root
-          count={5}
-          size="sm"
-          value={reviewRating}
-          onValueChange={(e) => setReviewRating(e.value ?? 0)}
-        >
-            <RatingGroup.HiddenInput />
-            <RatingGroup.Control />
-        </RatingGroup.Root>
-        <Textarea placeholder="Comment..." minH="130px" />
-        <Button mt={2} alignSelf="flex-start">
-          Submit
-        </Button>
+        {!isLoggedIn ? (
+          <Text fontSize="sm" color="gray.600">
+            <Button
+              variant="link"
+              colorPalette="teal"
+              size="sm"
+              p={0}
+              h="auto"
+              minW={0}
+              onClick={() => navigate("/login")}
+            >
+              Sign in
+            </Button>{" "}
+            to see if you can rate this product. Only customers who have received it from a
+            completed order may submit a review.
+          </Text>
+        ) : userStatusLoading ? (
+          <Text fontSize="sm" color="gray.500">
+            Checking whether you can review this product…
+          </Text>
+        ) : userProductStatus?.hasReviewed ? (
+          <Text fontSize="sm" color="gray.600">
+            You have already reviewed this product.
+          </Text>
+        ) : !userProductStatus?.canReview ? (
+          <Text fontSize="sm" color="gray.600">
+            Reviews are limited to customers who purchased this item and have a delivered (or
+            completed return/refund) order including it. Once you are eligible, a rating and
+            optional comment will appear here.
+          </Text>
+        ) : (
+          <>
+            <Text fontSize="xs" color="gray.500">
+              Rating (required) · Comment optional (max {MAX_REVIEW_COMMENT} characters)
+            </Text>
+            <RatingGroup.Root
+              count={5}
+              size="sm"
+              value={reviewRating}
+              onValueChange={(e) => setReviewRating(Number(e.value) || 0)}
+            >
+              <RatingGroup.HiddenInput />
+              <RatingGroup.Control />
+            </RatingGroup.Root>
+            <Textarea
+              placeholder="Share your experience (optional)…"
+              minH="130px"
+              value={reviewComment}
+              maxLength={MAX_REVIEW_COMMENT}
+              onChange={(e) => setReviewComment(e.target.value)}
+            />
+            <Text fontSize="xs" color="gray.500">
+              {reviewComment.length}/{MAX_REVIEW_COMMENT}
+            </Text>
+            <Button
+              mt={2}
+              alignSelf="flex-start"
+              colorPalette="teal"
+              onClick={onSubmitReview}
+              loading={createReviewMutation.isPending}
+              disabled={!product || createReviewMutation.isPending}
+            >
+              Submit review
+            </Button>
+          </>
+        )}
       </Stack>
 
-      {/* reviews */}
+      {/* reviews (preview from product payload; full list lives on /product/:id/reviews) */}
       <Stack mt={8} gap={4}>
         <Text fontSize="2xl" fontWeight="700">
-          Reviews ({isLoading ? "—" : reviewsLabel})
+          Reviews ({reviewsCountLabel})
         </Text>
-        {/* Server preview: show latest reviews if present (fallback to empty state). */}
         {isLoading ? (
           <Text fontSize="sm" color="gray.500">
-            Loading reviews...
+            Loading reviews…
           </Text>
         ) : reviewsPreview.length > 0 ? (
-          reviewsPreview.map((review) => (
-            <ReviewCard
-              key={review?._id ?? review?.id}
-              name={review.name}
-              date={review?.createdAt ? new Date(review.createdAt).toLocaleDateString() : "—"}
-              rating={Number(review?.rating ?? 0)}
-              comment={review?.comment ?? ""}
-            />
-          ))
+          <Stack gap={4}>
+            {reviewsPreview.map((review) => (
+              <ReviewRow
+                key={review?.id ?? review?._id}
+                review={review}
+                productId={productId}
+              />
+            ))}
+            {hasMoreReviews && productId ? (
+              <Button
+                as={RouterLink}
+                to={`/product/${encodeURIComponent(productId)}/reviews`}
+                variant="outline"
+                size="sm"
+                alignSelf="flex-start"
+              >
+                Show more
+              </Button>
+            ) : null}
+          </Stack>
         ) : (
           <Text fontSize="sm" color="gray.500">
             No reviews yet.

@@ -17,7 +17,7 @@ const ReviewCard = ({ name, date, rating = 0, comment, avatarUrl }) => {
           </Text>
         </HStack>
 
-        <RatingGroup.Root readOnly count={5} defaultValue={rating} size="sm">
+        <RatingGroup.Root readOnly count={5} value={rating} size="sm">
           <RatingGroup.HiddenInput />
           <RatingGroup.Control />
         </RatingGroup.Root>

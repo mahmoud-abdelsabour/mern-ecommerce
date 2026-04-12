@@ -12,7 +12,8 @@
     "lint:fix": "eslint . --config ./utils/config/eslint.cjs --fix",
     "format": "prettier . --config ./utils/config/prettier.cjs --ignore-path ./utils/config/.prettierignore --write",
     "format:check": "prettier . --config ./utils/config/prettier.cjs --ignore-path ./utils/config/.prettierignore --check",
-    "seed": "cross-env NODE_ENV=development node utils/seed.js"
+    "seed": "cross-env NODE_ENV=development node utils/seed.js",
+    "insert-product-reviews": "cross-env NODE_ENV=development node utils/insertProductReviews.js"
   },
     "author": "Mahmoud Ahmed",
     "license": "ISC",

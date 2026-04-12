@@ -1,5 +1,5 @@
 import axios from "axios"
-import { getAuthConfig } from "../apis/http"
+import { getAuthConfig } from "./http"
 
 const baseURL = "/api/products"
 

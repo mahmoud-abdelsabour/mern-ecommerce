@@ -2,6 +2,7 @@ const Product = require('../models/product.model')
 const Category = require('../models/category.model')
 const Brand = require('../models/brand.model')
 const Review = require('../models/review.model')
+const Order = require('../models/order.model')
 const { pickAllowedFields } = require('../utils/request/pick-fields.util')
 
 // Parse list-like query params into an array of slugs.
@@ -176,7 +177,7 @@ const getProductById = async data => {
 const updateProductRating = async data => {
     try {
         const { productId, session } = data
-        const stats = await Review.aggregate([
+        const aggregate = Review.aggregate([
             { $match: { product: productId } },
             {
                 $group: {
@@ -185,13 +186,15 @@ const updateProductRating = async data => {
                     voters: { $sum: 1 },
                 },
             },
-        ]).session(session)
+        ])
+        const stats = session ? await aggregate.session(session) : await aggregate
+        const updateOpts = session ? { session } : {}
 
         if (stats.length === 0) {
             await Product.findByIdAndUpdate(
                 productId,
                 { rating: { score: 0, voters: 0 } },
-                { session }
+                updateOpts
             )
             return
         }
@@ -204,7 +207,7 @@ const updateProductRating = async data => {
                     voters: stats[0].voters,
                 },
             },
-            { session }
+            updateOpts
         )
     } catch (error) {
         throw error
@@ -213,14 +216,26 @@ const updateProductRating = async data => {
 
 const getProductUserStatus = async ({ productId, user }) => {
     try {
+        const userId = user.id
         const cartItem = user.cart.find(item => String(item.product) === String(productId))
 
         const wishlistItem = user.wishlist.find(item => String(item) === String(productId))
+
+        const [hasEligibleOrder, hasReviewed] = await Promise.all([
+            Order.exists({
+                userId,
+                'products.product': productId,
+                deliveryStatus: { $in: ['delivered', 'return requested', 'returned', 'refunded'] },
+            }),
+            Review.exists({ user: userId, product: productId }),
+        ])
 
         return {
             inCart: !!cartItem,
             cartQuantity: cartItem ? cartItem.quantity : 0,
             inWishlist: !!wishlistItem,
+            hasReviewed: Boolean(hasReviewed),
+            canReview: Boolean(hasEligibleOrder && !hasReviewed),
         }
     } catch (error) {
         throw error
