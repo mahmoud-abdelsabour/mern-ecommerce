@@ -1,6 +1,6 @@
 import { useState } from "react"
 import logo from '../assets/logo.svg'
-import { Input, IconButton, Button, Menu, Portal, Avatar, HStack, Link, Flex, Box } from "@chakra-ui/react"
+import { Input, IconButton, Button, Menu, Portal, Avatar, HStack, Link, Flex, Box, Skeleton } from "@chakra-ui/react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { LuSearch } from "react-icons/lu"
 import { FaCartShopping } from "react-icons/fa6";
@@ -91,9 +91,11 @@ const Nav = () => {
                             <Menu.Positioner>
                                 <Menu.Content maxH="320px" overflowY="auto">
                                     {categoriesLoading ? (
-                                      <Menu.Item value="categories-loading" disabled>
-                                        Loading...
-                                      </Menu.Item>
+                                      Array.from({ length: 6 }).map((_, idx) => (
+                                        <Menu.Item key={`categories-skel-${idx}`} value={`categories-skel-${idx}`} disabled>
+                                          <Skeleton h="12px" w="160px" />
+                                        </Menu.Item>
+                                      ))
                                     ) : (categoriesData?.categories ?? []).length > 0 ? (
                                       (categoriesData?.categories ?? []).filter((c) => c?.slug).map((c) => (
                                         <Menu.Item
@@ -127,9 +129,11 @@ const Nav = () => {
                             <Menu.Positioner>
                                 <Menu.Content maxH="320px" overflowY="auto">
                                     {brandsLoading ? (
-                                      <Menu.Item value="brands-loading" disabled>
-                                        Loading...
-                                      </Menu.Item>
+                                      Array.from({ length: 6 }).map((_, idx) => (
+                                        <Menu.Item key={`brands-skel-${idx}`} value={`brands-skel-${idx}`} disabled>
+                                          <Skeleton h="12px" w="160px" />
+                                        </Menu.Item>
+                                      ))
                                     ) : (brandsData?.brands ?? []).length > 0 ? (
                                       (brandsData?.brands ?? []).filter((b) => b?.slug).map((b) => (
                                         <Menu.Item

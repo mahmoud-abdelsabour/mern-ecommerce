@@ -1,10 +1,11 @@
-import { Box, Button, EmptyState, Flex, HStack, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, EmptyState, Flex, HStack, Skeleton, Text, VStack } from "@chakra-ui/react"
 import { LuShoppingCart } from "react-icons/lu"
 import { Link as RouterLink } from "react-router-dom"
 import ProductList from "../components/ProductList"
 import { useAddToCart, useCart, useClearCart, useDecrementCartItem } from "../hooks/useCart"
 import { getToken } from "../APIs/http"
 import { ProductCard } from "../components/ProductCard"
+import ProductGridSkeleton from "../components/skeletons/ProductGridSkeleton"
 
 const Cart = () => {
   const token = getToken()
@@ -61,9 +62,13 @@ const Cart = () => {
       )}
 
       {isLoading ? (
-        <Flex minH="50vh" align="center" justify="center">
-          <Text color="gray.500">Loading cart...</Text>
-        </Flex>
+        <VStack w="100%" gap={6} align="stretch">
+          <ProductGridSkeleton count={4} variant="cart" />
+          <HStack w="100%" justify="center" flexWrap="wrap" gap={3}>
+            <Skeleton h="44px" w={{ base: "100%", md: "240px" }} rounded="md" />
+            <Skeleton h="44px" w={{ base: "100%", md: "320px" }} rounded="md" />
+          </HStack>
+        </VStack>
       ) : items.length > 0 ? (
         <VStack w="100%" gap={6}>
           <Box w="100%">

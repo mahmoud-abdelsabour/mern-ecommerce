@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { createElement, useMemo } from "react"
 import {
   Box,
   Button,
@@ -9,6 +9,8 @@ import {
   Image,
   Input,
   SimpleGrid,
+  Skeleton,
+  SkeletonText,
   Stack,
   Text,
   Field,
@@ -17,6 +19,7 @@ import { Link as RouterLink } from "react-router-dom"
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu"
 import { MdHeadsetMic, MdLocalShipping, MdUndo, MdVerifiedUser } from "react-icons/md"
 import { ProductCard } from "../components/ProductCard"
+import ProductCardSkeleton from "../components/skeletons/ProductCardSkeleton"
 import { useCategories } from "../hooks/useCategories"
 import { useProducts } from "../hooks/useProducts"
 import { slugifyLoose } from "../utils/filterHelpers"
@@ -133,9 +136,11 @@ const ProductRail = ({ title, subtitle, seeAllTo, railKey, items, isLoading }) =
     return (
       <Box>
         <SectionHeader title={title} subtitle={subtitle} seeAllTo={seeAllTo} />
-        <Text fontSize="sm" color="gray.500">
-          Loading products...
-        </Text>
+        <SimpleGrid columns={{ base: 2, md: 4, lg: 6 }} gap={4}>
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <ProductCardSkeleton key={`${railKey}-skel-${idx}`} />
+          ))}
+        </SimpleGrid>
       </Box>
     )
   }
@@ -316,7 +321,7 @@ const Home = () => {
           shadow="sm"
           mb={{ base: 14, md: 20 }}
         >
-          {VALUE_PROPS.map(({ icon: Icon, label, description }) => (
+          {VALUE_PROPS.map(({ icon, label, description }) => (
             <HStack key={label} align="start" gap={3}>
               <Flex
                 w="10"
@@ -328,7 +333,7 @@ const Home = () => {
                 justify="center"
                 flexShrink={0}
               >
-                <Icon size={22} />
+                {createElement(icon, { size: 22 })}
               </Flex>
               <Stack gap={0}>
                 <Text fontSize="sm" fontWeight="700" color="gray.900">
@@ -350,16 +355,32 @@ const Home = () => {
             seeAllTo="/catalog"
           />
           {categoriesLoading ? (
-            <Text fontSize="sm" color="gray.500">
-              Loading categories...
-            </Text>
+            <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={4}>
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <Box
+                  key={`cat-skel-${idx}`}
+                  position="relative"
+                  overflow="hidden"
+                  rounded="xl"
+                  h={{ base: "200px", md: "220px" }}
+                  borderWidth="1px"
+                  borderColor="gray.200"
+                  bg="white"
+                >
+                  <Skeleton w="100%" h="100%" />
+                  <Box position="absolute" bottom={4} left={4} right={4}>
+                    <SkeletonText noOfLines={1} />
+                  </Box>
+                </Box>
+              ))}
+            </SimpleGrid>
           ) : categoryTiles.length === 0 ? (
             <Text fontSize="sm" color="gray.500">
               No categories available yet.
             </Text>
           ) : (
             <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={4}>
-              {categoryTiles.map((cat, index) => (
+              {categoryTiles.map((cat) => (
                 <Box
                   key={cat.key}
                   as={RouterLink}

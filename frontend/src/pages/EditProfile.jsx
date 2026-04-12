@@ -1,4 +1,4 @@
-import { Box, Button, Field, Fieldset, Flex, HStack, Input, Stack, Text } from "@chakra-ui/react"
+import { Box, Button, Field, Fieldset, Flex, HStack, Input, Skeleton, SkeletonText, Stack, Text } from "@chakra-ui/react"
 import { useEffect, useMemo, useState } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { getToken } from "../APIs/http"
@@ -136,8 +136,32 @@ const EditProfile = () => {
 
   if (isLoading) {
     return (
-      <Flex minH="50vh" align="center" justify="center" px={4}>
-        <Text color="gray.500">Loading profile...</Text>
+      <Flex minH="70vh" align="center" justify="center" px={4} py={8}>
+        <Box w="100%" maxW="520px">
+          <Stack gap={4}>
+            <Skeleton h="22px" w="160px" />
+            <Skeleton h="14px" w="260px" />
+            <Stack gap={3}>
+              <HStack gap={3} flexWrap="wrap">
+                <Skeleton h="40px" flex="1" minW="220px" rounded="md" />
+                <Skeleton h="40px" flex="1" minW="220px" rounded="md" />
+              </HStack>
+              <Skeleton h="40px" w="100%" rounded="md" />
+              <Skeleton h="40px" w="100%" rounded="md" />
+              <SkeletonText noOfLines={2} />
+              <HStack justify="space-between" flexWrap="wrap" gap={3}>
+                <HStack flexWrap="wrap" gap={2}>
+                  <Skeleton h="36px" w="150px" rounded="md" />
+                  <Skeleton h="36px" w="140px" rounded="md" />
+                </HStack>
+                <HStack>
+                  <Skeleton h="36px" w="90px" rounded="md" />
+                  <Skeleton h="36px" w="90px" rounded="md" />
+                </HStack>
+              </HStack>
+            </Stack>
+          </Stack>
+        </Box>
       </Flex>
     )
   }

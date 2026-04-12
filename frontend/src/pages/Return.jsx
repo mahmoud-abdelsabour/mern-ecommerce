@@ -8,12 +8,13 @@ import {
   HStack,
   Portal,
   Separator,
+  Skeleton,
   Stack,
   Text,
   Textarea,
   VStack,
 } from "@chakra-ui/react"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { GoListUnordered } from "react-icons/go"
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom"
 import ProductList from "../components/ProductList"
@@ -21,6 +22,7 @@ import { ProductCard } from "../components/ProductCard"
 import { getToken } from "../APIs/http"
 import { useOrderById, useRequestReturn } from "../hooks/useOrders"
 import { setFlash } from "../utils/flashStorage"
+import ProductGridSkeleton from "../components/skeletons/ProductGridSkeleton"
 
 const Return = () => {
   const navigate = useNavigate()
@@ -30,60 +32,68 @@ const Return = () => {
 
   const { data: order, isLoading, isError, error } = useOrderById(orderId)
 
-  const [items, setItems] = useState([])
+  const [selectedById, setSelectedById] = useState(() => ({}))
+  const [quantityById, setQuantityById] = useState(() => ({}))
   const [comments, setComments] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
 
-  useEffect(() => {
+  const lines = useMemo(() => {
     const products = order?.products ?? []
-    if (products.length === 0) {
-      setItems([])
-      return
-    }
-    setItems(
-      products.map((p, index) => {
-        const productId = String(p?.product ?? "")
-        return {
-          id: productId || `line-${index}`,
-          productId,
-          title: p?.name ?? "Product",
-          price: p?.priceAtPurchase ?? 0,
-          brand: typeof p?.brand === "string" ? p.brand : p?.brand?.name ?? "—",
-          category: typeof p?.category === "string" ? p.category : p?.category?.name ?? "—",
-          image: p?.photos?.[0],
-          quantity: 1,
-          maxQuantity: Math.max(1, Number(p?.quantity ?? 1)),
-          selected: false,
-        }
-      })
-    )
+    return products.map((p, index) => {
+      const productId = String(p?.product ?? "")
+      const id = productId || `line-${index}`
+      return {
+        id,
+        productId,
+        title: p?.name ?? "Product",
+        price: p?.priceAtPurchase ?? 0,
+        brand: typeof p?.brand === "string" ? p.brand : p?.brand?.name ?? "—",
+        category: typeof p?.category === "string" ? p.category : p?.category?.name ?? "—",
+        image: p?.photos?.[0],
+        maxQuantity: Math.max(1, Number(p?.quantity ?? 1)),
+      }
+    })
   }, [order])
+
+  const maxQuantityById = useMemo(() => {
+    const map = {}
+    for (const line of lines) map[line.id] = line.maxQuantity
+    return map
+  }, [lines])
+
+  const items = useMemo(
+    () =>
+      lines.map((line) => {
+        const rawQty = Number(quantityById[line.id] ?? 1)
+        const qty = Math.min(line.maxQuantity, Math.max(1, rawQty || 1))
+        return {
+          ...line,
+          quantity: qty,
+          selected: Boolean(selectedById[line.id]),
+        }
+      }),
+    [lines, quantityById, selectedById]
+  )
 
   const hasSelected = useMemo(() => items.some((i) => i.selected), [items])
 
   const toggleSelected = (id, checked) => {
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, selected: Boolean(checked) } : i)))
+    setSelectedById((prev) => ({ ...prev, [id]: Boolean(checked) }))
   }
 
   const increaseQty = (id) => {
-    setItems((prev) =>
-      prev.map((i) => {
-        if (i.id !== id) return i
-        const maxQ = Number(i.maxQuantity ?? 1)
-        const next = Math.min(maxQ, Number(i.quantity ?? 1) + 1)
-        return { ...i, quantity: next }
-      })
-    )
+    const maxQ = Number(maxQuantityById[id] ?? 1)
+    setQuantityById((prev) => {
+      const current = Number(prev[id] ?? 1) || 1
+      return { ...prev, [id]: Math.min(maxQ, current + 1) }
+    })
   }
 
   const decreaseQty = (id) => {
-    setItems((prev) =>
-      prev.map((i) => {
-        if (i.id !== id) return i
-        const next = Math.max(1, Number(i.quantity ?? 1) - 1)
-        return { ...i, quantity: next }
-      })
-    )
+    setQuantityById((prev) => {
+      const current = Number(prev[id] ?? 1) || 1
+      return { ...prev, [id]: Math.max(1, current - 1) }
+    })
   }
 
   const returnMutation = useRequestReturn({
@@ -153,9 +163,27 @@ const Return = () => {
 
   if (isLoading) {
     return (
-      <Flex minH="50vh" align="center" justify="center" px={4}>
-        <Text color="gray.500">Loading order...</Text>
-      </Flex>
+      <Box maxW="1200px" mx="auto" px={4} py={8}>
+        <Stack gap={6}>
+          <Stack gap={2}>
+            <Skeleton h="28px" w="180px" />
+            <Skeleton h="12px" w="520px" maxW="90%" />
+          </Stack>
+          <Stack gap={3}>
+            <Skeleton h="18px" w="120px" />
+            <ProductGridSkeleton count={4} variant="return" />
+          </Stack>
+          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+            <Stack gap={3}>
+              <Skeleton h="16px" w="220px" />
+              <Skeleton h="90px" w="100%" rounded="md" />
+              <HStack justify="flex-end">
+                <Skeleton h="40px" w="160px" rounded="md" />
+              </HStack>
+            </Stack>
+          </Box>
+        </Stack>
+      </Box>
     )
   }
 

@@ -4,6 +4,7 @@ import {
   Drawer,
   HStack,
   Portal,
+  Skeleton,
   Stack,
   Text,
   VStack,
@@ -13,6 +14,7 @@ import { useCart } from "../hooks/useCart"
 import { getToken } from "../APIs/http"
 import DrawerCard from "./DrawerCard"
 import { cartLineToDrawerFields } from "../utils/cartLineToDrawerFields"
+import DrawerCardSkeleton from "./skeletons/DrawerCardSkeleton"
 
 const CartDrawer = ({ open, onOpenChange }) => {
   const token = getToken()
@@ -34,7 +36,15 @@ const CartDrawer = ({ open, onOpenChange }) => {
                 Your Cart
               </Drawer.Title>
               <Drawer.Description fontSize="sm" color="gray.600" mt={1}>
-                {rows.length > 0 ? `${rows.length} item${rows.length === 1 ? "" : "s"} in your cart` : "Review items before checkout"}
+                {!token ? (
+                  "Sign in to view your cart"
+                ) : isLoading ? (
+                  <Skeleton h="12px" w="240px" />
+                ) : rows.length > 0 ? (
+                  `${rows.length} item${rows.length === 1 ? "" : "s"} in your cart`
+                ) : (
+                  "Review items before checkout"
+                )}
               </Drawer.Description>
             </Drawer.Header>
 
@@ -44,9 +54,11 @@ const CartDrawer = ({ open, onOpenChange }) => {
                   Sign in to view your cart.
                 </Text>
               ) : isLoading ? (
-                <Text fontSize="sm" color="gray.500">
-                  Loading cart…
-                </Text>
+                <VStack align="stretch" gap={3}>
+                  {Array.from({ length: 3 }).map((_, idx) => (
+                    <DrawerCardSkeleton key={`drawer-card-skel-${idx}`} />
+                  ))}
+                </VStack>
               ) : isError ? (
                 <Text fontSize="sm" color="red.500">
                   {error?.response?.data?.message ?? error?.message ?? "Could not load cart."}

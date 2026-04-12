@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef } from "react"
-import { Box, Button, HStack, Spinner, Stack, Text } from "@chakra-ui/react"
+import { Box, Button, HStack, Skeleton, Stack, Text } from "@chakra-ui/react"
 import { Link as RouterLink, useParams } from "react-router-dom"
 import ReviewRow from "../components/ReviewRow"
+import ReviewRowSkeleton from "../components/skeletons/ReviewRowSkeleton"
 import { useProductReviewsInfinite } from "../hooks/useProductReviews"
 import { useProductById } from "../hooks/useProducts"
 
@@ -80,9 +81,7 @@ const ProductReviews = () => {
             ← Back to product
           </Button>
           {productLoading ? (
-            <Text fontSize="lg" fontWeight="700" color="gray.500">
-              Loading…
-            </Text>
+            <Skeleton h="18px" w="260px" />
           ) : productIsError ? (
             <Text fontSize="lg" fontWeight="700" color="gray.700">
               Reviews
@@ -116,12 +115,11 @@ const ProductReviews = () => {
         )}
 
         {initialReviewsLoading && (
-          <HStack gap={3} py={8} justify="center">
-            <Spinner size="md" colorPalette="teal" />
-            <Text fontSize="sm" color="gray.600">
-              Loading reviews…
-            </Text>
-          </HStack>
+          <Stack gap={4}>
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <ReviewRowSkeleton key={`review-initial-skel-${idx}`} />
+            ))}
+          </Stack>
         )}
 
         {!initialReviewsLoading && !reviewsIsError && reviews.length === 0 && (
@@ -144,6 +142,11 @@ const ProductReviews = () => {
                   productId={productId}
                 />
               ))}
+              {isFetchingNextPage
+                ? Array.from({ length: 2 }).map((_, idx) => (
+                    <ReviewRowSkeleton key={`review-next-skel-${idx}`} />
+                  ))
+                : null}
             </Stack>
           </Stack>
         )}
@@ -151,14 +154,6 @@ const ProductReviews = () => {
         {hasNextPage ? (
           <Stack gap={3} align="stretch">
             <Box ref={loadMoreSentinelRef} h="1px" w="full" aria-hidden />
-            {isFetchingNextPage && (
-              <HStack gap={2} justify="center" py={2}>
-                <Spinner size="sm" colorPalette="teal" />
-                <Text fontSize="sm" color="gray.600">
-                  Loading more…
-                </Text>
-              </HStack>
-            )}
             <Button
               variant="outline"
               size="sm"

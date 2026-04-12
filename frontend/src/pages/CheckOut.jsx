@@ -9,12 +9,14 @@ import {
   RadioGroup,
   Select,
   Separator,
+  Skeleton,
+  SkeletonText,
   Stack,
   Text,
   VStack,
   createListCollection,
 } from "@chakra-ui/react"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { LuPlus, LuShoppingCart } from "react-icons/lu"
 import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom"
 import ProductList from "../components/ProductList"
@@ -27,6 +29,7 @@ import { useProductById } from "../hooks/useProducts"
 import { useCreateAddress, useMe } from "../hooks/useUser"
 import { setFlash } from "../utils/flashStorage"
 import { notify } from "../utils/notify"
+import ProductGridSkeleton from "../components/skeletons/ProductGridSkeleton"
 
 const formatMoney = (value) => `$${Number(value ?? 0).toFixed(2)}`
 
@@ -113,10 +116,7 @@ const CheckOut = () => {
   const [notice, setNotice] = useState(null)
   const showNotice = (status, title) => setNotice({ id: Date.now(), status, title })
 
-  const addresses = useMemo(
-    () => (Array.isArray(me?.addresses) ? me.addresses : []),
-    [me?.addresses]
-  )
+  const addresses = useMemo(() => (Array.isArray(me?.addresses) ? me.addresses : []), [me])
 
   const hasSavedAddresses = addresses.length > 0
 
@@ -124,19 +124,9 @@ const CheckOut = () => {
 
   const [showAddressForm, setShowAddressForm] = useState(false)
 
-  useEffect(() => {
-    if (isMeLoading) return
-    if (!hasSavedAddresses) {
-      setShowAddressForm(true)
-      setSelectedAddressId("")
-      return
-    }
-    setSelectedAddressId((prev) => {
-      const ids = addresses.map((a) => String(a._id ?? a.id))
-      if (prev && ids.includes(prev)) return prev
-      return ids[0] ?? ""
-    })
-  }, [isMeLoading, hasSavedAddresses, addresses])
+  const mustShowAddressForm = !isMeLoading && !hasSavedAddresses
+  const resolvedSelectedAddressId =
+    selectedAddressId || (hasSavedAddresses ? String(addresses[0]?._id ?? addresses[0]?.id ?? "") : "")
 
   const [addressDraft, setAddressDraft] = useState({
     address_name: "",
@@ -149,11 +139,10 @@ const CheckOut = () => {
     special_mark: "",
   })
 
-  const selectedAddress = useMemo(() => {
-    return (
-      addresses.find((a) => String(a._id ?? a.id) === selectedAddressId) ?? null
-    )
-  }, [addresses, selectedAddressId])
+  const selectedAddress = useMemo(
+    () => addresses.find((a) => String(a._id ?? a.id) === resolvedSelectedAddressId) ?? null,
+    [addresses, resolvedSelectedAddressId]
+  )
 
   const addressCollection = useMemo(() => {
     return createListCollection({
@@ -200,8 +189,8 @@ const CheckOut = () => {
   const total = subtotal + shippingPrice + codFees
 
   const hasValidSelection =
-    Boolean(selectedAddressId) &&
-    addresses.some((a) => String(a._id ?? a.id) === selectedAddressId)
+    Boolean(resolvedSelectedAddressId) &&
+    addresses.some((a) => String(a._id ?? a.id) === resolvedSelectedAddressId)
 
   const canCheckout =
     items.length > 0 &&
@@ -289,9 +278,40 @@ const CheckOut = () => {
 
   if ((isBuyNow ? isBuyNowLoading : isCartLoading) || isMeLoading) {
     return (
-      <Flex minH="50vh" align="center" justify="center" px={4}>
-        <Text color="gray.500">Loading checkout...</Text>
-      </Flex>
+      <Box maxW="1200px" mx="auto" px={4} py={8}>
+        <Stack gap={6}>
+          <Stack gap={2}>
+            <Skeleton h="28px" w="160px" />
+            <Skeleton h="12px" w="520px" maxW="90%" />
+          </Stack>
+
+          <Stack gap={3}>
+            <Skeleton h="18px" w="120px" />
+            <ProductGridSkeleton count={4} variant="order" />
+          </Stack>
+
+          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+            <Stack gap={3}>
+              <Skeleton h="18px" w="200px" />
+              <SkeletonText noOfLines={3} />
+              <Skeleton h="40px" w="100%" rounded="md" />
+            </Stack>
+          </Box>
+
+          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+            <Stack gap={3}>
+              <Skeleton h="18px" w="160px" />
+              <Skeleton h="36px" w="60%" rounded="md" />
+              <Skeleton h="36px" w="60%" rounded="md" />
+              <Separator />
+              <Skeleton h="14px" w="55%" />
+              <Skeleton h="14px" w="65%" />
+              <Skeleton h="14px" w="45%" />
+              <Skeleton h="44px" w="100%" rounded="md" />
+            </Stack>
+          </Box>
+        </Stack>
+      </Box>
     )
   }
 
@@ -418,7 +438,7 @@ const CheckOut = () => {
                   size="sm"
                   w={{ base: "100%", sm: "360px" }}
                   disabled={!hasSavedAddresses}
-                  value={hasSavedAddresses && selectedAddressId ? [selectedAddressId] : []}
+                  value={hasSavedAddresses && resolvedSelectedAddressId ? [resolvedSelectedAddressId] : []}
                   onValueChange={(details) => setSelectedAddressId(details.value[0] ?? "")}
                 >
                   <Select.HiddenSelect />
@@ -468,7 +488,7 @@ const CheckOut = () => {
               </Text>
             )}
 
-            {showAddressForm && (
+            {(showAddressForm || mustShowAddressForm) && (
               <Stack gap={2}>
                 <AddressForm
                   title="Add New Address"

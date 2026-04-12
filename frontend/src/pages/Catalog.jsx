@@ -11,6 +11,7 @@ import {
   Portal,
   Select,
   Separator,
+  Skeleton,
   Slider,
   Stack,
   Text,
@@ -21,6 +22,7 @@ import {
 } from "@chakra-ui/react"
 import { useMemo } from "react"
 import ProductList from "../components/ProductList"
+import ProductGridSkeleton from "../components/skeletons/ProductGridSkeleton"
 import { PiEmptyFill } from "react-icons/pi"
 import PaginationControls from "../components/PaginationControls"
 import { useProducts } from "../hooks/useProducts"
@@ -87,7 +89,7 @@ const Catalog = () => {
   ])
 
   // Fetch products from the server (hook decides how/when to refetch).
-  const { data, isLoading, isError, error } = useProducts(apiFilters)
+  const { data, isLoading, isFetching, isError, error } = useProducts(apiFilters)
 
   // Ensure we always work with an array, even if the response is missing/undefined.
   const products = data?.products ?? []
@@ -170,7 +172,7 @@ const Catalog = () => {
           </Text>
           <Text fontSize="sm" color="gray.500">
             {/* While loading we show a placeholder label; otherwise show the current number of items */}
-            {isLoading ? "Loading..." : `${data.pagination.totalProducts} products`}
+            {isLoading || isFetching ? <Skeleton h="14px" w="160px" /> : `${data.pagination.totalProducts} products`}
           </Text>
           {searchQuery ? (
             <Text fontSize="sm" color="gray.600">
@@ -247,9 +249,12 @@ const Catalog = () => {
                 <Box maxH="180px" overflowY="auto" pr={2}>
                   <Stack gap={2}>
                     {brandsLoading ? (
-                      <Text fontSize="sm" color="gray.500">
-                        Loading brands...
-                      </Text>
+                      Array.from({ length: 8 }).map((_, idx) => (
+                        <HStack key={`brand-skel-${idx}`} gap={2}>
+                          <Skeleton h="16px" w="16px" rounded="sm" />
+                          <Skeleton h="12px" w="70%" />
+                        </HStack>
+                      ))
                     ) : brandOptions.length > 0 ? (
                       brandOptions.map((brand) => (
                         <Checkbox.Root
@@ -290,9 +295,12 @@ const Catalog = () => {
                 <Box maxH="180px" overflowY="auto" pr={2}>
                   <Stack gap={2}>
                     {categoriesLoading ? (
-                      <Text fontSize="sm" color="gray.500">
-                        Loading categories...
-                      </Text>
+                      Array.from({ length: 8 }).map((_, idx) => (
+                        <HStack key={`category-skel-${idx}`} gap={2}>
+                          <Skeleton h="16px" w="16px" rounded="sm" />
+                          <Skeleton h="12px" w="70%" />
+                        </HStack>
+                      ))
                     ) : categoryOptions.length > 0 ? (
                       categoryOptions.map((category) => (
                         <Checkbox.Root
@@ -383,14 +391,18 @@ const Catalog = () => {
 
           {/* Products panel */}
           <Box flex="1" w="100%" minH="70vh" display="flex" flexDirection="column">
-            {isLoading ? (
-              // Loading state keeps the layout height stable and centers the message.
-              <Box flex="1" display="flex" alignItems="center" justifyContent="center">
-                <Text color="gray.500">Loading products...</Text>
+            {isLoading && items.length === 0 ? (
+              <Box flex="1">
+                <ProductGridSkeleton count={pageSize} />
               </Box>
             ) : items.length > 0 ? (
               // When we have products, delegate rendering to `ProductList`.
               <Box flex="1">
+                {isFetching ? (
+                  <HStack justify="flex-end" mb={2}>
+                    <Skeleton h="10px" w="110px" />
+                  </HStack>
+                ) : null}
                 <ProductList items={items} />
               </Box>
             ) : (
@@ -425,15 +437,15 @@ const Catalog = () => {
             {/* Pagination (server-driven) */}
             {pagination?.totalProducts > pageSize && (
               <Box mt={6} display="flex" justifyContent="center">
-                <PaginationControls
-                  count={pagination.totalProducts}
-                  pageSize={pagination.limit ?? pageSize}
-                  page={pagination.currentPage ?? page}
-                  onPageChange={setPage}
-                  isDisabled={isLoading}
-                />
-              </Box>
-            )}
+                  <PaginationControls
+                    count={pagination.totalProducts}
+                    pageSize={pagination.limit ?? pageSize}
+                    page={pagination.currentPage ?? page}
+                    onPageChange={setPage}
+                    isDisabled={isLoading || isFetching}
+                  />
+                </Box>
+              )}
           </Box>
         </Stack>
       </Stack>

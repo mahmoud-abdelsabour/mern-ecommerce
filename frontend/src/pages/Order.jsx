@@ -1,4 +1,4 @@
-import { Badge, Box, Button, EmptyState, Flex, Separator, HStack, Stack, Text, Timeline, VStack } from "@chakra-ui/react"
+import { Badge, Box, Button, EmptyState, Flex, Separator, HStack, Skeleton, Stack, Text, Timeline, VStack } from "@chakra-ui/react"
 import { FaClock } from "react-icons/fa"
 import { MdCancel, MdLocalShipping, MdOutlineDoneOutline } from "react-icons/md"
 import { RiRefund2Line } from "react-icons/ri"
@@ -13,6 +13,7 @@ import GlobalNotification from "../components/GlobalNotification"
 import { useCancelOrder, useOrderById } from "../hooks/useOrders"
 import { getToken } from "../APIs/http"
 import { consumeFlash } from "../utils/flashStorage"
+import ProductGridSkeleton from "../components/skeletons/ProductGridSkeleton"
 
 const formatMoney = (value) => `$${Number(value ?? 0).toFixed(2)}`
 const formatDate = (value) => {
@@ -82,9 +83,45 @@ const Order = () => {
 
   if (isLoading) {
     return (
-      <Flex minH="50vh" align="center" justify="center" px={4}>
-        <Text color="gray.500">Loading order...</Text>
-      </Flex>
+      <Box maxW="1200px" mx="auto" px={4} py={8}>
+        <Stack gap={6}>
+          <Stack gap={2}>
+            <Skeleton h="28px" w="140px" />
+            <Skeleton h="12px" w="260px" />
+          </Stack>
+
+          <Stack gap={3}>
+            <Skeleton h="18px" w="120px" />
+            <ProductGridSkeleton count={4} variant="order" />
+          </Stack>
+
+          <Stack gap={4}>
+            <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+              <Stack gap={2}>
+                <Skeleton h="18px" w="220px" />
+                <Skeleton h="12px" w="90%" />
+                <Skeleton h="12px" w="70%" />
+              </Stack>
+            </Box>
+            <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+              <Stack gap={2}>
+                <Skeleton h="18px" w="220px" />
+                <Skeleton h="12px" w="70%" />
+                <Skeleton h="12px" w="85%" />
+                <Skeleton h="12px" w="75%" />
+              </Stack>
+            </Box>
+            <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+              <Stack gap={2}>
+                <Skeleton h="18px" w="140px" />
+                <Skeleton h="12px" w="85%" />
+                <Skeleton h="12px" w="75%" />
+                <Skeleton h="12px" w="65%" />
+              </Stack>
+            </Box>
+          </Stack>
+        </Stack>
+      </Box>
     )
   }
 

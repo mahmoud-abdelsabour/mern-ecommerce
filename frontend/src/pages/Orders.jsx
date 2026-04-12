@@ -7,6 +7,7 @@ import {
   Portal,
   Select,
   SimpleGrid,
+  Skeleton,
   Stack,
   Text,
   VStack,
@@ -16,6 +17,7 @@ import { GoListUnordered } from "react-icons/go"
 import { Link as RouterLink, useSearchParams } from "react-router-dom"
 import { useMemo, useCallback } from "react"
 import OrderCard from "../components/OrderCard"
+import OrderCardSkeleton from "../components/skeletons/OrderCardSkeleton"
 import PaginationControls from "../components/PaginationControls"
 import { useOrders } from "../hooks/useOrders"
 import { getToken } from "../APIs/http"
@@ -144,7 +146,7 @@ const Orders = () => {
     [page, pageSize, sortKey, deliveryStatus]
   )
 
-  const { data, isLoading, isError, error } = useOrders(apiQuery)
+  const { data, isLoading, isFetching, isError, error } = useOrders(apiQuery)
 
   const pagination = data?.pagination ?? null
 
@@ -298,11 +300,18 @@ const Orders = () => {
       </Stack>
 
       {isLoading ? (
-        <Flex minH="50vh" align="center" justify="center">
-          <Text color="gray.500">Loading orders...</Text>
-        </Flex>
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 3 }} gap={4}>
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <OrderCardSkeleton key={`order-skel-${idx}`} />
+          ))}
+        </SimpleGrid>
       ) : items.length > 0 ? (
         <>
+          {isFetching ? (
+            <HStack justify="flex-end" mb={2}>
+              <Skeleton h="10px" w="120px" />
+            </HStack>
+          ) : null}
           <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 3 }} gap={4}>
             {items.map((order) => (
               <OrderCard key={order.id} order={order} />
@@ -316,7 +325,7 @@ const Orders = () => {
                 pageSize={pagination.limit ?? pageSize}
                 page={Number(pagination.currentPage ?? page) || page}
                 onPageChange={setPage}
-                isDisabled={isLoading}
+                isDisabled={isLoading || isFetching}
               />
             </Box>
           )}

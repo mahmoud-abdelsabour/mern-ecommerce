@@ -6,6 +6,7 @@ import ProductList from "../components/ProductList"
 import { useClearWishlist, useWishlist } from "../hooks/useWishlist"
 import { getToken } from "../APIs/http"
 import productsApi from "../APIs/products.api"
+import ProductGridSkeleton from "../components/skeletons/ProductGridSkeleton"
 
 const Wishlist = () => {
   const token = getToken()
@@ -82,9 +83,7 @@ const Wishlist = () => {
       )}
 
       {isLoading || isProductsLoading ? (
-        <Flex minH="50vh" align="center" justify="center">
-          <Text color="gray.500">Loading wishlist...</Text>
-        </Flex>
+        <ProductGridSkeleton count={8} />
       ) : items.length > 0 ? (
         <ProductList items={items} />
       ) : (

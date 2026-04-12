@@ -11,6 +11,8 @@ import {
   IconButton,
   Image,
   Portal,
+  Skeleton,
+  SkeletonText,
   Text,
   useCarouselContext,
   RatingGroup,
@@ -22,6 +24,7 @@ import {
 import { LuChevronLeft, LuChevronRight, LuChevronDown, LuMinus, LuPlus } from "react-icons/lu"
 import { MdFavorite, MdFavoriteBorder } from "react-icons/md"
 import ReviewRow from "../components/ReviewRow"
+import ReviewRowSkeleton from "../components/skeletons/ReviewRowSkeleton"
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom"
 import { useProductById } from "../hooks/useProducts"
 import { useCreateReview, useProductUserStatus } from "../hooks/useProductReviews"
@@ -211,11 +214,11 @@ const Product = () => {
       )}
       <Text fontSize="sm" color="gray.500" fontWeight="600">
         {/* Brand name */}
-        {isLoading ? "Loading..." : product?.brand?.name ?? "—"}
+        {isLoading ? <Skeleton h="12px" w="120px" /> : product?.brand?.name ?? "—"}
       </Text>
       <Text fontSize="3xl" fontWeight="800" mb={4}>
         {/* Product name */}
-        {isLoading ? "Loading..." : product?.name ?? "Product"}
+        {isLoading ? <Skeleton h="34px" w="70%" /> : product?.name ?? "Product"}
       </Text>
       <Dialog.Root size="full">
         <Flex justify="center">
@@ -267,17 +270,21 @@ const Product = () => {
               <Carousel.ItemGroup width="full">
                 {items.map((item, index) => (
                   <Carousel.Item key={index} index={index}>
-                    <Dialog.Trigger asChild>
-                      <Image
-                        aspectRatio="16/9"
-                        src={item.url}
-                        alt={item.label}
-                        w="100%"
-                        h="100%"
-                        objectFit="cover"
-                        cursor="pointer"
-                      />
-                    </Dialog.Trigger>
+                    {isLoading ? (
+                      <Skeleton aspectRatio="16/9" w="100%" rounded="md" />
+                    ) : (
+                      <Dialog.Trigger asChild>
+                        <Image
+                          aspectRatio="16/9"
+                          src={item.url}
+                          alt={item.label}
+                          w="100%"
+                          h="100%"
+                          objectFit="cover"
+                          cursor="pointer"
+                        />
+                      </Dialog.Trigger>
+                    )}
                   </Carousel.Item>
                 ))}
               </Carousel.ItemGroup>
@@ -300,13 +307,17 @@ const Product = () => {
                     outlineOffset: "2px",
                   }}
                 >
-                  <Image
-                    w="20"
-                    aspectRatio="16/9"
-                    src={item.url}
-                    alt={item.label}
-                    objectFit="cover"
-                  />
+                  {isLoading ? (
+                    <Skeleton w="20" aspectRatio="16/9" rounded="sm" />
+                  ) : (
+                    <Image
+                      w="20"
+                      aspectRatio="16/9"
+                      src={item.url}
+                      alt={item.label}
+                      objectFit="cover"
+                    />
+                  )}
                 </Carousel.Indicator>
               ))}
             </Carousel.IndicatorGroup>
@@ -340,13 +351,19 @@ const Product = () => {
                     <Carousel.ItemGroup width="full">
                       {items.map((item, index) => (
                         <Carousel.Item key={index} index={index}>
-                          <AspectRatio ratio={16 / 9} maxH="72vh" w="full">
-                            <Image
-                              src={item.url}
-                              alt={item.label}
-                              objectFit="contain"
-                            />
-                          </AspectRatio>
+                          {isLoading ? (
+                            <AspectRatio ratio={16 / 9} maxH="72vh" w="full">
+                              <Skeleton w="100%" h="100%" rounded="md" />
+                            </AspectRatio>
+                          ) : (
+                            <AspectRatio ratio={16 / 9} maxH="72vh" w="full">
+                              <Image
+                                src={item.url}
+                                alt={item.label}
+                                objectFit="contain"
+                              />
+                            </AspectRatio>
+                          )}
                         </Carousel.Item>
                       ))}
                     </Carousel.ItemGroup>
@@ -358,7 +375,7 @@ const Product = () => {
                     </Carousel.NextTrigger>
                   </Carousel.Control>
 
-                  <CarouselThumbnails items={items} />
+                  <CarouselThumbnails items={items} loading={isLoading} />
                 </Carousel.Root>
               </Dialog.Body>
             </Dialog.Content>
@@ -370,28 +387,42 @@ const Product = () => {
       <HStack justify="space-between" align="center" mt={4}>
         <Text fontSize="xl" fontWeight="700">
           {/* Price */}
-          {isLoading ? "—" : `$${Number(product?.price ?? 0).toFixed(2)}`}
+          {isLoading ? <Skeleton h="22px" w="110px" /> : `$${Number(product?.price ?? 0).toFixed(2)}`}
         </Text>
         <HStack gap="2" align="center">
           {/* Average rating and number of voters */}
-          <RatingGroup.Root
-            readOnly
-            count={5}
-            value={Number(product?.rating?.score ?? 0)}
-            size="sm"
-          >
-            <RatingGroup.HiddenInput />
-            <RatingGroup.Control />
-          </RatingGroup.Root>
-          <Text fontSize="sm" color="gray.500">
-            ({isLoading ? "—" : String(product?.rating?.voters ?? 0)})
-          </Text>
+          {isLoading ? (
+            <>
+              <Skeleton h="14px" w="110px" />
+              <Skeleton h="12px" w="44px" />
+            </>
+          ) : (
+            <>
+              <RatingGroup.Root
+                readOnly
+                count={5}
+                value={Number(product?.rating?.score ?? 0)}
+                size="sm"
+              >
+                <RatingGroup.HiddenInput />
+                <RatingGroup.Control />
+              </RatingGroup.Root>
+              <Text fontSize="sm" color="gray.500">
+                ({String(product?.rating?.voters ?? 0)})
+              </Text>
+            </>
+          )}
         </HStack>
       </HStack>
       
       {/*buying buttons */}
       <HStack mt={3} gap={3} justify="center" mb={6}>
-        {cartQuantity > 0 ? (
+        {isLoading ? (
+          <>
+            <Skeleton h="32px" w="140px" rounded="md" />
+            <Skeleton h="32px" w="140px" rounded="md" />
+          </>
+        ) : cartQuantity > 0 ? (
           <HStack minW="140px" justify="space-between" align="center">
             <IconButton
               size="sm"
@@ -426,15 +457,17 @@ const Product = () => {
             {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
           </Button>
         )}
-        <Button
-          colorScheme="teal"
-          size="sm"
-          minW="140px"
-          onClick={onBuyNow}
-          disabled={isLoading || !product}
-        >
-          Buy now
-        </Button>
+        {!isLoading ? (
+          <Button
+            colorScheme="teal"
+            size="sm"
+            minW="140px"
+            onClick={onBuyNow}
+            disabled={isLoading || !product}
+          >
+            Buy now
+          </Button>
+        ) : null}
       </HStack>
 
       {/* description */}
@@ -451,9 +484,11 @@ const Product = () => {
             </Text>
             <Text fontSize="sm" color="gray.600">
               {/* Description text */}
-              {isLoading
-                ? "Loading description..."
-                : product?.description ?? "No description available."}
+              {isLoading ? (
+                <SkeletonText noOfLines={4} />
+              ) : (
+                product?.description ?? "No description available."
+              )}
             </Text>
           </Stack>
         </Collapsible.Content>
@@ -494,9 +529,10 @@ const Product = () => {
             completed order may submit a review.
           </Text>
         ) : userStatusLoading ? (
-          <Text fontSize="sm" color="gray.500">
-            Checking whether you can review this product…
-          </Text>
+          <Stack gap={2}>
+            <Skeleton h="12px" w="85%" />
+            <Skeleton h="12px" w="70%" />
+          </Stack>
         ) : userProductStatus?.hasReviewed ? (
           <Text fontSize="sm" color="gray.600">
             You have already reviewed this product.
@@ -551,9 +587,11 @@ const Product = () => {
           Reviews ({reviewsCountLabel})
         </Text>
         {isLoading ? (
-          <Text fontSize="sm" color="gray.500">
-            Loading reviews…
-          </Text>
+          <Stack gap={4}>
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <ReviewRowSkeleton key={`review-preview-skel-${idx}`} />
+            ))}
+          </Stack>
         ) : reviewsPreview.length > 0 ? (
           <Stack gap={4}>
             {reviewsPreview.map((review) => (
@@ -585,29 +623,35 @@ const Product = () => {
   )
 }
 
-const CarouselThumbnails = ({ items }) => {
+const CarouselThumbnails = ({ items, loading = false }) => {
   const carousel = useCarouselContext()
 
   return (
     <HStack justify="center">
       <Carousel.ProgressText mr="4" />
-      {items.map((item, index) => (
-        <AspectRatio
-          key={index}
-          ratio={1}
-          w="16"
-          cursor="pointer"
-          onClick={() => carousel.scrollTo(index)}
-        >
-          <Image
-            src={item.url}
-            alt={item.label}
-            w="100%"
-            h="100%"
-            objectFit="cover"
-          />
-        </AspectRatio>
-      ))}
+      {loading
+        ? Array.from({ length: 4 }).map((_, idx) => (
+            <AspectRatio key={`carousel-thumb-skel-${idx}`} ratio={1} w="16">
+              <Skeleton w="100%" h="100%" rounded="sm" />
+            </AspectRatio>
+          ))
+        : items.map((item, index) => (
+            <AspectRatio
+              key={index}
+              ratio={1}
+              w="16"
+              cursor="pointer"
+              onClick={() => carousel.scrollTo(index)}
+            >
+              <Image
+                src={item.url}
+                alt={item.label}
+                w="100%"
+                h="100%"
+                objectFit="cover"
+              />
+            </AspectRatio>
+          ))}
     </HStack>
   )
 }

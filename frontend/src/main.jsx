@@ -7,20 +7,23 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { CartDrawerProvider } from './contexts/CartDrawerProvider.jsx'
 import { AppToaster } from './components/AppToaster.jsx'
+import { AppSkeletonProvider } from './components/AppSkeletonProvider.jsx'
 
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ChakraProvider value={defaultSystem}>
-      <Router>
-        <QueryClientProvider client={queryClient}>
-          <CartDrawerProvider>
-            <App />
-          </CartDrawerProvider>
-          <AppToaster />
-        </QueryClientProvider>
-      </Router>
+      <AppSkeletonProvider>
+        <Router>
+          <QueryClientProvider client={queryClient}>
+            <CartDrawerProvider>
+              <App />
+            </CartDrawerProvider>
+            <AppToaster />
+          </QueryClientProvider>
+        </Router>
+      </AppSkeletonProvider>
     </ChakraProvider>
   </StrictMode>,
 )

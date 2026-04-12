@@ -9,6 +9,9 @@ import {
   IconButton,
   Portal,
   Separator,
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
   Stack,
   Text,
 } from "@chakra-ui/react"
@@ -184,9 +187,39 @@ const Profile = () => {
 
   if (isLoading) {
     return (
-      <Flex minH="50vh" align="center" justify="center" px={4}>
-        <Text color="gray.500">Loading profile...</Text>
-      </Flex>
+      <Box maxW="1200px" mx="auto" px={4} py={8} w="100%">
+        <Stack gap={6}>
+          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4} w="100%">
+            <Stack gap={3}>
+              <Skeleton h="18px" w="120px" />
+              <Separator />
+              <HStack align="center" spacing={4} flexWrap="wrap">
+                <SkeletonCircle size="24" />
+                <Stack gap={2}>
+                  <Skeleton h="18px" w="220px" />
+                  <Skeleton h="12px" w="140px" />
+                </Stack>
+              </HStack>
+
+              <Stack gap={2}>
+                <SkeletonText noOfLines={2} />
+              </Stack>
+            </Stack>
+          </Box>
+
+          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4} w="100%">
+            <Stack gap={3}>
+              <Skeleton h="18px" w="170px" />
+              <Separator />
+              <SkeletonText noOfLines={4} />
+              <HStack justify="flex-end" flexWrap="wrap" gap={2}>
+                <Skeleton h="36px" w="120px" rounded="md" />
+                <Skeleton h="36px" w="120px" rounded="md" />
+              </HStack>
+            </Stack>
+          </Box>
+        </Stack>
+      </Box>
     )
   }
 
