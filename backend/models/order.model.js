@@ -112,6 +112,27 @@ const orderSchema = mongoose.Schema(
             required: true,
             min: 0,
         },
+        subtotal: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+        shippingPrice: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+        codFees: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+        paymentMethod: {
+            type: String,
+            enum: ['COD', 'Credit'],
+            required: true,
+            default: 'COD',
+        },
         returnInfo: {
             returnedItems: [
                 {

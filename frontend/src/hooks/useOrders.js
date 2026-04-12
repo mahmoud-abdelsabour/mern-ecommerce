@@ -46,8 +46,8 @@ export const useCreateOrder = (options = {}) => {
 
   return useMutation({
     ...rest,
-    mutationFn: ({ products, shippingInfo, source }) =>
-      ordersApi.createOrder({ products, shippingInfo, source }),
+    mutationFn: ({ products, shippingInfo, source, paymentMethod }) =>
+      ordersApi.createOrder({ products, shippingInfo, source, paymentMethod }),
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({ queryKey: ["orders"] })
       await queryClient.invalidateQueries({ queryKey: ["cart"] })

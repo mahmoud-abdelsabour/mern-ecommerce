@@ -28,6 +28,7 @@ const createOrderSchema = Joi.object({
             special_mark: Joi.string().trim(),
         }),
     }),
+    paymentMethod: Joi.string().valid('COD', 'Credit').default('COD'),
     source: Joi.string().valid('cart', 'buyNow').default('cart'),
 })
 

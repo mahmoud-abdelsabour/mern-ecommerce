@@ -5,6 +5,8 @@ const Brand = require('../models/brand.model')
 const Category = require('../models/category.model')
 
 const OBJECT_ID_HEX = /^[a-fA-F0-9]{24}$/
+const DEFAULT_SHIPPING_PRICE = 25
+const DEFAULT_COD_FEES = 10
 
 const snapshotBrandCategory = product => {
     const b = product.brand
@@ -48,9 +50,10 @@ const placeOrder = async data => {
     session.startTransaction()
 
     try {
-        const { products, shippingInfo, user, source = 'cart' } = data
+        const { products, shippingInfo, user, source = 'cart', paymentMethod = 'COD' } = data
         const userId = user.id
         const normalizedSource = String(source || 'cart')
+        const normalizedPaymentMethod = paymentMethod === 'Credit' ? 'Credit' : 'COD'
 
         // The frontend may only send address + name + phone.
         // Ensure required fields are present using the authenticated user record.
@@ -60,7 +63,7 @@ const placeOrder = async data => {
             email: shippingInfo?.email || user.email,
         }
 
-        let totalPrice = 0
+        let subtotal = 0
         const orderProducts = []
 
         for (const item of products) {
@@ -96,13 +99,21 @@ const placeOrder = async data => {
                 category: categoryName,
             })
 
-            totalPrice += product.price * item.quantity
+            subtotal += product.price * item.quantity
         }
+
+        const shippingPrice = DEFAULT_SHIPPING_PRICE
+        const codFees = normalizedPaymentMethod === 'COD' ? DEFAULT_COD_FEES : 0
+        const totalPrice = subtotal + shippingPrice + codFees
 
         const order = new Order({
             products: orderProducts,
             userId,
             shippingInfo: normalizedShippingInfo,
+            subtotal,
+            shippingPrice,
+            codFees,
+            paymentMethod: normalizedPaymentMethod,
             totalPrice,
         })
 

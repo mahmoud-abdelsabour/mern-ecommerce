@@ -230,7 +230,7 @@ const CheckOut = () => {
   const onPlaceOrder = () => {
     if (!selectedAddress || !me) return
 
-    // Backend expects `{ products: [{ product, quantity }], shippingInfo }`.
+    // Backend expects `{ products: [{ product, quantity }], shippingInfo, paymentMethod }`.
     // Contact fields come from the authenticated user; delivery lines from the saved address.
     const products = items.map((i) => ({
       product: i.id,
@@ -253,7 +253,7 @@ const CheckOut = () => {
     }
 
     const source = isBuyNow ? "buyNow" : "cart"
-    createOrderMutation.mutate({ products, shippingInfo, source })
+    createOrderMutation.mutate({ products, shippingInfo, source, paymentMethod })
   }
 
   if (!isLoggedIn) {

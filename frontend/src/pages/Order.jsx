@@ -158,16 +158,15 @@ const Order = () => {
     image: p?.photos?.[0],
   }))
 
-  const subtotal = (order?.products ?? []).reduce(
+  const fallbackSubtotal = (order?.products ?? []).reduce(
     (sum, p) => sum + Number(p?.priceAtPurchase ?? 0) * Number(p?.quantity ?? 1),
     0
   )
-
-  // Current backend order model returns `totalPrice` (products subtotal).
-  // Shipping/COD are not modeled yet, so we show them as 0 for now.
-  const shippingPrice = 0
-  const codFees = 0
-  const total = Number(order?.totalPrice ?? subtotal) + shippingPrice + codFees
+  const subtotal = Number(order?.subtotal ?? fallbackSubtotal)
+  const shippingPrice = Number(order?.shippingPrice ?? 0)
+  const codFees = Number(order?.codFees ?? 0)
+  const total = Number(order?.totalPrice ?? subtotal + shippingPrice + codFees)
+  const paymentMethod = order?.paymentMethod ?? "COD"
 
   const canCancel = String(order?.deliveryStatus ?? "").toLowerCase() === "pending"
   const canReturn = String(order?.deliveryStatus ?? "").toLowerCase() === "delivered"
@@ -218,7 +217,7 @@ const Order = () => {
             codFees={codFees}
             subtotal={subtotal}
             total={total}
-            paymentMethod="COD"
+            paymentMethod={paymentMethod}
           />
         </Stack>
 
