@@ -150,7 +150,7 @@ const ProductCard = ({
     <Stack
       gap="2"
       borderWidth="1px"
-      borderColor="gray.200"
+      borderColor="surface.border"
       rounded="md"
       p={2}
       w="100%"
@@ -171,7 +171,7 @@ const ProductCard = ({
             }
           : undefined
       }
-      _hover={isClickable ? { borderColor: "gray.300" } : undefined}
+      _hover={isClickable ? { borderColor: "neutral.300", bg: "surface.subtle" } : undefined}
     >
       <Box position="relative" w="100%" aspectRatio={1}>
         {Boolean(productId) && (
@@ -190,12 +190,12 @@ const ProductCard = ({
               justifyContent="center"
               rounded="md"
               borderWidth="1px"
-              borderColor={isInWishlist ? "red.500" : "gray.200"}
+              borderColor={isInWishlist ? "red.500" : "surface.border"}
               bg={isInWishlist ? "red.50" : "whiteAlpha.900"}
               _hover={
                 wishlistIsBusy
                   ? undefined
-                  : { borderColor: isInWishlist ? "red.600" : "gray.300" }
+                  : { borderColor: isInWishlist ? "red.600" : "neutral.300" }
               }
               _active={wishlistIsBusy ? undefined : { transform: "scale(0.98)" }}
               cursor={wishlistIsBusy ? "not-allowed" : "pointer"}
@@ -237,7 +237,7 @@ const ProductCard = ({
       <Text fontWeight="semibold" fontSize="sm" noOfLines={2}>
         {title}
       </Text>
-      <Text fontSize="xs" color="gray.500" noOfLines={1}>
+      <Text fontSize="xs" color="text.muted" noOfLines={1}>
         {brand} • {category}
       </Text>
       <HStack justify="space-between" align="center">

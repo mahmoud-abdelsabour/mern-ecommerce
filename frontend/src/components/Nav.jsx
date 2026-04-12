@@ -55,9 +55,9 @@ const Nav = () => {
             top={0}
             zIndex={1100}
             w="100%"
-            bg="white"
+          bg="surface.panel"
             borderBottom="1px solid"
-            borderColor="gray.200"
+          borderColor="surface.border"
             boxShadow="0 1px 0 rgba(0, 0, 0, 0.04)"
             px={{ base: 4, md: 6 }}
             py={3}
@@ -173,7 +173,7 @@ const Nav = () => {
                             minW="18px"
                             h="18px"
                             px="1"
-                            bg="teal.500"
+                            bg="brand.600"
                             color="white"
                             rounded="full"
                             fontSize="xs"
