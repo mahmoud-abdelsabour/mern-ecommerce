@@ -28,6 +28,7 @@ const createOrderSchema = Joi.object({
             special_mark: Joi.string().trim(),
         }),
     }),
+    source: Joi.string().valid('cart', 'buyNow').default('cart'),
 })
 
 const returnRequestSchema = Joi.object({

@@ -3,8 +3,8 @@ import { getAuthConfig } from "./http"
 
 const baseURL = "/api/orders"
 
-const createOrder = async ({ products, shippingInfo }) => {
-  const response = await axios.post(baseURL, { products, shippingInfo }, getAuthConfig())
+const createOrder = async ({ products, shippingInfo, source = "cart" }) => {
+  const response = await axios.post(baseURL, { products, shippingInfo, source }, getAuthConfig())
   return response.data
 }
 

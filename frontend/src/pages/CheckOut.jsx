@@ -252,7 +252,8 @@ const CheckOut = () => {
       },
     }
 
-    createOrderMutation.mutate({ products, shippingInfo })
+    const source = isBuyNow ? "buyNow" : "cart"
+    createOrderMutation.mutate({ products, shippingInfo, source })
   }
 
   if (!isLoggedIn) {

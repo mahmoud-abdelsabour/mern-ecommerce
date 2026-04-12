@@ -48,8 +48,9 @@ const placeOrder = async data => {
     session.startTransaction()
 
     try {
-        const { products, shippingInfo, user } = data
+        const { products, shippingInfo, user, source = 'cart' } = data
         const userId = user.id
+        const normalizedSource = String(source || 'cart')
 
         // The frontend may only send address + name + phone.
         // Ensure required fields are present using the authenticated user record.
@@ -106,8 +107,11 @@ const placeOrder = async data => {
         })
 
         await order.save({ session })
-        user.cart = []
-        await user.save({ session })
+        // Preserve cart when order comes from the buy-now flow.
+        if (normalizedSource !== 'buyNow') {
+            user.cart = []
+            await user.save({ session })
+        }
 
         await session.commitTransaction()
         session.endSession()
