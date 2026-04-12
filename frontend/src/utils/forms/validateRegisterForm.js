@@ -1,12 +1,7 @@
 // Global validation helpers (reusable across forms).
 // This file implements the registration-specific validation using shared rules.
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-// Keep frontend validation aligned with backend Joi:
-// - 8+ chars
-// - at least 1 lowercase, 1 uppercase, 1 number, 1 special (@$!%*?&)
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/
+import { isStrongPassword, isValidEmail, strongPasswordMessage } from "./authValidation"
 
 // Egypt mobile format (backend expects local format, not +20).
 const phoneRegex = /^01[0125][0-9]{8}$/
@@ -31,13 +26,10 @@ export const validateRegisterForm = (values) => {
   }
 
   if (!normalizedEmail) errors.email = "Email is required."
-  else if (!emailRegex.test(normalizedEmail)) errors.email = "Enter a valid email address."
+  else if (!isValidEmail(normalizedEmail)) errors.email = "Enter a valid email address."
 
   if (!password) errors.password = "Password is required."
-  else if (password.length < 8 || !passwordRegex.test(password)) {
-    errors.password =
-      "Password must be 8+ chars and include uppercase, lowercase, number, and special character."
-  }
+  else if (!isStrongPassword(password)) errors.password = strongPasswordMessage
 
   if (!confirmPassword) errors.confirmPassword = "Please confirm your password."
   else if (confirmPassword !== password) errors.confirmPassword = "Passwords do not match."

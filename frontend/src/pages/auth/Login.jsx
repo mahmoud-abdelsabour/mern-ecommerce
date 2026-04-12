@@ -6,14 +6,13 @@ import { useLogin } from "../../hooks/useAuth"
 import { initialLoginFormState, loginFormReducer } from "../../utils/forms/loginFormState"
 import { setStoredUser } from "../../utils/authStorage"
 import { consumeFlash } from "../../utils/flashStorage"
+import { isStrongPassword, isValidEmail, strongPasswordMessage } from "../../utils/forms/authValidation"
 
 const Login = () => {
   const navigate = useNavigate()
 
   const [state, dispatch] = useReducer(loginFormReducer, initialLoginFormState)
   const { values, fieldErrors, formError } = state
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
   const [flash] = useState(() => consumeFlash())
 
@@ -44,8 +43,9 @@ const Login = () => {
     const password = String(values.password ?? "")
 
     if (!email) errors.email = "Email is required."
-    if (!emailRegex.test(email)) errors.email = "Enter a valid email address."
+    if (!isValidEmail(email)) errors.email = "Enter a valid email address."
     if (!password) errors.password = "Password is required."
+    else if (!isStrongPassword(password)) errors.password = strongPasswordMessage
 
     dispatch({ type: "set_field_errors", errors })
     if (Object.keys(errors).length > 0) return
