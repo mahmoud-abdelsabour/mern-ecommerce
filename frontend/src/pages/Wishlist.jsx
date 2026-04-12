@@ -3,7 +3,7 @@ import { FaHeartBroken } from "react-icons/fa"
 import { Link as RouterLink } from "react-router-dom"
 import { useQueries } from "@tanstack/react-query"
 import ProductList from "../components/ProductList"
-import { useClearWishlist, useWishlist } from "../hooks/useWishlist"
+import { useClearWishlist, useRemoveFromWishlist, useWishlist } from "../hooks/useWishlist"
 import { getToken } from "../APIs/http"
 import productsApi from "../APIs/products.api"
 import ProductGridSkeleton from "../components/skeletons/ProductGridSkeleton"
@@ -14,6 +14,7 @@ const Wishlist = () => {
 
   const { data, isLoading, isError, error } = useWishlist()
   const clearWishlistMutation = useClearWishlist()
+  const removeFromWishlistMutation = useRemoveFromWishlist()
   const wishlistIds = data ?? []
 
   const productQueries = useQueries({
@@ -26,6 +27,10 @@ const Wishlist = () => {
   })
 
   const isProductsLoading = productQueries.some((q) => q.isLoading)
+  const failedProductEntries = productQueries
+    .map((query, index) => ({ query, id: wishlistIds[index] }))
+    .filter(({ query, id }) => query.isError && Boolean(id))
+  const failedProductIds = Array.from(new Set(failedProductEntries.map(({ id }) => String(id))))
   const products = productQueries.map((q) => q.data?.product).filter(Boolean)
 
   const items = products.map((p) => ({
@@ -37,6 +42,18 @@ const Wishlist = () => {
     category: p?.category?.name ?? "—",
     image: p?.photos?.[0],
   }))
+
+  const retryFailedItems = () => {
+    failedProductEntries.forEach(({ query }) => {
+      query.refetch()
+    })
+  }
+
+  const cleanupStaleWishlistItems = async () => {
+    await Promise.allSettled(
+      failedProductIds.map((id) => removeFromWishlistMutation.mutateAsync(id))
+    )
+  }
 
   if (!isLoggedIn) {
     return (
@@ -80,6 +97,28 @@ const Wishlist = () => {
         <Text fontSize="sm" color="red.500" mb={4}>
           Failed to load wishlist: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
         </Text>
+      )}
+
+      {failedProductIds.length > 0 && (
+        <Box borderWidth="1px" borderColor="orange.200" bg="orange.50" borderRadius="md" p={4} mb={4}>
+          <Text fontSize="sm" color="orange.800" mb={2}>
+            {failedProductIds.length} wishlist item(s) could not be loaded and were hidden.
+          </Text>
+          <HStack>
+            <Button size="sm" variant="outline" onClick={retryFailedItems}>
+              Retry failed items
+            </Button>
+            <Button
+              size="sm"
+              colorScheme="orange"
+              variant="ghost"
+              onClick={cleanupStaleWishlistItems}
+              disabled={removeFromWishlistMutation.isPending}
+            >
+              {removeFromWishlistMutation.isPending ? "Cleaning..." : "Remove unavailable items"}
+            </Button>
+          </HStack>
+        </Box>
       )}
 
       {isLoading || isProductsLoading ? (
