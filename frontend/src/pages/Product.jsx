@@ -208,21 +208,34 @@ const Product = () => {
     <Box maxW="1200px" mx="auto" px={4} mt={6} pb={10}>
       {/* Show request errors (instead of silently rendering an empty product). */}
       {isError && (
-        <Text fontSize="sm" color="red.500" mb={4}>
+        <Text fontSize="sm" color="state.error" mb={4}>
           Failed to load product: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
         </Text>
       )}
-      <Text fontSize="sm" color="gray.500" fontWeight="600">
-        {/* Brand name */}
-        {isLoading ? <Skeleton h="12px" w="120px" /> : product?.brand?.name ?? "—"}
-      </Text>
-      <Text fontSize="3xl" fontWeight="800" mb={4}>
-        {/* Product name */}
-        {isLoading ? <Skeleton h="34px" w="70%" /> : product?.name ?? "Product"}
-      </Text>
+
+      <Stack gap={1} mb={4}>
+        <Text fontSize="sm" color="text.secondary" fontWeight="600">
+          {/* Brand name */}
+          {isLoading ? <Skeleton h="12px" w="120px" /> : product?.brand?.name ?? "—"}
+        </Text>
+        <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="900">
+          {/* Product name */}
+          {isLoading ? <Skeleton h="34px" w="70%" /> : product?.name ?? "Product"}
+        </Text>
+      </Stack>
+
       <Dialog.Root size="full">
         <Flex justify="center">
-          <Box position="relative" maxW="2xl" w="100%">
+          <Box
+            position="relative"
+            maxW="2xl"
+            w="100%"
+            borderWidth="1px"
+            borderColor="surface.border"
+            bg="surface.panel"
+            rounded="lg"
+            p={{ base: 3, md: 4 }}
+          >
             <Box position="absolute" top="2" right="2" zIndex="1">
               {/* Wishlist toggle (top-right). Selectable boxed heart icon. */}
               <Box
@@ -238,12 +251,12 @@ const Product = () => {
                 justifyContent="center"
                 rounded="md"
                 borderWidth="1px"
-                borderColor={isInWishlist ? "red.500" : "gray.200"}
+                borderColor={isInWishlist ? "red.500" : "surface.border"}
                 bg={isInWishlist ? "red.50" : "whiteAlpha.900"}
                 _hover={
                   wishlistIsBusy
                     ? undefined
-                    : { borderColor: isInWishlist ? "red.600" : "gray.300" }
+                    : { borderColor: isInWishlist ? "red.600" : "neutral.300" }
                 }
                 _active={wishlistIsBusy ? undefined : { transform: "scale(0.98)" }}
                 cursor={wishlistIsBusy ? "not-allowed" : "pointer"}
@@ -383,40 +396,41 @@ const Product = () => {
         </Portal>
       </Dialog.Root>
 
-      {/* price + rating */}
-      <HStack justify="space-between" align="center" mt={4}>
-        <Text fontSize="xl" fontWeight="700">
-          {/* Price */}
-          {isLoading ? <Skeleton h="22px" w="110px" /> : `$${Number(product?.price ?? 0).toFixed(2)}`}
-        </Text>
-        <HStack gap="2" align="center">
-          {/* Average rating and number of voters */}
-          {isLoading ? (
-            <>
-              <Skeleton h="14px" w="110px" />
-              <Skeleton h="12px" w="44px" />
-            </>
-          ) : (
-            <>
-              <RatingGroup.Root
-                readOnly
-                count={5}
-                value={Number(product?.rating?.score ?? 0)}
-                size="sm"
-              >
-                <RatingGroup.HiddenInput />
-                <RatingGroup.Control />
-              </RatingGroup.Root>
-              <Text fontSize="sm" color="gray.500">
-                ({String(product?.rating?.voters ?? 0)})
-              </Text>
-            </>
-          )}
+      <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4} mt={4}>
+        {/* price + rating */}
+        <HStack justify="space-between" align="center" gap={3} flexWrap="wrap">
+          <Text fontSize="xl" fontWeight="700">
+            {/* Price */}
+            {isLoading ? <Skeleton h="22px" w="110px" /> : `$${Number(product?.price ?? 0).toFixed(2)}`}
+          </Text>
+          <HStack gap="2" align="center">
+            {/* Average rating and number of voters */}
+            {isLoading ? (
+              <>
+                <Skeleton h="14px" w="110px" />
+                <Skeleton h="12px" w="44px" />
+              </>
+            ) : (
+              <>
+                <RatingGroup.Root
+                  readOnly
+                  count={5}
+                  value={Number(product?.rating?.score ?? 0)}
+                  size="sm"
+                >
+                  <RatingGroup.HiddenInput />
+                  <RatingGroup.Control />
+                </RatingGroup.Root>
+                <Text fontSize="sm" color="text.muted">
+                  ({String(product?.rating?.voters ?? 0)})
+                </Text>
+              </>
+            )}
+          </HStack>
         </HStack>
-      </HStack>
-      
-      {/*buying buttons */}
-      <HStack mt={3} gap={3} justify="center" mb={6}>
+
+        {/*buying buttons */}
+        <HStack mt={3} gap={3} justify="center" mb={2}>
         {isLoading ? (
           <>
             <Skeleton h="32px" w="140px" rounded="md" />
@@ -427,6 +441,7 @@ const Product = () => {
             <IconButton
               size="sm"
               variant="outline"
+              colorPalette="neutral"
               aria-label="Decrease"
               onClick={onDecrementCart}
               disabled={isLoading || decrementCartMutation.isPending || !product}
@@ -439,6 +454,7 @@ const Product = () => {
             <IconButton
               size="sm"
               variant="outline"
+              colorPalette="neutral"
               aria-label="Increase"
               onClick={onIncrementCart}
               disabled={isLoading || addToCartMutation.isPending || !product}
@@ -449,6 +465,7 @@ const Product = () => {
         ) : (
           <Button
             variant="outline"
+            colorPalette="neutral"
             size="sm"
             minW="140px"
             onClick={onAddToCart}
@@ -459,7 +476,7 @@ const Product = () => {
         )}
         {!isLoading ? (
           <Button
-            colorScheme="teal"
+            colorPalette="brand"
             size="sm"
             minW="140px"
             onClick={onBuyNow}
@@ -468,7 +485,8 @@ const Product = () => {
             Buy now
           </Button>
         ) : null}
-      </HStack>
+        </HStack>
+      </Box>
 
       {/* description */}
       <Collapsible.Root collapsedHeight="100px">
@@ -478,11 +496,11 @@ const Product = () => {
             shadowColor: "blackAlpha.500",
           }}
         >
-          <Stack padding="4" borderWidth="1px" rounded="l2">
+          <Stack padding="4" borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg">
             <Text fontSize="lg" fontWeight="700">
               Description
             </Text>
-            <Text fontSize="sm" color="gray.600">
+            <Text fontSize="sm" color="text.secondary">
               {/* Description text */}
               {isLoading ? (
                 <SkeletonText noOfLines={4} />
@@ -493,7 +511,7 @@ const Product = () => {
           </Stack>
         </Collapsible.Content>
         <Collapsible.Trigger asChild mt="4">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" colorPalette="neutral" size="sm">
             <Collapsible.Context>
               {(api) => (api.open ? "Show Less" : "Show More")}
             </Collapsible.Context>
@@ -508,15 +526,15 @@ const Product = () => {
       </Collapsible.Root>
 
       {/* add review */}
-      <Stack mt={8} gap={3}>
+      <Stack mt={8} gap={3} borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
         <Text fontSize="md" fontWeight="700">
           Write a review
         </Text>
         {!isLoggedIn ? (
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="text.secondary">
             <Button
               variant="link"
-              colorPalette="teal"
+              colorPalette="brand"
               size="sm"
               p={0}
               h="auto"
@@ -534,18 +552,18 @@ const Product = () => {
             <Skeleton h="12px" w="70%" />
           </Stack>
         ) : userProductStatus?.hasReviewed ? (
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="text.secondary">
             You have already reviewed this product.
           </Text>
         ) : !userProductStatus?.canReview ? (
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="text.secondary">
             Reviews are limited to customers who purchased this item and have a delivered (or
             completed return/refund) order including it. Once you are eligible, a rating and
             optional comment will appear here.
           </Text>
         ) : (
           <>
-            <Text fontSize="xs" color="gray.500">
+            <Text fontSize="xs" color="text.muted">
               Rating (required) · Comment optional (max {MAX_REVIEW_COMMENT} characters)
             </Text>
             <RatingGroup.Root
@@ -564,13 +582,13 @@ const Product = () => {
               maxLength={MAX_REVIEW_COMMENT}
               onChange={(e) => setReviewComment(e.target.value)}
             />
-            <Text fontSize="xs" color="gray.500">
+            <Text fontSize="xs" color="text.muted">
               {reviewComment.length}/{MAX_REVIEW_COMMENT}
             </Text>
             <Button
               mt={2}
               alignSelf="flex-start"
-              colorPalette="teal"
+              colorPalette="brand"
               onClick={onSubmitReview}
               loading={createReviewMutation.isPending}
               disabled={!product || createReviewMutation.isPending}
@@ -582,7 +600,7 @@ const Product = () => {
       </Stack>
 
       {/* reviews (preview from product payload; full list lives on /product/:id/reviews) */}
-      <Stack mt={8} gap={4}>
+      <Stack mt={8} gap={4} borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
         <Text fontSize="2xl" fontWeight="700">
           Reviews ({reviewsCountLabel})
         </Text>
@@ -606,6 +624,7 @@ const Product = () => {
                 as={RouterLink}
                 to={`/product/${encodeURIComponent(productId)}/reviews`}
                 variant="outline"
+                colorPalette="neutral"
                 size="sm"
                 alignSelf="flex-start"
               >
@@ -614,7 +633,7 @@ const Product = () => {
             ) : null}
           </Stack>
         ) : (
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text.muted">
             No reviews yet.
           </Text>
         )}

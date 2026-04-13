@@ -118,7 +118,7 @@ Status legend:
 3. Ensure loading and empty states match shared visual patterns.
 - Scope: Frontend
 - Priority: High
-- Status: Pending
+- Status: Done
 
 ### Task 3.2 - Refine cart, checkout, and orders flow surfaces
 - Title: Align transaction pages with consistent structure

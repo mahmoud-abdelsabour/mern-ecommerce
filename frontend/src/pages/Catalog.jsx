@@ -171,17 +171,17 @@ const Catalog = () => {
           <Text fontSize="2xl" fontWeight="900">
             Catalog
           </Text>
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text.secondary">
             {/* While loading we show a placeholder label; otherwise show the current number of items */}
             {isLoading || isFetching ? <Skeleton h="14px" w="160px" /> : `${totalProducts} products`}
           </Text>
           {searchQuery ? (
-            <Text fontSize="sm" color="gray.600">
+            <Text fontSize="sm" color="text.secondary">
               Results for &quot;{searchQuery}&quot;
             </Text>
           ) : null}
           {isError && (
-            <Text fontSize="sm" color="red.500">
+            <Text fontSize="sm" color="state.error">
               Failed to load products: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
             </Text>
           )}
@@ -190,13 +190,13 @@ const Catalog = () => {
         {/* Main layout: filters (left) + products (right). Stacks vertically on small screens. */}
         <Stack direction={{ base: "column", lg: "row" }} align="stretch" gap={6}>
           {/* Filters sidebar */}
-          <Box w={{ base: "100%", lg: "340px" }} borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+          <Box w={{ base: "100%", lg: "340px" }} borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
             <Stack gap={5}>
               <HStack justify="space-between" align="center">
                 <Text fontSize="lg" fontWeight="900">
                   Filters
                 </Text>
-                <Button size="xs" variant="outline" onClick={resetFilters}>
+                <Button size="xs" variant="outline" colorPalette="neutral" onClick={resetFilters}>
                   Clear
                 </Button>
               </HStack>
@@ -277,7 +277,7 @@ const Catalog = () => {
                         </Checkbox.Root>
                       ))
                     ) : (
-                      <Text fontSize="sm" color="gray.500">
+                      <Text fontSize="sm" color="text.muted">
                         No brands found.
                       </Text>
                     )}
@@ -323,7 +323,7 @@ const Catalog = () => {
                         </Checkbox.Root>
                       ))
                     ) : (
-                      <Text fontSize="sm" color="gray.500">
+                      <Text fontSize="sm" color="text.muted">
                         No categories found.
                       </Text>
                     )}
@@ -337,7 +337,7 @@ const Catalog = () => {
                   <Text fontSize="md" fontWeight="800">
                     Price range
                   </Text>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text fontSize="sm" color="text.secondary">
                     ${priceRange[0]} - ${priceRange[1]}
                   </Text>
                 </HStack>
@@ -369,7 +369,7 @@ const Catalog = () => {
                   <Text fontSize="md" fontWeight="800">
                     Min rating
                   </Text>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text fontSize="sm" color="text.secondary">
                     {minRating}+
                   </Text>
                 </HStack>
@@ -412,8 +412,9 @@ const Catalog = () => {
                 <Box
                   gridColumn="1 / -1"
                   borderWidth="1px"
-                  borderColor="gray.200"
-                  rounded="md"
+                  borderColor="surface.border"
+                  bg="surface.panel"
+                  rounded="lg"
                   p={8}
                   h="100%"
                   display="flex"
