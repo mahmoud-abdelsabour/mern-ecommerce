@@ -190,7 +190,7 @@ const Profile = () => {
     return (
       <Box maxW="1200px" mx="auto" px={4} py={8} w="100%">
         <Stack gap={6}>
-          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4} w="100%">
+          <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4} w="100%">
             <Stack gap={3}>
               <Skeleton h="18px" w="120px" />
               <Separator />
@@ -208,7 +208,7 @@ const Profile = () => {
             </Stack>
           </Box>
 
-          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4} w="100%">
+          <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4} w="100%">
             <Stack gap={3}>
               <Skeleton h="18px" w="170px" />
               <Separator />
@@ -227,7 +227,7 @@ const Profile = () => {
   if (isError) {
     return (
       <Flex minH="50vh" align="center" justify="center" px={4}>
-        <Text color="red.500" fontSize="sm">
+        <Text color="state.error" fontSize="sm">
           Failed to load profile: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
         </Text>
       </Flex>
@@ -249,7 +249,7 @@ const Profile = () => {
           status={flash?.status ?? "info"}
           title={flash?.title}
         />
-        <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4} w="100%">
+        <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4} w="100%">
           <Stack gap={3}>
             <Text fontSize="lg" fontWeight="800">
               Profile
@@ -265,7 +265,7 @@ const Profile = () => {
                 <Text fontSize="xl" fontWeight="900">
                   {user?.firstName ?? "—"} {user?.lastName ?? ""}
                 </Text>
-                <Text fontSize="sm" color="gray.600">
+                <Text fontSize="sm" color="text.secondary">
                   @{user?.username ?? "—"}
                 </Text>
               </Stack>
@@ -297,6 +297,7 @@ const Profile = () => {
             <Button
               type="button"
               variant="outline"
+              colorPalette="neutral"
               size="sm"
               alignSelf="flex-start"
               loading={photoBusy}
@@ -306,13 +307,13 @@ const Profile = () => {
             >
               <HiUpload /> Upload photo
             </Button>
-            <Text fontSize="xs" color="gray.500">
+            <Text fontSize="xs" color="text.muted">
               JPEG, PNG, WebP, or GIF · max 5 MB · hosted on Cloudinary
             </Text>
           </Stack>
         </Box>
 
-        <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4} w="100%">
+        <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4} w="100%">
           <Stack gap={3}>
             <HStack justify="space-between" align="center" flexWrap="wrap">
               <Text fontSize="lg" fontWeight="800">
@@ -321,6 +322,7 @@ const Profile = () => {
               <IconButton
                 aria-label="Add address"
                 variant="outline"
+                colorPalette="neutral"
                 size="sm"
                 onClick={openCreateAddress}
                 disabled={addressFormBusy || deleteBusy}
@@ -343,7 +345,7 @@ const Profile = () => {
             )}
 
             {addresses.length === 0 ? (
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="text.secondary">
                 No saved addresses yet.
               </Text>
             ) : (
@@ -352,8 +354,9 @@ const Profile = () => {
                   <Box
                     key={a?._id ?? a?.id ?? a?.address_name ?? JSON.stringify(a)}
                     borderWidth="1px"
-                    borderColor="gray.200"
-                    rounded="md"
+                    borderColor="surface.border"
+                    bg="surface.subtle"
+                    rounded="lg"
                     p={4}
                   >
                     <Stack gap={2}>
@@ -365,6 +368,7 @@ const Profile = () => {
                           <IconButton
                             aria-label="Edit address"
                             variant="ghost"
+                            colorPalette="neutral"
                             size="sm"
                             onClick={() => openEditAddress(a)}
                             disabled={addressFormBusy || deleteBusy}
@@ -383,11 +387,11 @@ const Profile = () => {
                           </IconButton>
                         </HStack>
                       </HStack>
-                      <Text fontSize="sm" color="gray.700">
+                      <Text fontSize="sm" color="text.secondary">
                         {a?.country ?? "—"}, {a?.city ?? "—"}, {a?.street ?? "—"}{" "}
                         {a?.building ?? "—"}, floor {a?.floor ?? "—"}
                       </Text>
-                      <Text fontSize="xs" color="gray.600">
+                      <Text fontSize="xs" color="text.muted">
                         Postal: {a?.postalcode ?? "—"}
                         {a?.special_mark ? ` • ${a.special_mark}` : ""}
                       </Text>
@@ -469,7 +473,7 @@ const Profile = () => {
                     <Text>
                       This action is permanent. Your account and profile data will be deleted.
                     </Text>
-                    <Text fontSize="sm" color="red.500">
+                    <Text fontSize="sm" color="state.error">
                       You will be signed out immediately.
                     </Text>
                   </Stack>
@@ -505,7 +509,7 @@ const Profile = () => {
           >
             Delete account
           </Button>
-          <Button as={RouterLink} to="/me/edit" variant="outline">
+          <Button as={RouterLink} to="/me/edit" variant="outline" colorPalette="neutral">
             Edit profile
           </Button>
         </HStack>

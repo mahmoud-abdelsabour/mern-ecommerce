@@ -103,7 +103,7 @@ const EditProfileForm = ({ initialForm }) => {
                 </Button>
               </HStack>
               <HStack>
-                <Button as={RouterLink} to="/me" variant="outline">
+                <Button as={RouterLink} to="/me" variant="outline" colorPalette="neutral">
                   Back
                 </Button>
                 <Button type="submit" disabled={!canSave || updateProfileMutation.isPending}>

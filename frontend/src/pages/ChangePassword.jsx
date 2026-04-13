@@ -104,7 +104,7 @@ const ChangePassword = () => {
             </Field.Root>
 
             <HStack justify="space-between" flexWrap="wrap" gap={3}>
-              <Button as={RouterLink} to="/me/edit" variant="outline">
+              <Button as={RouterLink} to="/me/edit" variant="outline" colorPalette="neutral">
                 Back
               </Button>
               <Button

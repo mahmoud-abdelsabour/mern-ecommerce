@@ -140,7 +140,7 @@ Status legend:
 3. Keep current mutations and redirects unchanged.
 - Scope: Frontend
 - Priority: Medium
-- Status: Pending
+- Status: Done
 
 ---
 
