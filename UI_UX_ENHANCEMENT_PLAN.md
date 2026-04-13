@@ -166,7 +166,7 @@ Status legend:
 3. Keep current route and data behavior unchanged.
 - Scope: Frontend
 - Priority: Medium
-- Status: Pending
+- Status: Done
 
 ### Task 4.3 - Desktop polish and consistency sweep
 - Title: Final desktop alignment and spacing polish

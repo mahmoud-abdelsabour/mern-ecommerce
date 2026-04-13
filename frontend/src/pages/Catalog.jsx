@@ -188,9 +188,9 @@ const Catalog = () => {
         </Stack>
 
         {/* Main layout: filters (left) + products (right). Stacks vertically on small screens. */}
-        <Stack direction={{ base: "column", lg: "row" }} align="stretch" gap={6}>
+        <Stack direction={{ base: "column", md: "row" }} align="stretch" gap={6}>
           {/* Filters sidebar */}
-          <Box w={{ base: "100%", lg: "340px" }} borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
+          <Box w={{ base: "100%", md: "300px", lg: "340px" }} borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
             <Stack gap={5}>
               <HStack justify="space-between" align="center">
                 <Text fontSize="lg" fontWeight="900">
@@ -408,7 +408,7 @@ const Catalog = () => {
               </Box>
             ) : (
               // Empty state uses a grid wrapper so spacing stays similar to the products grid.
-              <SimpleGrid columns={{ base: 1, sm: 2, md: 4, lg: 4 }} gap={4} w="100%" flex="1">
+              <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={4} w="100%" flex="1">
                 <Box
                   gridColumn="1 / -1"
                   borderWidth="1px"

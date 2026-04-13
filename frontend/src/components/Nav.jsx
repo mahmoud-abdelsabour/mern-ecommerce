@@ -63,14 +63,14 @@ const Nav = () => {
             py={3}
         >
             <Flex align="center" gap={3} flexWrap="wrap" rowGap={2}>
-                <Link as={RouterLink} to="/" display="inline-flex" alignItems="center" order={{ base: 1, md: 1 }}>
+                <Link as={RouterLink} to="/" display="inline-flex" alignItems="center" order={{ base: 1, lg: 1 }}>
                     <img src={logo} alt="logo" style={{ height: 40, width: 'auto' }} />
                 </Link>
 
                 <HStack
-                    order={{ base: 2, md: 3 }}
-                    w={{ base: "auto", md: "auto" }}
-                    ml={{ base: "auto", md: 0 }}
+                    order={{ base: 2, lg: 3 }}
+                    w={{ base: "auto", lg: "auto" }}
+                    ml={{ base: "auto", lg: 0 }}
                     spacing={3}
                 >
                     <Link as={RouterLink} to="/cart" position="relative">
@@ -138,8 +138,8 @@ const Nav = () => {
                 </HStack>
 
                 <HStack
-                    order={{ base: 3, md: 2 }}
-                    flex={{ base: "1 0 100%", md: "1" }}
+                    order={{ base: 3, lg: 2 }}
+                    flex={{ base: "1 0 100%", lg: "1" }}
                     minW={0}
                     as="form"
                     onSubmit={submitCatalogSearch}
@@ -158,10 +158,10 @@ const Nav = () => {
                 </HStack>
 
                   <HStack
-                    order={{ base: 4, md: 4 }}
-                    spacing={{ base: 2, md: 4 }}
+                    order={{ base: 4, lg: 4 }}
+                    spacing={{ base: 2, lg: 4 }}
                     flexWrap="wrap"
-                    w={{ base: "100%", md: "auto" }}
+                    w={{ base: "100%", lg: "auto" }}
                   >
                     <Menu.Root>
                         <Menu.Trigger asChild>
