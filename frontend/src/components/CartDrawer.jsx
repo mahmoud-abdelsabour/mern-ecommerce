@@ -28,14 +28,14 @@ const CartDrawer = ({ open, onOpenChange }) => {
         <Drawer.Backdrop />
         <Drawer.Positioner>
           <Drawer.Content maxH="100dvh" display="flex" flexDirection="column">
-            <Drawer.Header borderBottomWidth="1px" borderColor="gray.200" pb={3}>
+            <Drawer.Header borderBottomWidth="1px" borderColor="surface.border" pb={3}>
               <Drawer.CloseTrigger asChild>
                 <CloseButton size="sm" />
               </Drawer.CloseTrigger>
               <Drawer.Title fontSize="xl" fontWeight="900">
                 Your Cart
               </Drawer.Title>
-              <Drawer.Description fontSize="sm" color="gray.600" mt={1}>
+              <Drawer.Description fontSize="sm" color="text.muted" mt={1}>
                 {!token ? (
                   "Sign in to view your cart"
                 ) : isLoading ? (
@@ -50,7 +50,7 @@ const CartDrawer = ({ open, onOpenChange }) => {
 
             <Drawer.Body flex="1" overflowY="auto" py={4}>
               {!token ? (
-                <Text fontSize="sm" color="gray.600">
+                <Text fontSize="sm" color="text.muted">
                   Sign in to view your cart.
                 </Text>
               ) : isLoading ? (
@@ -60,11 +60,11 @@ const CartDrawer = ({ open, onOpenChange }) => {
                   ))}
                 </VStack>
               ) : isError ? (
-                <Text fontSize="sm" color="red.500">
+                <Text fontSize="sm" color="red.600">
                   {error?.response?.data?.message ?? error?.message ?? "Could not load cart."}
                 </Text>
               ) : rows.length === 0 ? (
-                <Text fontSize="sm" color="gray.600">
+                <Text fontSize="sm" color="text.muted">
                   Your cart is empty. Add products from the catalog or product pages.
                 </Text>
               ) : (
@@ -76,7 +76,7 @@ const CartDrawer = ({ open, onOpenChange }) => {
               )}
             </Drawer.Body>
 
-            <Drawer.Footer borderTopWidth="1px" borderColor="gray.200" pt={3}>
+            <Drawer.Footer borderTopWidth="1px" borderColor="surface.border" pt={3}>
               <Stack gap={3} w="100%">
                 <Button as={RouterLink} to="/cart" variant="outline" size="lg" w="100%" onClick={() => onOpenChange(false)}>
                   View cart

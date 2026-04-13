@@ -291,7 +291,7 @@ const CheckOut = () => {
             <ProductGridSkeleton count={4} variant="order" />
           </Stack>
 
-          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+          <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={4} bg="surface.panel">
             <Stack gap={3}>
               <Skeleton h="18px" w="200px" />
               <SkeletonText noOfLines={3} />
@@ -299,7 +299,7 @@ const CheckOut = () => {
             </Stack>
           </Box>
 
-          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+          <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={4} bg="surface.panel">
             <Stack gap={3}>
               <Skeleton h="18px" w="160px" />
               <Skeleton h="36px" w="60%" rounded="md" />
@@ -594,7 +594,7 @@ const ReceiptSection = ({ items, subtotal, shippingPrice, codFees, total, paymen
             flex="1"
             borderBottomWidth="2px"
             borderBottomStyle="dotted"
-            borderBottomColor="gray.400"
+            borderBottomColor="neutral.400"
             mx={3}
             mt={3}
           />

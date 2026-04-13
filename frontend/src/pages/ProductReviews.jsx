@@ -66,7 +66,7 @@ const ProductReviews = () => {
   if (!productId) {
     return (
       <Box maxW="1200px" mx="auto" px={4} mt={6} pb={12}>
-        <Text fontSize="sm" color="gray.600">
+        <Text fontSize="sm" color="text.muted">
           Missing product id.
         </Text>
       </Box>
@@ -83,7 +83,7 @@ const ProductReviews = () => {
           {productLoading ? (
             <Skeleton h="18px" w="260px" />
           ) : productIsError ? (
-            <Text fontSize="lg" fontWeight="700" color="gray.700">
+            <Text fontSize="lg" fontWeight="700" color="text.secondary">
               Reviews
             </Text>
           ) : (
@@ -94,7 +94,7 @@ const ProductReviews = () => {
         </HStack>
 
         {productIsError && (
-          <Text fontSize="sm" color="red.500">
+          <Text fontSize="sm" color="red.600">
             {productError?.response?.data?.message ??
               productError?.message ??
               "Could not load product details."}
@@ -102,8 +102,8 @@ const ProductReviews = () => {
         )}
 
         {reviewsIsError && (
-          <Stack gap={3} borderWidth="1px" borderColor="red.200" rounded="md" p={4} bg="red.50">
-            <Text fontSize="sm" color="red.700">
+          <Stack gap={3} borderWidth="1px" borderColor="red.200" rounded="lg" p={4} bg="red.50">
+            <Text fontSize="sm" color="red.800">
               {reviewsError?.response?.data?.message ??
                 reviewsError?.message ??
                 "Could not load reviews."}
@@ -123,14 +123,14 @@ const ProductReviews = () => {
         )}
 
         {!initialReviewsLoading && !reviewsIsError && reviews.length === 0 && (
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="text.muted">
             No reviews yet for this product.
           </Text>
         )}
 
         {reviews.length > 0 && (
           <Stack gap={1}>
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text.muted">
               Showing {totalLoaded}
               {typeof totalAvailable === "number" ? ` of ${totalAvailable}` : ""} reviews
             </Text>
@@ -168,7 +168,7 @@ const ProductReviews = () => {
         ) : null}
 
         {!reviewsIsError && !initialReviewsLoading && reviews.length > 0 && !hasNextPage && (
-          <Text fontSize="xs" color="gray.500" textAlign="center">
+          <Text fontSize="xs" color="text.muted" textAlign="center">
             You have reached the end of the reviews.
           </Text>
         )}

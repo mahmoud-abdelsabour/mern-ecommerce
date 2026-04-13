@@ -2,7 +2,7 @@ import { Box, HStack, Skeleton, Stack } from "@chakra-ui/react"
 
 export const DrawerCardSkeleton = () => {
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={3} bg="gray.50">
+    <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={3} bg="surface.panel">
       <HStack align="flex-start" gap={3}>
         <Skeleton flexShrink={0} w="64px" h="64px" rounded="md" />
         <Stack gap={2} flex="1" minW={0}>

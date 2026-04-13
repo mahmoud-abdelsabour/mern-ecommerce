@@ -3,7 +3,7 @@ import { Box, HStack, Skeleton, SkeletonCircle, SkeletonText, Stack } from "@cha
 export const ReviewRowSkeleton = () => {
   return (
     <Stack gap={2} align="stretch">
-      <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+      <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
         <Stack gap={3}>
           <HStack justify="space-between" align="center">
             <HStack gap={3}>

@@ -163,7 +163,7 @@ const ReviewRow = ({ review, productId }) => {
                       minH="100px"
                       placeholder="Update your feedback…"
                     />
-                    <Text fontSize="xs" color="gray.500" mt={1}>
+                    <Text fontSize="xs" color="text.muted" mt={1}>
                       {editComment.length}/{MAX_COMMENT}
                     </Text>
                   </Field.Root>
@@ -175,7 +175,7 @@ const ReviewRow = ({ review, productId }) => {
                     Cancel
                   </Button>
                   <Button
-                    colorPalette="teal"
+                    colorPalette="brand"
                     onClick={onSaveEdit}
                     loading={updateMutation.isPending}
                     disabled={updateMutation.isPending}

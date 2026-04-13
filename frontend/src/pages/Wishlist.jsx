@@ -85,7 +85,7 @@ const Wishlist = () => {
         <Button
           size="sm"
           variant="outline"
-          colorScheme="red"
+          colorPalette="red"
           onClick={() => clearWishlistMutation.mutate()}
           disabled={clearWishlistMutation.isPending || wishlistIds.length === 0}
         >
@@ -94,14 +94,14 @@ const Wishlist = () => {
       </HStack>
 
       {isError && (
-        <Text fontSize="sm" color="red.500" mb={4}>
+        <Text fontSize="sm" color="red.600" mb={4}>
           Failed to load wishlist: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
         </Text>
       )}
 
       {failedProductIds.length > 0 && (
-        <Box borderWidth="1px" borderColor="orange.200" bg="orange.50" borderRadius="md" p={4} mb={4}>
-          <Text fontSize="sm" color="orange.800" mb={2}>
+        <Box borderWidth="1px" borderColor="accent.200" bg="accent.50" borderRadius="lg" p={4} mb={4}>
+          <Text fontSize="sm" color="accent.800" mb={2}>
             {failedProductIds.length} wishlist item(s) could not be loaded and were hidden.
           </Text>
           <HStack>
@@ -110,7 +110,7 @@ const Wishlist = () => {
             </Button>
             <Button
               size="sm"
-              colorScheme="orange"
+              colorPalette="accent"
               variant="ghost"
               onClick={cleanupStaleWishlistItems}
               disabled={removeFromWishlistMutation.isPending}

@@ -172,7 +172,7 @@ const Return = () => {
             <Skeleton h="18px" w="120px" />
             <ProductGridSkeleton count={4} variant="return" />
           </Stack>
-          <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+          <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={4} bg="surface.panel">
             <Stack gap={3}>
               <Skeleton h="16px" w="220px" />
               <Skeleton h="90px" w="100%" rounded="md" />
@@ -226,7 +226,7 @@ const Return = () => {
   if (items.length === 0) {
     return (
       <Flex minH="50vh" align="center" justify="center" px={4}>
-        <Text color="gray.500">No line items in this order.</Text>
+        <Text color="text.muted">No line items in this order.</Text>
       </Flex>
     )
   }

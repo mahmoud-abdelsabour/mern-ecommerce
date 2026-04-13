@@ -14,7 +14,7 @@ const AddressCard = ({ shippingInfo }) => {
   const specialMark = shippingInfo?.address?.special_mark ?? "—"
 
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+    <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
       <Stack gap={2}>
         <Text fontSize="lg" fontWeight="800">
           Shipping Address

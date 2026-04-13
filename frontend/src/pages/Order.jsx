@@ -96,14 +96,14 @@ const Order = () => {
           </Stack>
 
           <Stack gap={4}>
-            <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+            <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={4} bg="surface.panel">
               <Stack gap={2}>
                 <Skeleton h="18px" w="220px" />
                 <Skeleton h="12px" w="90%" />
                 <Skeleton h="12px" w="70%" />
               </Stack>
             </Box>
-            <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+            <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={4} bg="surface.panel">
               <Stack gap={2}>
                 <Skeleton h="18px" w="220px" />
                 <Skeleton h="12px" w="70%" />
@@ -111,7 +111,7 @@ const Order = () => {
                 <Skeleton h="12px" w="75%" />
               </Stack>
             </Box>
-            <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+            <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={4} bg="surface.panel">
               <Stack gap={2}>
                 <Skeleton h="18px" w="140px" />
                 <Skeleton h="12px" w="85%" />
@@ -439,7 +439,7 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total, paymentMe
             flex="1"
             borderBottomWidth="2px"
             borderBottomStyle="dotted"
-            borderBottomColor="gray.400"
+            borderBottomColor="neutral.400"
             mx={3}
             mt={3}
           />

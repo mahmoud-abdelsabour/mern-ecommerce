@@ -2,7 +2,7 @@ import { Box, HStack, Skeleton, Stack } from "@chakra-ui/react"
 
 export const OrderCardSkeleton = () => {
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4} bg="white">
+    <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={4} bg="surface.panel">
       <HStack spacing={3} align="start">
         <HStack spacing={2}>
           <Skeleton w="80px" h="80px" rounded="md" />

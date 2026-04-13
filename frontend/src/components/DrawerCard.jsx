@@ -9,9 +9,9 @@ const DrawerCard = ({ name, price, brand, category, quantity, image }) => {
   const lineTotal = unit * qty
 
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={3} bg="gray.50">
+    <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={3} bg="surface.panel">
       <HStack align="flex-start" gap={3}>
-        <Box flexShrink={0} w="64px" h="64px" rounded="md" overflow="hidden" bg="white" borderWidth="1px" borderColor="gray.200">
+        <Box flexShrink={0} w="64px" h="64px" rounded="md" overflow="hidden" bg="surface.elevated" borderWidth="1px" borderColor="surface.border">
           <Image
             src={image || "https://placehold.co/128x128?text=No+image"}
             alt={name}
@@ -24,21 +24,21 @@ const DrawerCard = ({ name, price, brand, category, quantity, image }) => {
           <Text fontWeight="700" fontSize="sm" lineClamp={2}>
             {name}
           </Text>
-          <Text fontSize="xs" color="gray.600" lineClamp={1}>
+          <Text fontSize="xs" color="text.muted" lineClamp={1}>
             {brand} · {category}
           </Text>
           <Separator my={1} />
           <HStack justify="space-between" align="center" flexWrap="wrap" gap={2}>
             <Stack gap={0}>
-              <Text fontSize="xs" color="gray.600">
+              <Text fontSize="xs" color="text.subtle">
                 ${unit.toFixed(2)} each
               </Text>
-              <Text fontSize="sm" fontWeight="800" color="teal.700">
+              <Text fontSize="sm" fontWeight="800" color="brand.700">
                 ${lineTotal.toFixed(2)} total
               </Text>
             </Stack>
-            <Box px={2} py={1} rounded="md" bg="white" borderWidth="1px" borderColor="gray.200">
-              <Text fontSize="xs" fontWeight="700" color="gray.800">
+            <Box px={2} py={1} rounded="md" bg="surface.elevated" borderWidth="1px" borderColor="surface.border">
+              <Text fontSize="xs" fontWeight="700">
                 Qty {qty}
               </Text>
             </Box>

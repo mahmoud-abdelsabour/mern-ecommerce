@@ -200,7 +200,7 @@ const ProductCard = ({
               _active={wishlistIsBusy ? undefined : { transform: "scale(0.98)" }}
               cursor={wishlistIsBusy ? "not-allowed" : "pointer"}
             >
-              <Icon color={isInWishlist ? "red.500" : "gray.600"}>
+              <Icon color={isInWishlist ? "red.500" : "text.muted"}>
                 {isInWishlist ? (
                   <MdFavorite size={ICON_SIZE} />
                 ) : (
@@ -216,7 +216,7 @@ const ProductCard = ({
             <Checkbox.Root
               checked={Boolean(selected)}
               onCheckedChange={(details) => onToggleSelected?.(details.checked)}
-              colorPalette="teal"
+              colorPalette="brand"
               size="sm"
             >
               <Checkbox.HiddenInput />
@@ -319,7 +319,7 @@ const ProductCard = ({
           <Text fontSize="xs" fontWeight="700">
             Qty: {quantity}
           </Text>
-          <Text fontSize="xs" color="gray.600">
+          <Text fontSize="xs" color="text.muted">
             Item total: ${itemTotal.toFixed(2)}
           </Text>
         </Stack>

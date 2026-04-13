@@ -25,7 +25,7 @@ const ActionRowSkeleton = ({ variant }) => {
 
 export const ProductCardSkeleton = ({ variant = "default" }) => {
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={3} bg="white">
+    <Box borderWidth="1px" borderColor="surface.border" rounded="lg" p={3} bg="surface.panel">
       <Skeleton w="100%" aspectRatio={1} rounded="md" />
       <Stack mt={3} gap={2}>
         <SkeletonText noOfLines={2} />

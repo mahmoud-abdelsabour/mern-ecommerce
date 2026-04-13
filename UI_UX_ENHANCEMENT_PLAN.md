@@ -192,7 +192,7 @@ Status legend:
 3. Keep functionality and behavior unchanged.
 - Scope: Frontend
 - Priority: Medium
-- Status: Pending
+- Status: Done
 
 ### Task 5.2 - Plan closure and handoff notes
 - Title: Finalize roadmap completion notes
