@@ -191,7 +191,7 @@ const Order = () => {
           <Text fontSize="2xl" fontWeight="900">
             Order
           </Text>
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text.secondary">
             {order?.id ?? order?._id ?? "—"}
           </Text>
         </Stack>
@@ -221,12 +221,12 @@ const Order = () => {
           />
         </Stack>
 
-        <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+        <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
           <Stack gap={2}>
             <HStack>
               <Button
                 flex="1"
-                colorScheme="red"
+                colorPalette="red"
                 disabled={!canCancel || cancelMutation.isPending}
                 onClick={onCancelOrder}
               >
@@ -244,7 +244,7 @@ const Order = () => {
               </Button>
             </HStack>
             {!canCancel && !canReturn && (
-              <Text fontSize="xs" color="gray.500">
+              <Text fontSize="xs" color="text.muted">
                 Cancel works only when pending, return works only when delivered.
               </Text>
             )}
@@ -272,7 +272,7 @@ const OrderTimelineCard = ({ createdAt, shippedAt, deliveredAt, deliveryStatus }
   const deliveredDate = formatDate(deliveredAt)
 
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+    <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
       <Stack gap={2}>
         <HStack justify="space-between" align="center" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="800">
@@ -338,7 +338,7 @@ const OrderTimelineCard = ({ createdAt, shippedAt, deliveredAt, deliveryStatus }
 
 const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total, paymentMethod }) => {
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+    <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
       <Stack gap={2}>
         <Text fontSize="lg" fontWeight="800">
           Receipt
@@ -356,7 +356,7 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total, paymentMe
                   <Text fontSize="sm" fontWeight="700" noOfLines={2}>
                     {item?.title ?? "Product"}
                   </Text>
-                  <Text fontSize="xs" color="gray.600">
+                  <Text fontSize="xs" color="text.secondary">
                     {qty} x {formatMoney(price)}
                   </Text>
                 </Stack>
@@ -364,7 +364,7 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total, paymentMe
                   flex="1"
                   borderBottomWidth="1px"
                   borderBottomStyle="dotted"
-                  borderBottomColor="gray.300"
+                  borderBottomColor="neutral.300"
                   mx={3}
                   mt={3}
                 />
@@ -380,14 +380,14 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total, paymentMe
 
         <Stack gap={1}>
           <HStack>
-            <Text fontSize="sm" color="gray.600">
+            <Text fontSize="sm" color="text.secondary">
               Subtotal
             </Text>
             <Box
               flex="1"
               borderBottomWidth="1px"
               borderBottomStyle="dotted"
-              borderBottomColor="gray.300"
+              borderBottomColor="neutral.300"
               mx={3}
               mt={2}
             />
@@ -396,14 +396,14 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total, paymentMe
             </Text>
           </HStack>
           <HStack>
-            <Text fontSize="sm" color="gray.600">
+            <Text fontSize="sm" color="text.secondary">
               Shipping
             </Text>
             <Box
               flex="1"
               borderBottomWidth="1px"
               borderBottomStyle="dotted"
-              borderBottomColor="gray.300"
+              borderBottomColor="neutral.300"
               mx={3}
               mt={2}
             />
@@ -412,14 +412,14 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total, paymentMe
             </Text>
           </HStack>
           <HStack>
-            <Text fontSize="sm" color="gray.600">
+            <Text fontSize="sm" color="text.secondary">
               COD fees
             </Text>
             <Box
               flex="1"
               borderBottomWidth="1px"
               borderBottomStyle="dotted"
-              borderBottomColor="gray.300"
+              borderBottomColor="neutral.300"
               mx={3}
               mt={2}
             />
@@ -451,14 +451,14 @@ const ReceiptCard = ({ items, shippingPrice, codFees, subtotal, total, paymentMe
         <Separator />
 
         <HStack>
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="text.secondary">
             Payment method
           </Text>
           <Box
             flex="1"
             borderBottomWidth="1px"
             borderBottomStyle="dotted"
-            borderBottomColor="gray.300"
+            borderBottomColor="neutral.300"
             mx={3}
             mt={2}
           />

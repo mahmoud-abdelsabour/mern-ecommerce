@@ -129,7 +129,7 @@ Status legend:
 3. Preserve all business logic and data rendering.
 - Scope: Frontend
 - Priority: High
-- Status: Pending
+- Status: Done
 
 ### Task 3.3 - Refine account pages visual consistency
 - Title: Unify profile and settings page presentation

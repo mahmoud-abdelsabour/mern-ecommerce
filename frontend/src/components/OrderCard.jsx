@@ -18,8 +18,9 @@ const OrderCard = ({ order }) => {
       {...(to ? { as: RouterLink, to } : {})}
       display="block"
       borderWidth="1px"
-      borderColor="gray.200"
-      rounded="md"
+      borderColor="surface.border"
+      bg="surface.panel"
+      rounded="lg"
       p={4}
       cursor={to ? "pointer" : "default"}
       textDecoration="none"
@@ -27,12 +28,12 @@ const OrderCard = ({ order }) => {
       transition="border-color 0.15s ease, box-shadow 0.15s ease"
       _hover={
         to
-          ? { borderColor: "gray.300", boxShadow: "sm" }
+          ? { borderColor: "neutral.300", boxShadow: "sm" }
           : undefined
       }
       _focusVisible={
         to
-          ? { outline: "2px solid", outlineColor: "teal.500", outlineOffset: "2px" }
+          ? { outline: "2px solid", outlineColor: "brand.500", outlineOffset: "2px" }
           : undefined
       }
     >
@@ -63,7 +64,7 @@ const OrderCard = ({ order }) => {
         </HStack>
 
         <Stack spacing={2} flex="1">
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text.muted">
             {order?.createdAt ?? "—"}
           </Text>
           <HStack gap={2}>

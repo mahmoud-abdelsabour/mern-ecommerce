@@ -238,7 +238,7 @@ const Return = () => {
           <Text fontSize="2xl" fontWeight="900">
             Return order
           </Text>
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text.secondary">
             Order {order?.id ?? order?._id ?? "—"} · Select items and quantities to return.
           </Text>
         </Stack>
@@ -264,7 +264,7 @@ const Return = () => {
           />
         </Stack>
 
-        <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+        <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
           <Stack gap={3}>
             <Text fontSize="lg" fontWeight="800">
               Reason
@@ -280,7 +280,7 @@ const Return = () => {
         </Box>
 
         <HStack justify="center" gap={4} flexWrap="wrap">
-          <Button variant="outline" as={RouterLink} to={`/order/${orderId}`}>
+          <Button variant="outline" colorPalette="neutral" as={RouterLink} to={`/order/${orderId}`}>
             Back to order
           </Button>
           <Button
@@ -294,7 +294,7 @@ const Return = () => {
         </HStack>
 
         {returnMutation.isError && (
-          <Text fontSize="sm" color="red.500" textAlign="center">
+          <Text fontSize="sm" color="state.error" textAlign="center">
             {returnMutation.error?.response?.data?.message ??
               returnMutation.error?.message ??
               "Could not submit return request."}
@@ -320,12 +320,12 @@ const Return = () => {
                 <Dialog.Title>Confirm return request</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
-                <Text fontSize="sm" color="gray.600">
+                <Text fontSize="sm" color="text.secondary">
                   Submit this return request for the selected items? You will be redirected back to your order.
                 </Text>
               </Dialog.Body>
               <Dialog.Footer>
-                <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={returnMutation.isPending}>
+                <Button variant="outline" colorPalette="neutral" onClick={() => setConfirmOpen(false)} disabled={returnMutation.isPending}>
                   Cancel
                 </Button>
                 <Button colorPalette="orange" onClick={submitReturn} disabled={returnMutation.isPending}>

@@ -197,19 +197,24 @@ const Orders = () => {
           <Text fontSize="2xl" fontWeight="800">
             My Orders
           </Text>
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text.secondary">
             View active and past orders
           </Text>
         </Stack>
 
         <Stack
+          borderWidth="1px"
+          borderColor="surface.border"
+          bg="surface.panel"
+          rounded="lg"
+          p={4}
           direction={{ base: "column", sm: "row" }}
           gap={4}
           align={{ base: "stretch", sm: "flex-end" }}
           flexWrap="wrap"
         >
           <Stack gap={1} flex="1" minW={{ base: "100%", sm: "200px" }} maxW={{ md: "280px" }}>
-            <Text fontSize="xs" fontWeight="700" color="gray.600">
+            <Text fontSize="xs" fontWeight="700" color="text.secondary">
               Sort by
             </Text>
             <Select.Root
@@ -243,7 +248,7 @@ const Orders = () => {
           </Stack>
 
           <Stack gap={1} flex="1" minW={{ base: "100%", sm: "200px" }} maxW={{ md: "240px" }}>
-            <Text fontSize="xs" fontWeight="700" color="gray.600">
+            <Text fontSize="xs" fontWeight="700" color="text.secondary">
               Delivery status
             </Text>
             <Select.Root
@@ -277,8 +282,8 @@ const Orders = () => {
           </Stack>
         </Stack>
 
-        <HStack gap={2} flexWrap="wrap" fontSize="xs" color="gray.600">
-          <Text fontWeight="600" color="gray.700">
+        <HStack gap={2} flexWrap="wrap" fontSize="xs" color="text.secondary">
+          <Text fontWeight="600" color="text.primary">
             Active:
           </Text>
           <Text>{sortLabel}</Text>
@@ -293,7 +298,7 @@ const Orders = () => {
         </HStack>
 
         {isError && (
-          <Text fontSize="sm" color="red.500">
+          <Text fontSize="sm" color="state.error">
             Failed to load orders: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
           </Text>
         )}

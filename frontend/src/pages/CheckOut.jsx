@@ -385,7 +385,7 @@ const CheckOut = () => {
           <Text fontSize="2xl" fontWeight="900">
             Checkout
           </Text>
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text.secondary">
             Choose payment, delivery address, and confirm your order.
           </Text>
         </Stack>
@@ -397,7 +397,7 @@ const CheckOut = () => {
           <ProductList items={items} variant="order" />
         </Stack>
 
-        <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+        <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
           <Stack gap={3}>
             <Text fontSize="lg" fontWeight="800">
               Payment
@@ -427,7 +427,7 @@ const CheckOut = () => {
           </Stack>
         </Box>
 
-        <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+        <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
           <Stack gap={3}>
             <HStack justify="space-between" align="center" flexWrap="wrap">
               <Text fontSize="lg" fontWeight="800">
@@ -483,7 +483,7 @@ const CheckOut = () => {
             <Separator />
 
             {selectedAddress && (
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="text.secondary">
                 {me?.firstName} {me?.lastName} • {me?.phone} • {selectedAddress.address_name} •{" "}
                 {selectedAddress.country}, {selectedAddress.city}, {selectedAddress.street}{" "}
                 {selectedAddress.building}, floor {selectedAddress.floor}
@@ -502,7 +502,7 @@ const CheckOut = () => {
                   disabled={addressFormBusy}
                 />
                 {!hasSavedAddresses && (
-                  <Text fontSize="xs" color="gray.500">
+                  <Text fontSize="xs" color="text.muted">
                     Add at least one saved address to enable checkout.
                   </Text>
                 )}
@@ -537,7 +537,7 @@ export default CheckOut
 
 const ReceiptSection = ({ items, subtotal, shippingPrice, codFees, total, paymentMethod }) => {
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4}>
+    <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
       <Stack gap={2}>
         <Text fontSize="lg" fontWeight="800">
           Receipt
@@ -555,7 +555,7 @@ const ReceiptSection = ({ items, subtotal, shippingPrice, codFees, total, paymen
                   <Text fontSize="sm" fontWeight="700" noOfLines={2}>
                     {item?.title ?? "Product"}
                   </Text>
-                  <Text fontSize="xs" color="gray.600">
+                  <Text fontSize="xs" color="text.secondary">
                     {qty} x {formatMoney(price)}
                   </Text>
                 </Stack>
@@ -563,7 +563,7 @@ const ReceiptSection = ({ items, subtotal, shippingPrice, codFees, total, paymen
                   flex="1"
                   borderBottomWidth="1px"
                   borderBottomStyle="dotted"
-                  borderBottomColor="gray.300"
+                  borderBottomColor="neutral.300"
                   mx={3}
                   mt={3}
                 />
@@ -612,14 +612,14 @@ const ReceiptSection = ({ items, subtotal, shippingPrice, codFees, total, paymen
 
 const LeaderRow = ({ label, value }) => (
   <HStack>
-    <Text fontSize="sm" color="gray.600">
+          <Text fontSize="sm" color="text.secondary">
       {label}
     </Text>
     <Box
       flex="1"
       borderBottomWidth="1px"
       borderBottomStyle="dotted"
-      borderBottomColor="gray.300"
+      borderBottomColor="neutral.300"
       mx={3}
       mt={2}
     />
