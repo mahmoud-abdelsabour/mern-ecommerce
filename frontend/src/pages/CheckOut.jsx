@@ -406,7 +406,7 @@ const CheckOut = () => {
 
             <RadioGroup.Root
               variant="outline"
-              colorPalette="teal"
+              colorPalette="brand"
               value={paymentMethod}
               onValueChange={(details) => setPaymentMethod(details.value)}
             >
@@ -471,6 +471,7 @@ const CheckOut = () => {
                   aria-label="Add address"
                   size="sm"
                   variant="outline"
+                  colorPalette="neutral"
                   onClick={() => setShowAddressForm((v) => !v)}
                   disabled={addressFormBusy}
                 >
@@ -521,7 +522,7 @@ const CheckOut = () => {
 
         <Button
           size="lg"
-          colorPalette="teal"
+          colorPalette="brand"
           disabled={!canCheckout || createOrderMutation.isPending}
           onClick={onPlaceOrder}
         >

@@ -199,10 +199,10 @@ const Register = () => {
             </Field.Root>
           </Fieldset.Content>
 
-          <Button type="submit" alignSelf="flex-start" disabled={registerMutation.isPending}>
+          <Button type="submit" alignSelf="flex-start" colorPalette="brand" disabled={registerMutation.isPending}>
             {registerMutation.isPending ? "Submitting..." : "Submit"}
           </Button>
-          <Button as={RouterLink} to="/login" variant="link" size="sm" alignSelf="flex-start">
+          <Button as={RouterLink} to="/login" variant="link" colorPalette="brand" size="sm" alignSelf="flex-start">
             Already a user? Login
           </Button>
         </Fieldset.Root>

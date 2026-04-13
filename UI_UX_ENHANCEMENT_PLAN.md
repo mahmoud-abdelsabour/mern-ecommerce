@@ -92,7 +92,7 @@ Status legend:
 3. Keep current flows and handlers unchanged.
 - Scope: Frontend
 - Priority: Medium
-- Status: Pending
+- Status: Done
 
 ### Task 2.3 - Improve forms visual rhythm
 - Title: Standardize form spacing and field grouping

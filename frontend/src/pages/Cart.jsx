@@ -90,6 +90,7 @@ const Cart = () => {
             {items.length > 0 && (
               <Button
                 variant="outline"
+                colorPalette="neutral"
                 size="lg"
                 onClick={() => clearCartMutation.mutate()}
                 disabled={clearCartMutation.isPending}
@@ -102,7 +103,7 @@ const Cart = () => {
               as={RouterLink}
               to="/order/check-out"
               size="lg"
-              colorScheme="teal"
+              colorPalette="brand"
               w={{ base: "100%", md: "320px" }}
             >
               Checkout

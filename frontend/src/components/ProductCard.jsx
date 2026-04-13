@@ -331,6 +331,7 @@ const ProductCard = ({
               <IconButton
                 size="xs"
                 variant="outline"
+                colorPalette="neutral"
                 aria-label="Decrease"
                 onClick={onDecrementCart}
                 disabled={decrementCartMutation.isPending}
@@ -343,6 +344,7 @@ const ProductCard = ({
               <IconButton
                 size="xs"
                 variant="outline"
+                colorPalette="neutral"
                 aria-label="Increase"
                 onClick={onIncrementCart}
                 disabled={addToCartMutation.isPending}
@@ -354,6 +356,7 @@ const ProductCard = ({
             <Button
               size="xs"
               variant="outline"
+              colorPalette="neutral"
               flex="1"
               onClick={onAddToCart}
               disabled={addToCartMutation.isPending}
@@ -361,7 +364,7 @@ const ProductCard = ({
               {addToCartMutation.isPending ? "Adding..." : "Add to cart"}
             </Button>
           )}
-          <Button size="xs" colorScheme="teal" flex="1" onClick={onBuyNow}>
+          <Button size="xs" colorPalette="brand" flex="1" onClick={onBuyNow}>
             Buy now
           </Button>
         </HStack>

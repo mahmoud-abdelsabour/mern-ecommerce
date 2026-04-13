@@ -106,10 +106,10 @@ const Login = () => {
             </Field.Root>
           </Fieldset.Content>
 
-          <Button type="submit" alignSelf="flex-start" disabled={loginMutation.isPending}>
+          <Button type="submit" alignSelf="flex-start" colorPalette="brand" disabled={loginMutation.isPending}>
             {loginMutation.isPending ? "Submitting..." : "Submit"}
           </Button>
-          <Button as={RouterLink} to="/register" variant="link" size="sm" alignSelf="flex-start">
+          <Button as={RouterLink} to="/register" variant="link" colorPalette="brand" size="sm" alignSelf="flex-start">
             Not a user? Register
           </Button>
         </Fieldset.Root>

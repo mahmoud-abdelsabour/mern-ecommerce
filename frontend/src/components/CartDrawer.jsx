@@ -84,7 +84,7 @@ const CartDrawer = ({ open, onOpenChange }) => {
                 <Button
                   as={RouterLink}
                   to="/order/check-out"
-                  colorPalette="teal"
+                  colorPalette="brand"
                   size="lg"
                   w="100%"
                   onClick={() => onOpenChange(false)}
@@ -93,7 +93,7 @@ const CartDrawer = ({ open, onOpenChange }) => {
                 </Button>
                 <HStack justify="center" w="100%">
                   <Drawer.CloseTrigger asChild>
-                    <Button variant="ghost" size="sm" colorPalette="gray">
+                    <Button variant="ghost" size="sm" colorPalette="neutral">
                       Continue shopping
                     </Button>
                   </Drawer.CloseTrigger>
