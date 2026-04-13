@@ -203,7 +203,14 @@ Status legend:
 3. Keep this file as single progress tracker for this operation.
 - Scope: Frontend
 - Priority: Low
-- Status: Pending
+- Status: Done
+
+Completion notes:
+- UI/UX enhancement plan fully completed across Phases 0-5.
+- Design system adoption finalized with semantic tokens applied to shared surfaces, cards, forms, and loading states across in-scope pages.
+- Action hierarchy standardized: primary brand actions, consistent secondary/tertiary variants, and semantic destructive actions.
+- Responsive hardening completed for mobile, tablet, and desktop with consistent spacing rhythm and container behavior.
+- Scope guardrails honored: no logic/data/routing changes and Home/Footer redesign excluded.
 
 ---
 
