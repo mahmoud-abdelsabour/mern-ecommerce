@@ -63,106 +63,16 @@ const Nav = () => {
             py={3}
         >
             <Flex align="center" gap={3} flexWrap="wrap" rowGap={2}>
-                <Link as={RouterLink} to="/" display="inline-flex" alignItems="center">
+                <Link as={RouterLink} to="/" display="inline-flex" alignItems="center" order={{ base: 1, md: 1 }}>
                     <img src={logo} alt="logo" style={{ height: 40, width: 'auto' }} />
                 </Link>
 
-                <HStack flex="1" minW={0} as="form" onSubmit={submitCatalogSearch} gap={2}>
-                    <Input
-                        placeholder="Search"
-                        size="sm"
-                        width="100%"
-                        value={searchDraft}
-                        onChange={(e) => setSearchDraft(e.target.value)}
-                    />
-                    <IconButton type="submit" aria-label="Search catalog" size="sm">
-                        <LuSearch size={ICON_SIZE} />
-                    </IconButton>
-                </HStack>
-
-                <HStack spacing={4}>
-                    <Menu.Root>
-                        <Menu.Trigger asChild>
-                            <Button variant="outline" size="sm">
-                                Categories <FaChevronDown />
-                            </Button>
-                        </Menu.Trigger>
-                        <Portal>
-                            <Menu.Positioner>
-                                <Menu.Content maxH="320px" overflowY="auto">
-                                    {categoriesLoading ? (
-                                      Array.from({ length: 6 }).map((_, idx) => (
-                                        <Menu.Item key={`categories-skel-${idx}`} value={`categories-skel-${idx}`} disabled>
-                                          <Skeleton h="12px" w="160px" />
-                                        </Menu.Item>
-                                      ))
-                                    ) : (categoriesData?.categories ?? []).length > 0 ? (
-                                      (categoriesData?.categories ?? []).filter((c) => c?.slug).map((c) => (
-                                        <Menu.Item
-                                          asChild
-                                          key={c?.id ?? c?._id ?? c?.slug}
-                                          value={c?.slug ?? c?.name}
-                                        >
-                                          {/* Navigate to Catalog with a single category slug filter */}
-                                          <Link as={RouterLink} to={`/catalog?category=${encodeURIComponent(c.slug)}`}>
-                                            {c?.name ?? c?.slug}
-                                          </Link>
-                                        </Menu.Item>
-                                      ))
-                                    ) : (
-                                      <Menu.Item value="categories-empty" disabled>
-                                        No categories
-                                      </Menu.Item>
-                                    )}
-                                </Menu.Content>
-                            </Menu.Positioner>
-                        </Portal>
-                    </Menu.Root>
-
-                    <Menu.Root>
-                        <Menu.Trigger asChild>
-                            <Button variant="outline" size="sm">
-                                Brands <FaChevronDown />
-                            </Button>
-                        </Menu.Trigger>
-                        <Portal>
-                            <Menu.Positioner>
-                                <Menu.Content maxH="320px" overflowY="auto">
-                                    {brandsLoading ? (
-                                      Array.from({ length: 6 }).map((_, idx) => (
-                                        <Menu.Item key={`brands-skel-${idx}`} value={`brands-skel-${idx}`} disabled>
-                                          <Skeleton h="12px" w="160px" />
-                                        </Menu.Item>
-                                      ))
-                                    ) : (brandsData?.brands ?? []).length > 0 ? (
-                                      (brandsData?.brands ?? []).filter((b) => b?.slug).map((b) => (
-                                        <Menu.Item
-                                          asChild
-                                          key={b?.id ?? b?._id ?? b?.slug}
-                                          value={b?.slug ?? b?.name}
-                                        >
-                                          {/* Navigate to Catalog with a single brand slug filter */}
-                                          <Link as={RouterLink} to={`/catalog?brand=${encodeURIComponent(b.slug)}`}>
-                                            {b?.name ?? b?.slug}
-                                          </Link>
-                                        </Menu.Item>
-                                      ))
-                                    ) : (
-                                      <Menu.Item value="brands-empty" disabled>
-                                        No brands
-                                      </Menu.Item>
-                                    )}
-                                </Menu.Content>
-                            </Menu.Positioner>
-                        </Portal>
-                    </Menu.Root>
-
-                    <Link as={RouterLink} to="/orders" fontWeight="500">
-                        Orders
-                    </Link>
-                </HStack>
-
-                <HStack spacing={3}>
+                <HStack
+                    order={{ base: 2, md: 3 }}
+                    w={{ base: "auto", md: "auto" }}
+                    ml={{ base: "auto", md: 0 }}
+                    spacing={3}
+                >
                     <Link as={RouterLink} to="/cart" position="relative">
                         <FaCartShopping size={ICON_SIZE} />
                         {cartCount > 0 && (
@@ -221,10 +131,117 @@ const Nav = () => {
                         </Portal>
                       </Menu.Root>
                     ) : (
-                      <Button as={RouterLink} to="/login" size="sm" variant="outline">
+                      <Button as={RouterLink} to="/login" size="sm" variant="outline" colorPalette="neutral">
                         Login
                       </Button>
                     )}
+                </HStack>
+
+                <HStack
+                    order={{ base: 3, md: 2 }}
+                    flex={{ base: "1 0 100%", md: "1" }}
+                    minW={0}
+                    as="form"
+                    onSubmit={submitCatalogSearch}
+                    gap={2}
+                >
+                    <Input
+                        placeholder="Search"
+                        size="sm"
+                        width="100%"
+                        value={searchDraft}
+                        onChange={(e) => setSearchDraft(e.target.value)}
+                    />
+                    <IconButton type="submit" aria-label="Search catalog" size="sm">
+                        <LuSearch size={ICON_SIZE} />
+                    </IconButton>
+                </HStack>
+
+                  <HStack
+                    order={{ base: 4, md: 4 }}
+                    spacing={{ base: 2, md: 4 }}
+                    flexWrap="wrap"
+                    w={{ base: "100%", md: "auto" }}
+                  >
+                    <Menu.Root>
+                        <Menu.Trigger asChild>
+                        <Button variant="outline" colorPalette="neutral" size="sm">
+                                Categories <FaChevronDown />
+                            </Button>
+                        </Menu.Trigger>
+                        <Portal>
+                            <Menu.Positioner>
+                                <Menu.Content maxH="320px" overflowY="auto">
+                                    {categoriesLoading ? (
+                                      Array.from({ length: 6 }).map((_, idx) => (
+                                        <Menu.Item key={`categories-skel-${idx}`} value={`categories-skel-${idx}`} disabled>
+                                          <Skeleton h="12px" w="160px" />
+                                        </Menu.Item>
+                                      ))
+                                    ) : (categoriesData?.categories ?? []).length > 0 ? (
+                                      (categoriesData?.categories ?? []).filter((c) => c?.slug).map((c) => (
+                                        <Menu.Item
+                                          asChild
+                                          key={c?.id ?? c?._id ?? c?.slug}
+                                          value={c?.slug ?? c?.name}
+                                        >
+                                          {/* Navigate to Catalog with a single category slug filter */}
+                                          <Link as={RouterLink} to={`/catalog?category=${encodeURIComponent(c.slug)}`}>
+                                            {c?.name ?? c?.slug}
+                                          </Link>
+                                        </Menu.Item>
+                                      ))
+                                    ) : (
+                                      <Menu.Item value="categories-empty" disabled>
+                                        No categories
+                                      </Menu.Item>
+                                    )}
+                                </Menu.Content>
+                            </Menu.Positioner>
+                        </Portal>
+                    </Menu.Root>
+
+                    <Menu.Root>
+                        <Menu.Trigger asChild>
+                        <Button variant="outline" colorPalette="neutral" size="sm">
+                                Brands <FaChevronDown />
+                            </Button>
+                        </Menu.Trigger>
+                        <Portal>
+                            <Menu.Positioner>
+                                <Menu.Content maxH="320px" overflowY="auto">
+                                    {brandsLoading ? (
+                                      Array.from({ length: 6 }).map((_, idx) => (
+                                        <Menu.Item key={`brands-skel-${idx}`} value={`brands-skel-${idx}`} disabled>
+                                          <Skeleton h="12px" w="160px" />
+                                        </Menu.Item>
+                                      ))
+                                    ) : (brandsData?.brands ?? []).length > 0 ? (
+                                      (brandsData?.brands ?? []).filter((b) => b?.slug).map((b) => (
+                                        <Menu.Item
+                                          asChild
+                                          key={b?.id ?? b?._id ?? b?.slug}
+                                          value={b?.slug ?? b?.name}
+                                        >
+                                          {/* Navigate to Catalog with a single brand slug filter */}
+                                          <Link as={RouterLink} to={`/catalog?brand=${encodeURIComponent(b.slug)}`}>
+                                            {b?.name ?? b?.slug}
+                                          </Link>
+                                        </Menu.Item>
+                                      ))
+                                    ) : (
+                                      <Menu.Item value="brands-empty" disabled>
+                                        No brands
+                                      </Menu.Item>
+                                    )}
+                                </Menu.Content>
+                            </Menu.Positioner>
+                        </Portal>
+                    </Menu.Root>
+
+                    <Link as={RouterLink} to="/orders" fontWeight="500">
+                        Orders
+                    </Link>
                 </HStack>
             </Flex>
         </Box>

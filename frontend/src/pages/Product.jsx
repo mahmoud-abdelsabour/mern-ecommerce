@@ -430,14 +430,14 @@ const Product = () => {
         </HStack>
 
         {/*buying buttons */}
-        <HStack mt={3} gap={3} justify="center" mb={2}>
+        <HStack mt={3} gap={3} justify="center" flexWrap="wrap" align="stretch" mb={2}>
         {isLoading ? (
           <>
             <Skeleton h="32px" w="140px" rounded="md" />
             <Skeleton h="32px" w="140px" rounded="md" />
           </>
         ) : cartQuantity > 0 ? (
-          <HStack minW="140px" justify="space-between" align="center">
+          <HStack minW={{ base: "100%", sm: "140px" }} justify="space-between" align="center">
             <IconButton
               size="sm"
               variant="outline"
@@ -467,7 +467,7 @@ const Product = () => {
             variant="outline"
             colorPalette="neutral"
             size="sm"
-            minW="140px"
+              minW={{ base: "100%", sm: "140px" }}
             onClick={onAddToCart}
             disabled={isLoading || addToCartMutation.isPending || !product}
           >
@@ -478,7 +478,7 @@ const Product = () => {
           <Button
             colorPalette="brand"
             size="sm"
-            minW="140px"
+            minW={{ base: "100%", sm: "140px" }}
             onClick={onBuyNow}
             disabled={isLoading || !product}
           >
@@ -646,8 +646,8 @@ const CarouselThumbnails = ({ items, loading = false }) => {
   const carousel = useCarouselContext()
 
   return (
-    <HStack justify="center">
-      <Carousel.ProgressText mr="4" />
+    <HStack justify={{ base: "flex-start", md: "center" }} overflowX="auto" w="100%" pb={1}>
+      <Carousel.ProgressText mr="4" display={{ base: "none", md: "block" }} />
       {loading
         ? Array.from({ length: 4 }).map((_, idx) => (
             <AspectRatio key={`carousel-thumb-skel-${idx}`} ratio={1} w="16">

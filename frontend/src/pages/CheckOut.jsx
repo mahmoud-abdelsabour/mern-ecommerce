@@ -433,7 +433,7 @@ const CheckOut = () => {
               <Text fontSize="lg" fontWeight="800">
                 Deliver to
               </Text>
-              <HStack>
+              <HStack w={{ base: "100%", sm: "auto" }} flexWrap="wrap" justify={{ base: "flex-start", sm: "flex-end" }}>
                 <Select.Root
                   collection={addressCollection}
                   size="sm"
@@ -472,6 +472,7 @@ const CheckOut = () => {
                   size="sm"
                   variant="outline"
                   colorPalette="neutral"
+                  alignSelf={{ base: "flex-end", sm: "center" }}
                   onClick={() => setShowAddressForm((v) => !v)}
                   disabled={addressFormBusy}
                 >

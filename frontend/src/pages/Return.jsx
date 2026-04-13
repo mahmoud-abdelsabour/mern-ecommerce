@@ -280,10 +280,11 @@ const Return = () => {
         </Box>
 
         <HStack justify="center" gap={4} flexWrap="wrap">
-          <Button variant="outline" colorPalette="neutral" as={RouterLink} to={`/order/${orderId}`}>
+          <Button w={{ base: "100%", sm: "auto" }} variant="outline" colorPalette="neutral" as={RouterLink} to={`/order/${orderId}`}>
             Back to order
           </Button>
           <Button
+            w={{ base: "100%", sm: "auto" }}
             size="lg"
             colorPalette="orange"
             disabled={!hasSelected || returnMutation.isPending}
