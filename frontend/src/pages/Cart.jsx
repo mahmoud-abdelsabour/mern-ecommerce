@@ -54,7 +54,7 @@ const Cart = () => {
   }
 
   return (
-    <Box maxW="1200px" mx="auto" px={4} py={8}>
+    <Box maxW="1280px" mx="auto" px={{ base: 4, lg: 6 }} py={{ base: 8, lg: 10 }}>
       {isError && (
         <Text fontSize="sm" color="state.error" mb={4}>
           Failed to load cart: {error?.response?.data?.message ?? error?.message ?? "Unknown error"}

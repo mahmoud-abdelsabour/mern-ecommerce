@@ -238,7 +238,7 @@ const Profile = () => {
   const addresses = Array.isArray(user?.addresses) ? user.addresses : []
 
   return (
-    <Box maxW="1200px" mx="auto" px={4} py={8} w="100%">
+    <Box maxW="1280px" mx="auto" px={{ base: 4, lg: 6 }} py={{ base: 8, lg: 10 }} w="100%">
       <Stack gap={6}>
         <GlobalNotification
           key={notice?.id}

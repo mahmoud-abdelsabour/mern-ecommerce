@@ -77,7 +77,7 @@ const Wishlist = () => {
   }
 
   return (
-    <Box maxW="1200px" mx="auto" px={4} py={8}>
+    <Box maxW="1280px" mx="auto" px={{ base: 4, lg: 6 }} py={{ base: 8, lg: 10 }}>
       <HStack justify="space-between" align="center" mb={4}>
         <Text fontSize="lg" fontWeight="700">
           Wishlist

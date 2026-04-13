@@ -232,7 +232,7 @@ const Return = () => {
   }
 
   return (
-    <Box maxW="1200px" mx="auto" px={4} py={8}>
+    <Box maxW="1280px" mx="auto" px={{ base: 4, lg: 6 }} py={{ base: 8, lg: 10 }}>
       <Stack gap={6}>
         <Stack gap={1}>
           <Text fontSize="2xl" fontWeight="900">

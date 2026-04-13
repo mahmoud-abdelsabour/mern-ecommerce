@@ -164,7 +164,7 @@ const Catalog = () => {
   // - Main area is a responsive Stack: column on small screens, two columns on large screens.
   return (
     // Outer container (controls page width + adds padding).
-    <Box maxW="1400px" mx="auto" px={4} py={8}>
+    <Box maxW="1360px" mx="auto" px={{ base: 4, lg: 6 }} py={{ base: 8, lg: 10 }}>
       <Stack gap={6}>
         {/* Header (page title + result count) */}
         <Stack gap={1}>

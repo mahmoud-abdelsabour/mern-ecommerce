@@ -205,7 +205,7 @@ const Product = () => {
   ])
 
   return (
-    <Box maxW="1200px" mx="auto" px={4} mt={6} pb={10}>
+    <Box maxW="1280px" mx="auto" px={{ base: 4, lg: 6 }} mt={{ base: 6, lg: 8 }} pb={{ base: 10, lg: 12 }}>
       {/* Show request errors (instead of silently rendering an empty product). */}
       {isError && (
         <Text fontSize="sm" color="state.error" mb={4}>
