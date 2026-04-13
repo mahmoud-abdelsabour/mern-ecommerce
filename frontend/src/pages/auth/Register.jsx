@@ -60,12 +60,15 @@ const Register = () => {
   return (
     <Flex minH="70vh" align="center" justify="center" px={4}>
       <Box as="form" onSubmit={onSubmit} w="100%" maxW="420px">
-        <Fieldset.Root size="lg" maxW="md" invalid={Boolean(formError) || Object.keys(fieldErrors).length > 0}>
-          <Stack>
+        <Fieldset.Root size="lg" maxW="md" borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={{ base: 4, md: 6 }} invalid={Boolean(formError) || Object.keys(fieldErrors).length > 0}>
+          <Stack mb={4}>
             <Fieldset.Legend>Register</Fieldset.Legend>
+            <Text fontSize="sm" color="text.secondary">
+              Create your account to place orders and track purchases.
+            </Text>
           </Stack>
 
-          <Fieldset.Content>
+          <Fieldset.Content gap={4}>
             <GlobalNotification status="error" title={formError} />
 
             <HStack gap={3} flexWrap="wrap">
@@ -80,7 +83,7 @@ const Register = () => {
                   }
                 />
                 {fieldErrors.firstName && (
-                  <Text fontSize="xs" color="red.500">
+                  <Text fontSize="xs" color="state.error">
                     {fieldErrors.firstName}
                   </Text>
                 )}
@@ -96,7 +99,7 @@ const Register = () => {
                   }
                 />
                 {fieldErrors.lastName && (
-                  <Text fontSize="xs" color="red.500">
+                  <Text fontSize="xs" color="state.error">
                     {fieldErrors.lastName}
                   </Text>
                 )}
@@ -114,7 +117,7 @@ const Register = () => {
                 }
               />
               {fieldErrors.username && (
-                <Text fontSize="xs" color="red.500">
+                <Text fontSize="xs" color="state.error">
                   {fieldErrors.username}
                 </Text>
               )}
@@ -133,7 +136,7 @@ const Register = () => {
                 }
               />
               {fieldErrors.email && (
-                <Text fontSize="xs" color="red.500">
+                <Text fontSize="xs" color="state.error">
                   {fieldErrors.email}
                 </Text>
               )}
@@ -151,7 +154,7 @@ const Register = () => {
                 }
               />
               {fieldErrors.password && (
-                <Text fontSize="xs" color="red.500">
+                <Text fontSize="xs" color="state.error">
                   {fieldErrors.password}
                 </Text>
               )}
@@ -173,7 +176,7 @@ const Register = () => {
                 }
               />
               {fieldErrors.confirmPassword && (
-                <Text fontSize="xs" color="red.500">
+                <Text fontSize="xs" color="state.error">
                   {fieldErrors.confirmPassword}
                 </Text>
               )}
@@ -192,7 +195,7 @@ const Register = () => {
                 }
               />
               {fieldErrors.phone && (
-                <Text fontSize="xs" color="red.500">
+                <Text fontSize="xs" color="state.error">
                   {fieldErrors.phone}
                 </Text>
               )}

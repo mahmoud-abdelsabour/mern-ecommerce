@@ -35,15 +35,15 @@ const ChangeEmail = () => {
   return (
     <Flex minH="70vh" align="center" justify="center" px={4} py={8}>
       <Box as="form" onSubmit={onSubmit} w="100%" maxW="520px">
-        <Fieldset.Root size="lg">
+        <Fieldset.Root size="lg" borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={{ base: 4, md: 6 }}>
           <Stack mb={4}>
             <Fieldset.Legend>Change Email</Fieldset.Legend>
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text.secondary">
               Enter your new email address. You will be signed out after saving.
             </Text>
           </Stack>
 
-          <Fieldset.Content>
+          <Fieldset.Content gap={4}>
             <Field.Root>
               <Field.Label>New email</Field.Label>
               <Input
@@ -61,7 +61,7 @@ const ChangeEmail = () => {
               </Button>
               <Button
                 type="submit"
-                colorScheme="teal"
+                colorPalette="brand"
                 disabled={!canSubmit || updateProfileMutation.isPending}
               >
                 {updateProfileMutation.isPending ? "Updating..." : "Update email"}

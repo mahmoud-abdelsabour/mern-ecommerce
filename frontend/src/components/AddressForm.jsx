@@ -10,15 +10,15 @@ const AddressForm = ({
   disabled = false,
 }) => {
   return (
-    <Box borderWidth="1px" borderColor="gray.200" rounded="md" p={4} w="100%">
-      <Stack gap={3}>
+    <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={{ base: 4, md: 5 }} w="100%">
+      <Stack gap={4}>
         <Text fontSize="md" fontWeight="800">
           {title}
         </Text>
 
-        <Stack gap={3}>
+        <Stack gap={4}>
           <Field.Root>
-            <Field.Label>Address name</Field.Label>
+            <Field.Label color="text.secondary">Address name</Field.Label>
             <Input
               value={draft.address_name}
               onChange={(e) => onChange({ address_name: e.target.value })}
@@ -28,7 +28,7 @@ const AddressForm = ({
 
           <HStack gap={3} flexWrap="wrap">
             <Field.Root flex="1" minW="240px">
-              <Field.Label>Country</Field.Label>
+              <Field.Label color="text.secondary">Country</Field.Label>
               <Input
                 value={draft.country}
                 onChange={(e) => onChange({ country: e.target.value })}
@@ -36,7 +36,7 @@ const AddressForm = ({
               />
             </Field.Root>
             <Field.Root flex="1" minW="240px">
-              <Field.Label>City</Field.Label>
+              <Field.Label color="text.secondary">City</Field.Label>
               <Input
                 value={draft.city}
                 onChange={(e) => onChange({ city: e.target.value })}
@@ -47,7 +47,7 @@ const AddressForm = ({
 
           <HStack gap={3} flexWrap="wrap">
             <Field.Root flex="1" minW="240px">
-              <Field.Label>Postal code</Field.Label>
+              <Field.Label color="text.secondary">Postal code</Field.Label>
               <Input
                 value={draft.postalcode}
                 onChange={(e) => onChange({ postalcode: e.target.value })}
@@ -55,7 +55,7 @@ const AddressForm = ({
               />
             </Field.Root>
             <Field.Root flex="2" minW="240px">
-              <Field.Label>Street</Field.Label>
+              <Field.Label color="text.secondary">Street</Field.Label>
               <Input
                 value={draft.street}
                 onChange={(e) => onChange({ street: e.target.value })}
@@ -66,7 +66,7 @@ const AddressForm = ({
 
           <HStack gap={3} flexWrap="wrap">
             <Field.Root flex="2" minW="240px">
-              <Field.Label>Building</Field.Label>
+              <Field.Label color="text.secondary">Building</Field.Label>
               <Input
                 value={draft.building}
                 onChange={(e) => onChange({ building: e.target.value })}
@@ -74,7 +74,7 @@ const AddressForm = ({
               />
             </Field.Root>
             <Field.Root flex="1" minW="160px">
-              <Field.Label>Floor</Field.Label>
+              <Field.Label color="text.secondary">Floor</Field.Label>
               <Input
                 type="number"
                 value={draft.floor}
@@ -85,7 +85,7 @@ const AddressForm = ({
           </HStack>
 
           <Field.Root>
-            <Field.Label>Special mark</Field.Label>
+            <Field.Label color="text.secondary">Special mark</Field.Label>
             <Input
               value={draft.special_mark}
               onChange={(e) => onChange({ special_mark: e.target.value })}
@@ -94,11 +94,11 @@ const AddressForm = ({
           </Field.Root>
 
           <HStack>
-            <Button onClick={onSubmit} disabled={disabled}>
+            <Button onClick={onSubmit} colorPalette="brand" disabled={disabled}>
               {submitLabel}
             </Button>
             {onCancel && (
-              <Button variant="outline" onClick={onCancel} disabled={disabled}>
+              <Button variant="outline" colorPalette="neutral" onClick={onCancel} disabled={disabled}>
                 Cancel
               </Button>
             )}

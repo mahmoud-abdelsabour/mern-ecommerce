@@ -59,13 +59,21 @@ const Login = () => {
         <Fieldset.Root
           size="lg"
           maxW="md"
+          borderWidth="1px"
+          borderColor="surface.border"
+          bg="surface.panel"
+          rounded="lg"
+          p={{ base: 4, md: 6 }}
           invalid={Boolean(formError) || Object.keys(fieldErrors).length > 0}
         >
-          <Stack>
+          <Stack mb={4}>
             <Fieldset.Legend>Login</Fieldset.Legend>
+            <Text fontSize="sm" color="text.secondary">
+              Sign in to continue shopping and manage your orders.
+            </Text>
           </Stack>
 
-          <Fieldset.Content>
+          <Fieldset.Content gap={4}>
             <GlobalNotification status={flash?.status ?? "info"} title={flash?.title} />
             <GlobalNotification status="error" title={formError} />
 
@@ -81,7 +89,7 @@ const Login = () => {
                 }
               />
               {fieldErrors.email && (
-                <Text fontSize="xs" color="red.500">
+                <Text fontSize="xs" color="state.error">
                   {fieldErrors.email}
                 </Text>
               )}
@@ -99,7 +107,7 @@ const Login = () => {
                 }
               />
               {fieldErrors.password && (
-                <Text fontSize="xs" color="red.500">
+                <Text fontSize="xs" color="state.error">
                   {fieldErrors.password}
                 </Text>
               )}

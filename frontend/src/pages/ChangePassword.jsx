@@ -59,15 +59,15 @@ const ChangePassword = () => {
   return (
     <Flex minH="70vh" align="center" justify="center" px={4} py={8}>
       <Box as="form" onSubmit={onSubmit} w="100%" maxW="520px">
-        <Fieldset.Root size="lg">
+        <Fieldset.Root size="lg" borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={{ base: 4, md: 6 }}>
           <Stack mb={4}>
             <Fieldset.Legend>Change Password</Fieldset.Legend>
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text.secondary">
               Enter your old password, then set a new one.
             </Text>
           </Stack>
 
-          <Fieldset.Content>
+          <Fieldset.Content gap={4}>
             <Field.Root>
               <Field.Label>Old password</Field.Label>
               <Input
@@ -97,7 +97,7 @@ const ChangePassword = () => {
                 disabled={updatePasswordMutation.isPending}
               />
               {mismatch && (
-                <Text fontSize="xs" color="red.500" mt={1}>
+                <Text fontSize="xs" color="state.error" mt={1}>
                   Passwords do not match.
                 </Text>
               )}
@@ -109,7 +109,7 @@ const ChangePassword = () => {
               </Button>
               <Button
                 type="submit"
-                colorScheme="teal"
+                colorPalette="brand"
                 disabled={!canSubmit || updatePasswordMutation.isPending || !userId}
               >
                 {updatePasswordMutation.isPending ? "Updating..." : "Update password"}

@@ -47,15 +47,15 @@ const EditProfileForm = ({ initialForm }) => {
   return (
     <Flex minH="70vh" align="center" justify="center" px={4} py={8}>
       <Box as="form" onSubmit={onSubmit} w="100%" maxW="520px">
-        <Fieldset.Root size="lg">
+        <Fieldset.Root size="lg" borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={{ base: 4, md: 6 }}>
           <Stack mb={4}>
             <Fieldset.Legend>Edit Profile</Fieldset.Legend>
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text.secondary">
               Update your personal information.
             </Text>
           </Stack>
 
-          <Fieldset.Content>
+          <Fieldset.Content gap={4}>
             <HStack gap={3} flexWrap="wrap">
               <Field.Root flex="1" minW="220px">
                 <Field.Label>First name</Field.Label>
