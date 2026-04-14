@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Collapsible,
   EmptyState,
   HStack,
   Portal,
@@ -24,6 +25,7 @@ import { useMemo } from "react"
 import ProductList from "../components/ProductList"
 import ProductGridSkeleton from "../components/skeletons/ProductGridSkeleton"
 import { PiEmptyFill } from "react-icons/pi"
+import { LuChevronDown, LuSlidersHorizontal } from "react-icons/lu"
 import PaginationControls from "../components/PaginationControls"
 import { useProducts } from "../hooks/useProducts"
 import { useBrands } from "../hooks/useBrands"
@@ -159,6 +161,207 @@ const Catalog = () => {
     return createListCollection({ items })
   }, [])
 
+  const hasCustomPriceRange = priceRange[0] !== sliderMin || priceRange[1] !== sliderMax
+  const activeFilterCount =
+    selectedBrands.length +
+    selectedCategories.length +
+    (hasCustomPriceRange ? 1 : 0) +
+    (minRating > 0 ? 1 : 0) +
+    (sort !== defaultSort ? 1 : 0)
+
+  const renderFiltersContent = () => (
+    <Stack gap={5}>
+      <HStack justify="space-between" align="center">
+        <Text fontSize="lg" fontWeight="900">
+          Filters
+        </Text>
+        <Button size="xs" variant="outline" colorPalette="neutral" onClick={resetFilters}>
+          Clear
+        </Button>
+      </HStack>
+      <Separator />
+
+      {/* Sort filter */}
+      <Stack gap={2}>
+        <Text fontSize="md" fontWeight="800">
+          Sort
+        </Text>
+        <Separator />
+        <Select.Root
+          collection={sortCollection}
+          size="sm"
+          value={sort ? [sort] : [defaultSort]}
+          onValueChange={(details) => setSort(details.value[0] ?? defaultSort)}
+        >
+          <Select.HiddenSelect />
+          <Select.Control>
+            <Select.Trigger>
+              <Select.ValueText placeholder="Select sort" />
+            </Select.Trigger>
+            <Select.IndicatorGroup>
+              <Select.Indicator />
+            </Select.IndicatorGroup>
+          </Select.Control>
+          <Portal>
+            <Select.Positioner>
+              <Select.Content>
+                {sortCollection.items.map((item) => (
+                  <Select.Item item={item} key={item.value}>
+                    {item.label}
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Positioner>
+          </Portal>
+        </Select.Root>
+      </Stack>
+
+      {/* Brands filter (multi-select) */}
+      <Stack gap={2}>
+        <HStack justify="space-between">
+          <Text fontSize="md" fontWeight="800">
+            Brands ({brandsLoading ? "…" : String((brandsData?.brands ?? []).length)})
+          </Text>
+        </HStack>
+        <Separator />
+        <Box maxH="180px" overflowY="auto" pr={2}>
+          <Stack gap={2}>
+            {brandsLoading ? (
+              Array.from({ length: 8 }).map((_, idx) => (
+                <HStack key={`brand-skel-${idx}`} gap={2}>
+                  <Skeleton h="16px" w="16px" rounded="sm" />
+                  <Skeleton h="12px" w="70%" />
+                </HStack>
+              ))
+            ) : brandOptions.length > 0 ? (
+              brandOptions.map((brand) => (
+                <Checkbox.Root
+                  key={brand.value}
+                  checked={selectedBrands.includes(brand.value)}
+                  onCheckedChange={(d) => {
+                    const checked = Boolean(d.checked)
+                    const nextList = checked
+                      ? toggleListValue(selectedBrands, brand.value)
+                      : selectedBrands.filter((b) => b !== brand.value)
+                    setBrands(nextList)
+                  }}
+                >
+                  <Checkbox.HiddenInput />
+                  <Checkbox.Control />
+                  <Checkbox.Label fontSize="sm">{brand.label}</Checkbox.Label>
+                </Checkbox.Root>
+              ))
+            ) : (
+              <Text fontSize="sm" color="text.muted">
+                No brands found.
+              </Text>
+            )}
+          </Stack>
+        </Box>
+      </Stack>
+
+      {/* Categories filter (multi-select) */}
+      <Stack gap={2}>
+        <HStack justify="space-between">
+          <Text fontSize="md" fontWeight="800">
+            Categories ({categoriesLoading ? "…" : String((categoriesData?.categories ?? []).length)})
+          </Text>
+        </HStack>
+        <Separator />
+        <Box maxH="180px" overflowY="auto" pr={2}>
+          <Stack gap={2}>
+            {categoriesLoading ? (
+              Array.from({ length: 8 }).map((_, idx) => (
+                <HStack key={`category-skel-${idx}`} gap={2}>
+                  <Skeleton h="16px" w="16px" rounded="sm" />
+                  <Skeleton h="12px" w="70%" />
+                </HStack>
+              ))
+            ) : categoryOptions.length > 0 ? (
+              categoryOptions.map((category) => (
+                <Checkbox.Root
+                  key={category.value}
+                  checked={selectedCategories.includes(category.value)}
+                  onCheckedChange={(d) => {
+                    const checked = Boolean(d.checked)
+                    const nextList = checked
+                      ? toggleListValue(selectedCategories, category.value)
+                      : selectedCategories.filter((c) => c !== category.value)
+                    setCategories(nextList)
+                  }}
+                >
+                  <Checkbox.HiddenInput />
+                  <Checkbox.Control />
+                  <Checkbox.Label fontSize="sm">{category.label}</Checkbox.Label>
+                </Checkbox.Root>
+              ))
+            ) : (
+              <Text fontSize="sm" color="text.muted">
+                No categories found.
+              </Text>
+            )}
+          </Stack>
+        </Box>
+      </Stack>
+
+      {/* Price range filter (two-thumb slider) */}
+      <Stack gap={2}>
+        <HStack justify="space-between">
+          <Text fontSize="md" fontWeight="800">
+            Price range
+          </Text>
+          <Text fontSize="sm" color="text.secondary">
+            ${priceRange[0]} - ${priceRange[1]}
+          </Text>
+        </HStack>
+        <Separator />
+        <Slider.Root
+          maxW="md"
+          min={sliderMin}
+          max={sliderMax}
+          step={sliderStep}
+          value={priceRange}
+          onValueChange={(e) => {
+            setPriceRange(e.value)
+          }}
+          minStepsBetweenThumbs={sliderMinStepsBetweenThumbs}
+        >
+          <Slider.Control>
+            <Slider.Track>
+              <Slider.Range />
+            </Slider.Track>
+            <Slider.Thumbs />
+          </Slider.Control>
+        </Slider.Root>
+      </Stack>
+
+      {/* Rating filter (selects a minimum rating from 0..5) */}
+      <Stack gap={2}>
+        <HStack justify="space-between">
+          <Text fontSize="md" fontWeight="800">
+            Min rating
+          </Text>
+          <Text fontSize="sm" color="text.secondary">
+            {minRating}+
+          </Text>
+        </HStack>
+        <Separator />
+        <RatingGroup.Root
+          count={5}
+          value={minRating}
+          onValueChange={(e) => {
+            const next = Number(e.value ?? 0)
+            setMinRating(next)
+          }}
+        >
+          <RatingGroup.HiddenInput />
+          <RatingGroup.Control />
+        </RatingGroup.Root>
+      </Stack>
+    </Stack>
+  )
+
   // Page UI.
   // - Outer container sets a consistent max width (similar to the Order page).
   // - Main area is a responsive Stack: column on small screens, two columns on large screens.
@@ -187,207 +390,49 @@ const Catalog = () => {
           )}
         </Stack>
 
-        {/* Main layout: filters (left) + products (right). Stacks vertically on small screens. */}
-        <Stack direction={{ base: "column", md: "row" }} align="stretch" gap={6}>
-          {/* Filters sidebar */}
-          <Box w={{ base: "100%", md: "300px", lg: "340px" }} borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
-            <Stack gap={5}>
-              <HStack justify="space-between" align="center">
-                <Text fontSize="lg" fontWeight="900">
-                  Filters
-                </Text>
-                <Button size="xs" variant="outline" colorPalette="neutral" onClick={resetFilters}>
-                  Clear
-                </Button>
+        {/* Mobile/small-screen filters: collapsible so products are visible immediately. */}
+        <Collapsible.Root display={{ base: "block", md: "none" }}>
+          <Collapsible.Trigger asChild>
+            <Button
+              variant="outline"
+              colorPalette="neutral"
+              justifyContent="space-between"
+              w="100%"
+              aria-label="Toggle catalog filters"
+            >
+              <HStack gap={2}>
+                <LuSlidersHorizontal size={16} />
+                <Text>Filters</Text>
               </HStack>
-              <Separator />
-
-              {/* Sort filter */}
-              <Stack gap={2}>
-                <Text fontSize="md" fontWeight="800">
-                  Sort
+              <HStack gap={2}>
+                <Text fontSize="xs" color="text.muted">
+                  {activeFilterCount > 0 ? `${activeFilterCount} active` : "All"}
                 </Text>
-                <Separator />
-                <Select.Root
-                  collection={sortCollection}
-                  size="sm"
-                  value={sort ? [sort] : [defaultSort]}
-                  onValueChange={(details) => setSort(details.value[0] ?? defaultSort)}
-                >
-                  <Select.HiddenSelect />
-                  <Select.Control>
-                    <Select.Trigger>
-                      <Select.ValueText placeholder="Select sort" />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Portal>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {sortCollection.items.map((item) => (
-                          <Select.Item item={item} key={item.value}>
-                            {item.label}
-                            <Select.ItemIndicator />
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Positioner>
-                  </Portal>
-                </Select.Root>
-              </Stack>
+                <Collapsible.Indicator transition="transform 0.2s" _open={{ transform: "rotate(180deg)" }}>
+                  <LuChevronDown size={16} />
+                </Collapsible.Indicator>
+              </HStack>
+            </Button>
+          </Collapsible.Trigger>
+          <Collapsible.Content>
+            <Box mt={3} borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
+              {renderFiltersContent()}
+            </Box>
+          </Collapsible.Content>
+        </Collapsible.Root>
 
-              {/* Brands filter (multi-select) */}
-              <Stack gap={2}>
-                <HStack justify="space-between">
-                  <Text fontSize="md" fontWeight="800">
-                    Brands ({brandsLoading ? "…" : String((brandsData?.brands ?? []).length)})
-                  </Text>
-                </HStack>
-                <Separator />
-                {/* Scroll container to keep the sidebar height reasonable */}
-                <Box maxH="180px" overflowY="auto" pr={2}>
-                  <Stack gap={2}>
-                    {brandsLoading ? (
-                      Array.from({ length: 8 }).map((_, idx) => (
-                        <HStack key={`brand-skel-${idx}`} gap={2}>
-                          <Skeleton h="16px" w="16px" rounded="sm" />
-                          <Skeleton h="12px" w="70%" />
-                        </HStack>
-                      ))
-                    ) : brandOptions.length > 0 ? (
-                      brandOptions.map((brand) => (
-                        <Checkbox.Root
-                          key={brand.value}
-                          checked={selectedBrands.includes(brand.value)}
-                          onCheckedChange={(d) => {
-                            // `d.checked` may be boolean or "indeterminate"; normalize to boolean.
-                            const checked = Boolean(d.checked)
-                            // If checked -> add, else -> remove.
-                            const nextList = checked
-                              ? toggleListValue(selectedBrands, brand.value)
-                              : selectedBrands.filter((b) => b !== brand.value)
-                            setBrands(nextList)
-                          }}
-                        >
-                          <Checkbox.HiddenInput />
-                          <Checkbox.Control />
-                          <Checkbox.Label fontSize="sm">{brand.label}</Checkbox.Label>
-                        </Checkbox.Root>
-                      ))
-                    ) : (
-                      <Text fontSize="sm" color="text.muted">
-                        No brands found.
-                      </Text>
-                    )}
-                  </Stack>
-                </Box>
-              </Stack>
-
-              {/* Categories filter (multi-select) */}
-              <Stack gap={2}>
-                <HStack justify="space-between">
-                  <Text fontSize="md" fontWeight="800">
-                    Categories ({categoriesLoading ? "…" : String((categoriesData?.categories ?? []).length)})
-                  </Text>
-                </HStack>
-                <Separator />
-                <Box maxH="180px" overflowY="auto" pr={2}>
-                  <Stack gap={2}>
-                    {categoriesLoading ? (
-                      Array.from({ length: 8 }).map((_, idx) => (
-                        <HStack key={`category-skel-${idx}`} gap={2}>
-                          <Skeleton h="16px" w="16px" rounded="sm" />
-                          <Skeleton h="12px" w="70%" />
-                        </HStack>
-                      ))
-                    ) : categoryOptions.length > 0 ? (
-                      categoryOptions.map((category) => (
-                        <Checkbox.Root
-                          key={category.value}
-                          checked={selectedCategories.includes(category.value)}
-                          onCheckedChange={(d) => {
-                            // `d.checked` may be boolean or "indeterminate"; normalize to boolean.
-                            const checked = Boolean(d.checked)
-                            // If checked -> add, else -> remove.
-                            const nextList = checked
-                              ? toggleListValue(selectedCategories, category.value)
-                              : selectedCategories.filter((c) => c !== category.value)
-                            setCategories(nextList)
-                          }}
-                        >
-                          <Checkbox.HiddenInput />
-                          <Checkbox.Control />
-                          <Checkbox.Label fontSize="sm">{category.label}</Checkbox.Label>
-                        </Checkbox.Root>
-                      ))
-                    ) : (
-                      <Text fontSize="sm" color="text.muted">
-                        No categories found.
-                      </Text>
-                    )}
-                  </Stack>
-                </Box>
-              </Stack>
-
-              {/* Price range filter (two-thumb slider) */}
-              <Stack gap={2}>
-                <HStack justify="space-between">
-                  <Text fontSize="md" fontWeight="800">
-                    Price range
-                  </Text>
-                  <Text fontSize="sm" color="text.secondary">
-                    ${priceRange[0]} - ${priceRange[1]}
-                  </Text>
-                </HStack>
-                <Separator />
-                <Slider.Root
-                  maxW="md"
-                  min={sliderMin}
-                  max={sliderMax}
-                  step={sliderStep}
-                  value={priceRange}
-                  onValueChange={(e) => {
-                    // `e.value` is `[min, max]`.
-                    setPriceRange(e.value)
-                  }}
-                  minStepsBetweenThumbs={sliderMinStepsBetweenThumbs}
-                >
-                  <Slider.Control>
-                    <Slider.Track>
-                      <Slider.Range />
-                    </Slider.Track>
-                    <Slider.Thumbs />
-                  </Slider.Control>
-                </Slider.Root>
-              </Stack>
-
-              {/* Rating filter (selects a minimum rating from 0..5) */}
-              <Stack gap={2}>
-                <HStack justify="space-between">
-                  <Text fontSize="md" fontWeight="800">
-                    Min rating
-                  </Text>
-                  <Text fontSize="sm" color="text.secondary">
-                    {minRating}+
-                  </Text>
-                </HStack>
-                <Separator />
-                <RatingGroup.Root
-                  count={5}
-                  value={minRating}
-                  onValueChange={(e) => {
-                    // RatingGroup gives a value; we persist it to the URL.
-                    const next = Number(e.value ?? 0)
-                    setMinRating(next)
-                  }}
-                >
-                  <RatingGroup.HiddenInput />
-                  <RatingGroup.Control />
-                </RatingGroup.Root>
-              </Stack>
-            </Stack>
+        {/* Main layout: desktop filters (left) + products (right). */}
+        <Stack direction={{ base: "column", md: "row" }} align="stretch" gap={6}>
+          <Box
+            display={{ base: "none", md: "block" }}
+            w={{ md: "300px", lg: "340px" }}
+            borderWidth="1px"
+            borderColor="surface.border"
+            bg="surface.panel"
+            rounded="lg"
+            p={4}
+          >
+            {renderFiltersContent()}
           </Box>
 
           {/* Products panel */}
