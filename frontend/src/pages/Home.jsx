@@ -105,12 +105,12 @@ const SectionHeader = ({ title, subtitle, seeAllTo, seeAllLabel = "See all" }) =
         fontSize={{ base: "xl", md: "2xl" }}
         fontWeight="800"
         letterSpacing="-0.02em"
-        color="gray.900"
+        color="text.primary"
       >
         {title}
       </Text>
       {subtitle ? (
-        <Text fontSize="sm" color="gray.600" lineHeight="1.6">
+        <Text fontSize="sm" color="text.secondary" lineHeight="1.6">
           {subtitle}
         </Text>
       ) : null}
@@ -149,7 +149,7 @@ const ProductRail = ({ title, subtitle, seeAllTo, railKey, items, isLoading }) =
     return (
       <Box>
         <SectionHeader title={title} subtitle={subtitle} seeAllTo={seeAllTo} />
-        <Text fontSize="sm" color="gray.500">
+        <Text fontSize="sm" color="text.muted">
           No products to show yet.
         </Text>
       </Box>
@@ -185,12 +185,12 @@ const ProductRail = ({ title, subtitle, seeAllTo, railKey, items, isLoading }) =
       <Carousel.Root display={{ base: "none", lg: "block" }} slideCount={items.length} slidesPerPage={6} gap="0">
         <HStack justify="flex-end" mb={3}>
           <Carousel.PrevTrigger asChild>
-            <IconButton size="sm" variant="outline" borderColor="gray.200" aria-label="Previous products">
+            <IconButton size="sm" variant="outline" borderColor="surface.border" aria-label="Previous products">
               <LuChevronLeft />
             </IconButton>
           </Carousel.PrevTrigger>
           <Carousel.NextTrigger asChild>
-            <IconButton size="sm" variant="outline" borderColor="gray.200" aria-label="Next products">
+            <IconButton size="sm" variant="outline" borderColor="surface.border" aria-label="Next products">
               <LuChevronRight />
             </IconButton>
           </Carousel.NextTrigger>
@@ -288,7 +288,7 @@ const Home = () => {
   const spotlightSeeAll = spotlightSlug ? `/catalog?category=${encodeURIComponent(spotlightSlug)}` : "/catalog"
 
   return (
-    <Box bg="gray.50" minH="100%">
+    <Box bg="surface.canvas" minH="100%">
       <Box maxW="1400px" mx="auto" px={4} py={{ base: 6, md: 10 }}>
         {/* Hero Section */}
         <Box mb={{ base: 10, md: 14 }}>
@@ -337,10 +337,10 @@ const Home = () => {
           gap={{ base: 4, md: 6 }}
           py={{ base: 5, md: 6 }}
           px={{ base: 4, md: 8 }}
-          bg="white"
+          bg="surface.panel"
           rounded="xl"
           borderWidth="1px"
-          borderColor="gray.100"
+          borderColor="surface.border"
           shadow="sm"
           mb={{ base: 14, md: 20 }}
         >
@@ -350,8 +350,8 @@ const Home = () => {
                 w="10"
                 h="10"
                 rounded="lg"
-                bg="teal.50"
-                color="teal.700"
+                bg="surface.subtle"
+                color="brand.700"
                 align="center"
                 justify="center"
                 flexShrink={0}
@@ -359,10 +359,10 @@ const Home = () => {
                 {createElement(icon, { size: 22 })}
               </Flex>
               <Stack gap={0}>
-                <Text fontSize="sm" fontWeight="700" color="gray.900">
+                <Text fontSize="sm" fontWeight="700" color="text.primary">
                   {label}
                 </Text>
-                <Text fontSize="xs" color="gray.600" lineHeight="short">
+                <Text fontSize="xs" color="text.secondary" lineHeight="short">
                   {description}
                 </Text>
               </Stack>
@@ -398,7 +398,7 @@ const Home = () => {
               ))}
             </SimpleGrid>
           ) : categoryTiles.length === 0 ? (
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text.muted">
               No categories available yet.
             </Text>
           ) : (
@@ -413,9 +413,9 @@ const Home = () => {
                   rounded="xl"
                   h={{ base: "200px", md: "220px" }}
                   borderWidth="1px"
-                  borderColor="gray.200"
+                  borderColor="surface.border"
                   _hover={{
-                    borderColor: "teal.300",
+                    borderColor: "brand.300",
                     shadow: "md",
                     "& .cat-img": { transform: "scale(1.05)" },
                   }}
@@ -491,8 +491,8 @@ const Home = () => {
           overflow="hidden"
           rounded="2xl"
           borderWidth="1px"
-          borderColor="gray.100"
-          bg="white"
+          borderColor="surface.border"
+          bg="surface.panel"
           shadow="sm"
         >
           <Box
@@ -509,17 +509,17 @@ const Home = () => {
             p={{ base: 8, md: 12 }}
             maxW={{ lg: "50%" }}
           >
-            <Text fontSize="xs" fontWeight="700" color="teal.600" textTransform="uppercase" letterSpacing="wider">
+            <Text fontSize="xs" fontWeight="700" color="brand.600" textTransform="uppercase" letterSpacing="wider">
               Our story
             </Text>
-            <Text as="h3" fontSize={{ base: "xl", md: "2xl" }} fontWeight="800" color="gray.900" lineHeight="short">
+            <Text as="h3" fontSize={{ base: "xl", md: "2xl" }} fontWeight="800" color="text.primary" lineHeight="short">
               Quality you can feel, service you can trust
             </Text>
-            <Text fontSize="sm" color="gray.600" lineHeight="1.75">
+            <Text fontSize="sm" color="text.secondary" lineHeight="1.75">
               We curate every collection with care—fewer compromises, clearer value, and support when you need it.
             </Text>
             <Box>
-              <Button as={RouterLink} to="/catalog" variant="outline" colorPalette="brand">
+              <Button as={RouterLink} to="/catalog" variant="outline" colorPalette="neutral">
                 Browse the catalog
               </Button>
             </Box>
@@ -531,7 +531,7 @@ const Home = () => {
           py={{ base: 8, md: 10 }}
           px={{ base: 6, md: 12 }}
           rounded="2xl"
-          bg="teal.900"
+          bg={{ base: "neutral.900", _dark: "neutral.800" }}
           color="white"
           mb={4}
         >

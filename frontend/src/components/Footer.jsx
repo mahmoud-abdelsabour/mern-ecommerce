@@ -11,8 +11,8 @@ const FooterLink = ({ to, children, ...rest }) => (
     as={RouterLink}
     to={to}
     fontSize="sm"
-    color="gray.600"
-    _hover={{ color: "teal.600" }}
+    color="text.secondary"
+    _hover={{ color: "brand.600" }}
     display="block"
     {...rest}
   >
@@ -24,11 +24,11 @@ const Footer = () => {
   const isLoggedIn = Boolean(getToken())
 
   return (
-    <Box as="footer" borderTopWidth="1px" borderColor="gray.200" bg="gray.50" mt="auto">
+    <Box as="footer" borderTopWidth="1px" borderColor="surface.border" bg="surface.subtle" mt="auto">
       <Box maxW="1400px" mx="auto" px={{ base: 4, md: 6 }} py={{ base: 10, md: 12 }}>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} gap={{ base: 8, md: 10 }}>
           <Stack gap={3} align="start">
-            <Text fontSize="sm" fontWeight="800" color="gray.900" letterSpacing="wide">
+            <Text fontSize="sm" fontWeight="800" color="text.primary" letterSpacing="wide">
               Shop
             </Text>
             <FooterLink to="/catalog">Catalog</FooterLink>
@@ -38,16 +38,16 @@ const Footer = () => {
           </Stack>
 
           <Stack gap={3} align="start">
-            <Text fontSize="sm" fontWeight="800" color="gray.900" letterSpacing="wide">
+            <Text fontSize="sm" fontWeight="800" color="text.primary" letterSpacing="wide">
               Help
             </Text>
-            <Text fontSize="sm" color="gray.600">
+            <Text fontSize="sm" color="text.secondary">
               Questions? Email us anytime.
             </Text>
             <Link
               href="mailto:mahmoud.abdelsabur03@gmail.com"
               fontSize="sm"
-              color="teal.600"
+              color="brand.600"
               fontWeight="600"
             >
               Contact support
@@ -55,7 +55,7 @@ const Footer = () => {
           </Stack>
 
           <Stack gap={3} align="start">
-            <Text fontSize="sm" fontWeight="800" color="gray.900" letterSpacing="wide">
+            <Text fontSize="sm" fontWeight="800" color="text.primary" letterSpacing="wide">
               Account
             </Text>
             {isLoggedIn ? (
@@ -72,16 +72,16 @@ const Footer = () => {
           </Stack>
 
           <Stack gap={3} align="start">
-            <Text fontSize="sm" fontWeight="800" color="gray.900" letterSpacing="wide">
+            <Text fontSize="sm" fontWeight="800" color="text.primary" letterSpacing="wide">
               Legal
             </Text>
-            <Text fontSize="sm" color="gray.600" lineHeight="1.6">
+            <Text fontSize="sm" color="text.secondary" lineHeight="1.6">
               Terms, privacy, and returns policies apply at checkout and on your order confirmation.
             </Text>
           </Stack>
         </SimpleGrid>
 
-        <Separator my={10} borderColor="gray.200" />
+        <Separator my={10} borderColor="surface.border" />
 
         <Stack
           gap={6}
@@ -90,28 +90,28 @@ const Footer = () => {
           justify="space-between"
         >
           <HStack spacing={1} flexWrap="wrap" justify={{ base: "center", md: "flex-start" }}>
-            <Text fontSize="sm" color="gray.600">
+            <Text fontSize="sm" color="text.secondary">
               Made with
             </Text>
             <IoHeart size={ICON_SIZE} color="var(--chakra-colors-red-400)" />
-            <Text fontSize="sm" color="gray.600">
+            <Text fontSize="sm" color="text.secondary">
               by Mahmoud Ahmed
             </Text>
           </HStack>
 
           <HStack spacing={4} justify="center">
             <Link href="https://github.com/mahmoud-abdelsabour" isExternal aria-label="GitHub">
-              <IoLogoGithub size={ICON_SIZE} color="var(--chakra-colors-gray-700)" />
+              <IoLogoGithub size={ICON_SIZE} color="var(--chakra-colors-text-secondary)" />
             </Link>
             <Link href="https://www.linkedin.com" isExternal aria-label="LinkedIn">
-              <FaLinkedin size={ICON_SIZE} color="var(--chakra-colors-gray-700)" />
+              <FaLinkedin size={ICON_SIZE} color="var(--chakra-colors-text-secondary)" />
             </Link>
             <Link href="mailto:mahmoud.abdelsabur03@gmail.com" aria-label="Email">
-              <IoIosMail size={ICON_SIZE} color="var(--chakra-colors-gray-700)" />
+              <IoIosMail size={ICON_SIZE} color="var(--chakra-colors-text-secondary)" />
             </Link>
           </HStack>
 
-          <HStack spacing={3} justify={{ base: "center", md: "flex-end" }} color="gray.500">
+          <HStack spacing={3} justify={{ base: "center", md: "flex-end" }} color="text.muted">
             <FaCcVisa size={36} aria-label="Visa" />
             <FaCcMastercard size={36} aria-label="Mastercard" />
             <FaCcPaypal size={36} aria-label="PayPal" />

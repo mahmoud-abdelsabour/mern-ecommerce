@@ -22,6 +22,7 @@ import {
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import {
   LuChevronDown,
+  LuMoon,
   LuHeart,
   LuLogIn,
   LuMenu,
@@ -29,6 +30,7 @@ import {
   LuSearch,
   LuShoppingCart,
   LuStore,
+  LuSun,
   LuTags,
   LuUser,
 } from "react-icons/lu"
@@ -38,6 +40,7 @@ import { useCategories } from "../hooks/useCategories"
 import { clearStoredUser } from "../utils/authStorage"
 import { useCart } from "../hooks/useCart"
 import { useStoredUser } from "../hooks/useStoredUser"
+import { useColorMode } from "../theme/use-color-mode"
 
 const Nav = () => {
   const navigate = useNavigate()
@@ -48,6 +51,7 @@ const Nav = () => {
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories()
   const { data: cartData } = useCart()
   const storedUser = useStoredUser()
+  const { colorMode, toggleColorMode } = useColorMode()
 
   const categories = (categoriesData?.categories ?? []).filter((c) => c?.slug)
   const brands = (brandsData?.brands ?? []).filter((b) => b?.slug)
@@ -125,6 +129,16 @@ const Nav = () => {
           </HStack>
 
           <HStack gap={2}>
+            <IconButton
+              aria-label={colorMode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              variant="ghost"
+              colorPalette="neutral"
+              rounded="full"
+              onClick={toggleColorMode}
+            >
+              {colorMode === "dark" ? <LuSun size={ICON_SIZE} /> : <LuMoon size={ICON_SIZE} />}
+            </IconButton>
+
             <Box position="relative">
               <IconButton
                 as={RouterLink}

@@ -7,8 +7,15 @@ body {
   font-family: "Segoe UI", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--chakra-colors-surface-canvas);
   color: var(--chakra-colors-text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
   /* Do not clip position:fixed UI (e.g. toasts) that extend to the viewport edge */
   overflow-x: visible;
+}
+
+#root,
+[data-scope],
+.chakra-theme {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 #root {

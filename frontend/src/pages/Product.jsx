@@ -262,7 +262,7 @@ const Product = () => {
                 _active={wishlistIsBusy ? undefined : { transform: "scale(0.98)" }}
                 cursor={wishlistIsBusy ? "not-allowed" : "pointer"}
               >
-                <Icon color={isInWishlist ? "red.500" : "gray.600"}>
+                <Icon color={isInWishlist ? "red.500" : "text.muted"}>
                   {isInWishlist ? (
                     <MdFavorite size={ICON_SIZE} />
                   ) : (

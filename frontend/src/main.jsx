@@ -9,22 +9,25 @@ import { CartDrawerProvider } from './contexts/CartDrawerProvider.jsx'
 import { AppToaster } from './components/AppToaster.jsx'
 import { AppSkeletonProvider } from './components/AppSkeletonProvider.jsx'
 import { appSystem } from './theme/system.js'
+import { ColorModeProvider } from './theme/color-mode.jsx'
 
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ChakraProvider value={appSystem}>
-      <AppSkeletonProvider>
-        <Router>
-          <QueryClientProvider client={queryClient}>
-            <CartDrawerProvider>
-              <App />
-            </CartDrawerProvider>
-            <AppToaster />
-          </QueryClientProvider>
-        </Router>
-      </AppSkeletonProvider>
-    </ChakraProvider>
+    <ColorModeProvider>
+      <ChakraProvider value={appSystem}>
+        <AppSkeletonProvider>
+          <Router>
+            <QueryClientProvider client={queryClient}>
+              <CartDrawerProvider>
+                <App />
+              </CartDrawerProvider>
+              <AppToaster />
+            </QueryClientProvider>
+          </Router>
+        </AppSkeletonProvider>
+      </ChakraProvider>
+    </ColorModeProvider>
   </StrictMode>,
 )
