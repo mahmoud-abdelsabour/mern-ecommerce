@@ -203,7 +203,7 @@ const Order = () => {
           <Text fontSize="lg" fontWeight="800">
             Products
           </Text>
-          <ProductList items={items} variant="order" />
+          <ProductList items={items} variant="order" layout="rail" />
         </Stack>
 
         <Stack gap={4}>

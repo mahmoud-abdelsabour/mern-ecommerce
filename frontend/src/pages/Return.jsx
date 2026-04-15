@@ -250,6 +250,7 @@ const Return = () => {
           <ProductList
             items={items}
             variant="return"
+            layout="rail"
             renderItem={(item) => (
               <ProductCard
                 key={item.id}

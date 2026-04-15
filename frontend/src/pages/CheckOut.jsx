@@ -394,7 +394,7 @@ const CheckOut = () => {
           <Text fontSize="lg" fontWeight="800">
             Products
           </Text>
-          <ProductList items={items} variant="order" />
+          <ProductList items={items} variant="order" layout="rail" />
         </Stack>
 
         <Box borderWidth="1px" borderColor="surface.border" bg="surface.panel" rounded="lg" p={4}>
