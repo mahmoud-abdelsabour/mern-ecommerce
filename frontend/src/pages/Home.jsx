@@ -120,7 +120,7 @@ const SectionHeader = ({ title, subtitle, seeAllTo, seeAllLabel = "See all" }) =
         as={RouterLink}
         to={seeAllTo}
         variant="ghost"
-        colorPalette="teal"
+        colorPalette="brand"
         size="sm"
         fontWeight="600"
         flexShrink={0}
@@ -325,7 +325,7 @@ const Home = () => {
             </Carousel.Control>
           </Carousel.Root>
           <Flex justify="center" mt={4}>
-            <Button as={RouterLink} to="/catalog">
+            <Button as={RouterLink} to="/catalog" colorPalette="brand">
               Shop Now
             </Button>
           </Flex>
@@ -519,7 +519,7 @@ const Home = () => {
               We curate every collection with care—fewer compromises, clearer value, and support when you need it.
             </Text>
             <Box>
-              <Button as={RouterLink} to="/catalog" variant="outline" colorPalette="teal">
+              <Button as={RouterLink} to="/catalog" variant="outline" colorPalette="brand">
                 Browse the catalog
               </Button>
             </Box>
@@ -570,7 +570,15 @@ const Home = () => {
                   rounded="lg"
                 />
               </Field.Root>
-              <Button type="submit" colorPalette="teal" bg="white" color="teal.900" h="44px" px={6} _hover={{ bg: "gray.100" }}>
+              <Button
+                type="submit"
+                bg="surface.panel"
+                color="text.primary"
+                h="44px"
+                px={6}
+                _hover={{ bg: "surface.subtle" }}
+                _active={{ bg: "neutral.200" }}
+              >
                 Subscribe
               </Button>
             </Flex>

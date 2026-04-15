@@ -77,7 +77,7 @@ const ProductReviews = () => {
     <Box maxW="1200px" mx="auto" px={4} mt={6} pb={12}>
       <Stack gap={6}>
         <HStack flexWrap="wrap" gap={3} align="center">
-          <Button as={RouterLink} to={`/product/${productId}`} variant="outline" size="sm">
+          <Button as={RouterLink} to={`/product/${productId}`} variant="outline" colorPalette="neutral" size="sm">
             ← Back to product
           </Button>
           {productLoading ? (

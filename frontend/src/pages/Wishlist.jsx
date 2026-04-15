@@ -66,7 +66,7 @@ const Wishlist = () => {
             <VStack textAlign="center">
               <EmptyState.Title>Login required</EmptyState.Title>
               <EmptyState.Description>Login to view your wishlist.</EmptyState.Description>
-              <Button as={RouterLink} to="/login">
+              <Button as={RouterLink} to="/login" colorPalette="brand">
                 Go to Login
               </Button>
             </VStack>
@@ -105,7 +105,7 @@ const Wishlist = () => {
             {failedProductIds.length} wishlist item(s) could not be loaded and were hidden.
           </Text>
           <HStack>
-            <Button size="sm" variant="outline" onClick={retryFailedItems}>
+            <Button size="sm" variant="outline" colorPalette="neutral" onClick={retryFailedItems}>
               Retry failed items
             </Button>
             <Button
@@ -135,7 +135,7 @@ const Wishlist = () => {
               <VStack textAlign="center">
                 <EmptyState.Title>Your Wishlist is empty</EmptyState.Title>
                 <EmptyState.Description>Explore our products and add items to your Wishlist</EmptyState.Description>
-                <Button as={RouterLink} to="/catalog">
+                <Button as={RouterLink} to="/catalog" colorPalette="brand">
                   Start Shopping
                 </Button>
               </VStack>

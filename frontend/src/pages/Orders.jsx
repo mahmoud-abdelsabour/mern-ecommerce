@@ -180,7 +180,7 @@ const Orders = () => {
             <VStack textAlign="center">
               <EmptyState.Title>Login required</EmptyState.Title>
               <EmptyState.Description>Login to view your orders.</EmptyState.Description>
-              <Button as={RouterLink} to="/login">
+              <Button as={RouterLink} to="/login" colorPalette="brand">
                 Go to Login
               </Button>
             </VStack>
@@ -351,7 +351,7 @@ const Orders = () => {
                     ? "Explore our products and place an order."
                     : "Try changing delivery status or sort, or browse the catalog."}
                 </EmptyState.Description>
-                <Button as={RouterLink} to="/catalog">
+                <Button as={RouterLink} to="/catalog" colorPalette="brand">
                   Start Shopping
                 </Button>
               </VStack>

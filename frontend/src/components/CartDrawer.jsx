@@ -78,7 +78,7 @@ const CartDrawer = ({ open, onOpenChange }) => {
 
             <Drawer.Footer borderTopWidth="1px" borderColor="surface.border" pt={3}>
               <Stack gap={3} w="100%">
-                <Button as={RouterLink} to="/cart" variant="outline" size="lg" w="100%" onClick={() => onOpenChange(false)}>
+                <Button as={RouterLink} to="/cart" variant="outline" colorPalette="neutral" size="lg" w="100%" onClick={() => onOpenChange(false)}>
                   View cart
                 </Button>
                 <Button

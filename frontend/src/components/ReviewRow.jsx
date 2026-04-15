@@ -171,7 +171,7 @@ const ReviewRow = ({ review, productId }) => {
               </Dialog.Body>
               <Dialog.Footer>
                 <HStack gap={2} justify="flex-end" w="full">
-                  <Button variant="outline" onClick={() => setEditOpen(false)}>
+                  <Button variant="outline" colorPalette="neutral" onClick={() => setEditOpen(false)}>
                     Cancel
                   </Button>
                   <Button

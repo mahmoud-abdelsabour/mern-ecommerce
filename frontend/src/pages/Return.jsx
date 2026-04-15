@@ -135,7 +135,7 @@ const Return = () => {
             <VStack textAlign="center">
               <EmptyState.Title>Login required</EmptyState.Title>
               <EmptyState.Description>Log in to request a return.</EmptyState.Description>
-              <Button as={RouterLink} to="/login">
+              <Button as={RouterLink} to="/login" colorPalette="brand">
                 Go to Login
               </Button>
             </VStack>
@@ -151,7 +151,7 @@ const Return = () => {
         <EmptyState.Root size="lg">
           <EmptyState.Content>
             <EmptyState.Title>Missing order</EmptyState.Title>
-            <Button as={RouterLink} to="/orders">
+            <Button as={RouterLink} to="/orders" variant="outline" colorPalette="neutral">
               Back to orders
             </Button>
           </EmptyState.Content>
@@ -195,7 +195,7 @@ const Return = () => {
             <EmptyState.Description>
               {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
             </EmptyState.Description>
-            <Button as={RouterLink} to="/orders">
+            <Button as={RouterLink} to="/orders" variant="outline" colorPalette="neutral">
               Back to orders
             </Button>
           </EmptyState.Content>
@@ -214,7 +214,7 @@ const Return = () => {
             <EmptyState.Description>
               Returns can only be requested for delivered orders. Current status: {order?.deliveryStatus ?? "—"}
             </EmptyState.Description>
-            <Button as={RouterLink} to={`/order/${orderId}`}>
+            <Button as={RouterLink} to={`/order/${orderId}`} variant="outline" colorPalette="neutral">
               Back to order
             </Button>
           </EmptyState.Content>

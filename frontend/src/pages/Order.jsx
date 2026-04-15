@@ -50,7 +50,7 @@ const Order = () => {
             <VStack textAlign="center">
               <EmptyState.Title>Login required</EmptyState.Title>
               <EmptyState.Description>Login to view your order details.</EmptyState.Description>
-              <Button as={RouterLink} to="/login">
+              <Button as={RouterLink} to="/login" colorPalette="brand">
                 Go to Login
               </Button>
             </VStack>
@@ -71,7 +71,7 @@ const Order = () => {
             <VStack textAlign="center">
               <EmptyState.Title>Missing order id</EmptyState.Title>
               <EmptyState.Description>Open an order from your orders list.</EmptyState.Description>
-              <Button as={RouterLink} to="/orders">
+              <Button as={RouterLink} to="/orders" variant="outline" colorPalette="neutral">
                 Go to Orders
               </Button>
             </VStack>
@@ -138,7 +138,7 @@ const Order = () => {
               <EmptyState.Description>
                 {error?.response?.data?.message ?? error?.message ?? "Unknown error"}
               </EmptyState.Description>
-              <Button as={RouterLink} to="/orders">
+              <Button as={RouterLink} to="/orders" variant="outline" colorPalette="neutral">
                 Back to Orders
               </Button>
             </VStack>

@@ -15,7 +15,7 @@ const NotFound = () => {
                 <EmptyState.Description>
                     Page is not found it may be moved or deleted from the server
                 </EmptyState.Description>
-                <Button as={RouterLink} to="/">
+                <Button as={RouterLink} to="/" colorPalette="brand">
                     Home
                 </Button>
                 </VStack>

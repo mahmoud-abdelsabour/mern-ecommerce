@@ -267,7 +267,7 @@ const CheckOut = () => {
             <VStack textAlign="center">
               <EmptyState.Title>Login required</EmptyState.Title>
               <EmptyState.Description>Login to checkout.</EmptyState.Description>
-              <Button as={RouterLink} to="/login">
+              <Button as={RouterLink} to="/login" colorPalette="brand">
                 Go to Login
               </Button>
             </VStack>
@@ -333,7 +333,7 @@ const CheckOut = () => {
                   ? buyNowError?.response?.data?.message ?? buyNowError?.message ?? "Unknown error"
                   : cartError?.response?.data?.message ?? cartError?.message ?? "Unknown error"}
               </EmptyState.Description>
-              <Button as={RouterLink} to={isBuyNow ? "/catalog" : "/cart"}>
+              <Button as={RouterLink} to={isBuyNow ? "/catalog" : "/cart"} variant="outline" colorPalette="neutral">
                 {isBuyNow ? "Back to catalog" : "Back to cart"}
               </Button>
             </VStack>
@@ -360,7 +360,7 @@ const CheckOut = () => {
                   ? "Try choosing another product."
                   : "Add products to your cart before checkout."}
               </EmptyState.Description>
-              <Button as={RouterLink} to="/catalog">
+              <Button as={RouterLink} to="/catalog" colorPalette="brand">
                 Start Shopping
               </Button>
             </VStack>

@@ -95,10 +95,10 @@ const EditProfileForm = ({ initialForm }) => {
 
             <HStack justify="space-between" flexWrap="wrap" gap={3}>
               <HStack flexWrap="wrap" gap={2}>
-                <Button as={RouterLink} to="/me/change-password" variant="outline">
+                <Button as={RouterLink} to="/me/change-password" variant="outline" colorPalette="neutral">
                   Change password
                 </Button>
-                <Button as={RouterLink} to="/me/change-email" variant="outline">
+                <Button as={RouterLink} to="/me/change-email" variant="outline" colorPalette="neutral">
                   Change email
                 </Button>
               </HStack>
@@ -106,7 +106,7 @@ const EditProfileForm = ({ initialForm }) => {
                 <Button as={RouterLink} to="/me" variant="outline" colorPalette="neutral">
                   Back
                 </Button>
-                <Button type="submit" disabled={!canSave || updateProfileMutation.isPending}>
+                <Button type="submit" colorPalette="brand" disabled={!canSave || updateProfileMutation.isPending}>
                   {updateProfileMutation.isPending ? "Saving..." : "Save"}
                 </Button>
               </HStack>

@@ -43,7 +43,7 @@ const Cart = () => {
             <VStack textAlign="center">
               <EmptyState.Title>Login required</EmptyState.Title>
               <EmptyState.Description>Login to view your cart.</EmptyState.Description>
-              <Button as={RouterLink} to="/login">
+              <Button as={RouterLink} to="/login" colorPalette="brand">
                 Go to Login
               </Button>
             </VStack>
@@ -120,7 +120,7 @@ const Cart = () => {
               <VStack textAlign="center">
                 <EmptyState.Title>Your cart is empty</EmptyState.Title>
                 <EmptyState.Description>Explore our products and add items to your cart</EmptyState.Description>
-                <Button as={RouterLink} to="/catalog">
+                <Button as={RouterLink} to="/catalog" colorPalette="brand">
                   Start Shopping
                 </Button>
               </VStack>
