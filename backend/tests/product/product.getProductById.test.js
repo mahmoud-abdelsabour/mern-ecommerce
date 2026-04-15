@@ -48,6 +48,7 @@ describe('GET /api/products/:productId', () => {
         expect(response.body.product.category.name).toBeDefined()
         expect(Array.isArray(response.body.reviewsPreview)).toBe(true)
         expect(response.body.reviewsPreview.length).toBe(3)
+        expect(response.body.reviewsCount).toBe(3)
         expect(response.body.hasMoreReviews).toBe(false)
     })
 
@@ -71,7 +72,22 @@ describe('GET /api/products/:productId', () => {
 
         expect(response.status).toBe(200)
         expect(response.body.reviewsPreview.length).toBe(5)
+        expect(response.body.reviewsCount).toBe(6)
         expect(response.body.hasMoreReviews).toBe(true)
+    })
+
+    it('returns live review counters even when stored product.rating is stale', async () => {
+        const { product } = await createProduct({ rating: { score: 4.9, voters: 187 } })
+
+        const response = await api.get(`/api/products/${product._id}`)
+        logIfServerError(response)
+
+        expect(response.status).toBe(200)
+        expect(response.body.reviewsPreview.length).toBe(0)
+        expect(response.body.reviewsCount).toBe(0)
+        expect(response.body.product.rating.voters).toBe(0)
+        expect(response.body.product.rating.score).toBe(0)
+        expect(response.body.hasMoreReviews).toBe(false)
     })
 
     it('returns 404 when product not found', async () => {

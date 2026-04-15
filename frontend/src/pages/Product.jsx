@@ -56,6 +56,7 @@ const Product = () => {
   // Normalize the server response to predictable values for rendering.
   const product = data?.product ?? null
   const reviewsPreview = data?.reviewsPreview ?? []
+  const reviewsCount = Number(data?.reviewsCount ?? product?.rating?.voters ?? reviewsPreview.length)
   const hasMoreReviews = Boolean(data?.hasMoreReviews)
 
   // Convert `product.photos` (string URLs) into the shape expected by Chakra Carousel.
@@ -78,7 +79,7 @@ const Product = () => {
 
   const reviewsCountLabel = isLoading
     ? "—"
-    : String(product?.rating?.voters ?? reviewsPreview.length)
+    : String(reviewsCount)
 
   const { openCartDrawer } = useCartDrawer()
   const addToCartMutation = useAddToCart()
@@ -422,7 +423,7 @@ const Product = () => {
                   <RatingGroup.Control />
                 </RatingGroup.Root>
                 <Text fontSize="sm" color="text.muted">
-                  ({String(product?.rating?.voters ?? 0)})
+                  ({String(reviewsCount)})
                 </Text>
               </>
             )}

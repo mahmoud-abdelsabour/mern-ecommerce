@@ -143,6 +143,7 @@ const getProducts = async data => {
 const getProductById = async data => {
     try {
         const { productId, user } = data
+        const reviewsPreviewLimit = 5
 
         let skipDeletedFilter = false
 
@@ -158,16 +159,38 @@ const getProductById = async data => {
             throw Object.assign(new Error('product not found'), { statusCode: 404 })
         }
 
-        const reviewsPreview = await Review.find({ product: productId })
-            .sort({ createdAt: -1 })
-            .limit(5)
+        const [reviewsPreview, stats] = await Promise.all([
+            Review.find({ product: productId })
+                .sort({ createdAt: -1 })
+                .limit(reviewsPreviewLimit),
+            Review.aggregate([
+                { $match: { product: product._id } },
+                {
+                    $group: {
+                        _id: '$product',
+                        avgRating: { $avg: '$rating' },
+                        voters: { $sum: 1 },
+                    },
+                },
+            ]),
+        ])
 
-        const totalReviews = await Review.countDocuments({ product: productId })
+        const reviewsCount = Number(stats?.[0]?.voters ?? 0)
+        const reviewScore = Number(stats?.[0]?.avgRating ?? 0)
+
+        // Build product payload from live review stats to avoid stale denormalized counters.
+        const productPayload = product.toJSON()
+        productPayload.rating = {
+            ...(productPayload.rating ?? {}),
+            score: reviewScore,
+            voters: reviewsCount,
+        }
 
         return {
-            product,
+            product: productPayload,
             reviewsPreview,
-            hasMoreReviews: totalReviews > 5,
+            reviewsCount,
+            hasMoreReviews: reviewsCount > reviewsPreviewLimit,
         }
     } catch (error) {
         throw error

@@ -15,7 +15,7 @@ export const useProducts = (filters, options = {}) => {
 }
 
 // Fetch a single product by id for the Product page.
-// Backend response shape: `{ product, reviewsPreview, hasMoreReviews }`.
+// Backend response shape: `{ product, reviewsPreview, reviewsCount, hasMoreReviews }`.
 export const useProductById = (productId, options = {}) => {
   return useQuery({
     queryKey: ['product', productId],
