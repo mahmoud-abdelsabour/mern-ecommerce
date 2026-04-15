@@ -4,6 +4,7 @@ import {
   Avatar,
   Box,
   Button,
+  Collapsible,
   CloseButton,
   Drawer,
   Flex,
@@ -371,71 +372,119 @@ const Nav = () => {
 
                   <Separator />
 
-                  <Stack gap={2}>
-                    <Text fontSize="xs" fontWeight="700" letterSpacing="wide" color="text.muted">
-                      CATEGORIES
-                    </Text>
-                    <Stack gap={1} maxH="180px" overflowY="auto" pr={1}>
-                      {categoriesLoading ? (
-                        Array.from({ length: 6 }).map((_, idx) => (
-                          <Skeleton key={`mobile-categories-skel-${idx}`} h="28px" rounded="md" />
-                        ))
-                      ) : categories.length > 0 ? (
-                        categories.map((c) => (
-                          <Button
-                            key={c?.id ?? c?._id ?? c?.slug}
-                            as={RouterLink}
-                            to={`/catalog?category=${encodeURIComponent(c.slug)}`}
-                            justifyContent="flex-start"
-                            variant="ghost"
-                            colorPalette="neutral"
-                            size="sm"
-                            onClick={closeMobileMenu}
+                  <Collapsible.Root>
+                    <Stack gap={2}>
+                      <Collapsible.Trigger asChild>
+                        <Button
+                          variant="subtle"
+                          colorPalette="neutral"
+                          justifyContent="space-between"
+                          size="sm"
+                          w="100%"
+                          aria-label="Toggle categories"
+                        >
+                          <HStack gap={2}>
+                            <Text fontSize="xs" fontWeight="700" letterSpacing="wide" color="text.muted">
+                              CATEGORIES
+                            </Text>
+                            <Text fontSize="xs" color="text.muted">({categories.length})</Text>
+                          </HStack>
+                          <Collapsible.Indicator
+                            transition="transform 0.2s"
+                            _open={{ transform: "rotate(180deg)" }}
                           >
-                            {c?.name ?? c?.slug}
-                          </Button>
-                        ))
-                      ) : (
-                        <Text fontSize="sm" color="text.muted">
-                          No categories
-                        </Text>
-                      )}
+                            <LuChevronDown size={14} />
+                          </Collapsible.Indicator>
+                        </Button>
+                      </Collapsible.Trigger>
+                      <Collapsible.Content>
+                        <Stack gap={1} maxH="180px" overflowY="auto" pr={1}>
+                          {categoriesLoading ? (
+                            Array.from({ length: 6 }).map((_, idx) => (
+                              <Skeleton key={`mobile-categories-skel-${idx}`} h="28px" rounded="md" />
+                            ))
+                          ) : categories.length > 0 ? (
+                            categories.map((c) => (
+                              <Button
+                                key={c?.id ?? c?._id ?? c?.slug}
+                                as={RouterLink}
+                                to={`/catalog?category=${encodeURIComponent(c.slug)}`}
+                                justifyContent="flex-start"
+                                variant="ghost"
+                                colorPalette="neutral"
+                                size="sm"
+                                onClick={closeMobileMenu}
+                              >
+                                {c?.name ?? c?.slug}
+                              </Button>
+                            ))
+                          ) : (
+                            <Text fontSize="sm" color="text.muted">
+                              No categories
+                            </Text>
+                          )}
+                        </Stack>
+                      </Collapsible.Content>
                     </Stack>
-                  </Stack>
+                  </Collapsible.Root>
 
                   <Separator />
 
-                  <Stack gap={2}>
-                    <Text fontSize="xs" fontWeight="700" letterSpacing="wide" color="text.muted">
-                      BRANDS
-                    </Text>
-                    <Stack gap={1} maxH="180px" overflowY="auto" pr={1}>
-                      {brandsLoading ? (
-                        Array.from({ length: 6 }).map((_, idx) => (
-                          <Skeleton key={`mobile-brands-skel-${idx}`} h="28px" rounded="md" />
-                        ))
-                      ) : brands.length > 0 ? (
-                        brands.map((b) => (
-                          <Button
-                            key={b?.id ?? b?._id ?? b?.slug}
-                            as={RouterLink}
-                            to={`/catalog?brand=${encodeURIComponent(b.slug)}`}
-                            justifyContent="flex-start"
-                            variant="ghost"
-                            colorPalette="neutral"
-                            size="sm"
-                            onClick={closeMobileMenu}
+                  <Collapsible.Root>
+                    <Stack gap={2}>
+                      <Collapsible.Trigger asChild>
+                        <Button
+                          variant="subtle"
+                          colorPalette="neutral"
+                          justifyContent="space-between"
+                          size="sm"
+                          w="100%"
+                          aria-label="Toggle brands"
+                        >
+                          <HStack gap={2}>
+                            <Text fontSize="xs" fontWeight="700" letterSpacing="wide" color="text.muted">
+                              BRANDS
+                            </Text>
+                            <Text fontSize="xs" color="text.muted">({brands.length})</Text>
+                          </HStack>
+                          <Collapsible.Indicator
+                            transition="transform 0.2s"
+                            _open={{ transform: "rotate(180deg)" }}
                           >
-                            {b?.name ?? b?.slug}
-                          </Button>
-                        ))
-                      ) : (
-                        <Text fontSize="sm" color="text.muted">
-                          No brands
-                        </Text>
-                      )}
+                            <LuChevronDown size={14} />
+                          </Collapsible.Indicator>
+                        </Button>
+                      </Collapsible.Trigger>
+                      <Collapsible.Content>
+                        <Stack gap={1} maxH="180px" overflowY="auto" pr={1}>
+                          {brandsLoading ? (
+                            Array.from({ length: 6 }).map((_, idx) => (
+                              <Skeleton key={`mobile-brands-skel-${idx}`} h="28px" rounded="md" />
+                            ))
+                          ) : brands.length > 0 ? (
+                            brands.map((b) => (
+                              <Button
+                                key={b?.id ?? b?._id ?? b?.slug}
+                                as={RouterLink}
+                                to={`/catalog?brand=${encodeURIComponent(b.slug)}`}
+                                justifyContent="flex-start"
+                                variant="ghost"
+                                colorPalette="neutral"
+                                size="sm"
+                                onClick={closeMobileMenu}
+                              >
+                                {b?.name ?? b?.slug}
+                              </Button>
+                            ))
+                          ) : (
+                            <Text fontSize="sm" color="text.muted">
+                              No brands
+                            </Text>
+                          )}
+                        </Stack>
+                      </Collapsible.Content>
                     </Stack>
-                  </Stack>
+                  </Collapsible.Root>
 
                   <Separator />
 
