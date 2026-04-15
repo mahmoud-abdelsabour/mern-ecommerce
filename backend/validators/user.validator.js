@@ -23,7 +23,7 @@ const createAddressSchema = Joi.object({
     postalcode: Joi.string().trim().required(),
     street: Joi.string().trim().required(),
     building: Joi.string().trim().required(),
-    floor: Joi.number().required(),
+    floor: Joi.number().integer().required(),
     special_mark: Joi.string().trim().allow(''),
 })
 
@@ -34,7 +34,7 @@ const updateAddressSchema = Joi.object({
     postalcode: Joi.string().trim(),
     street: Joi.string().trim(),
     building: Joi.string().trim(),
-    floor: Joi.number(),
+    floor: Joi.number().integer(),
     special_mark: Joi.string().trim().allow(''),
 }).min(1)
 

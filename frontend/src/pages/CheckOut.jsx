@@ -196,6 +196,7 @@ const CheckOut = () => {
     items.length > 0 &&
     Boolean(paymentMethod) &&
     hasValidSelection &&
+    !createAddressMutation.isPending &&
     Boolean(me?.firstName && me?.lastName && me?.phone)
 
   const onSaveAddress = () => {
@@ -211,6 +212,12 @@ const CheckOut = () => {
     const missing = required.some((key) => String(addressDraft[key] ?? "").trim() === "")
     if (missing) return
 
+    const parsedFloor = Number.parseInt(String(addressDraft.floor ?? "").trim(), 10)
+    if (!Number.isInteger(parsedFloor)) {
+      showNotice("error", "Floor must be a whole number.")
+      return
+    }
+
     const payload = {
       address_name: String(addressDraft.address_name ?? "").trim(),
       country: String(addressDraft.country ?? "").trim(),
@@ -218,7 +225,7 @@ const CheckOut = () => {
       postalcode: String(addressDraft.postalcode ?? "").trim(),
       street: String(addressDraft.street ?? "").trim(),
       building: String(addressDraft.building ?? "").trim(),
-      floor: Number(addressDraft.floor),
+      floor: parsedFloor,
       special_mark: String(addressDraft.special_mark ?? "").trim(),
     }
 
@@ -229,6 +236,12 @@ const CheckOut = () => {
 
   const onPlaceOrder = () => {
     if (!selectedAddress || !me) return
+
+    const parsedFloor = Number.parseInt(String(selectedAddress.floor ?? "").trim(), 10)
+    if (!Number.isInteger(parsedFloor)) {
+      showNotice("error", "Selected address has an invalid floor value. Please edit or re-add it.")
+      return
+    }
 
     // Backend expects `{ products: [{ product, quantity }], shippingInfo, paymentMethod }`.
     // Contact fields come from the authenticated user; delivery lines from the saved address.
@@ -247,7 +260,7 @@ const CheckOut = () => {
         postalcode: selectedAddress.postalcode,
         street: selectedAddress.street,
         building: selectedAddress.building,
-        floor: Number(selectedAddress.floor),
+        floor: parsedFloor,
         special_mark: selectedAddress.special_mark ?? "",
       },
     }
