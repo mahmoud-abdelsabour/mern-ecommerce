@@ -148,13 +148,15 @@ const ProductCard = ({
 
   return (
     <Stack
-      gap="2"
+      gap="3"
       borderWidth="1px"
       borderColor="surface.border"
-      rounded="md"
-      p={2}
+      bg="surface.panel"
+      rounded="lg"
+      p={3}
       w="100%"
-      maxW="200px"
+      minW={0}
+      h="100%"
       // Make the whole card behave like a link (click + keyboard).
       cursor={isClickable ? "pointer" : undefined}
       role={isClickable ? "link" : undefined}
@@ -171,9 +173,28 @@ const ProductCard = ({
             }
           : undefined
       }
-      _hover={isClickable ? { borderColor: "neutral.300", bg: "surface.subtle" } : undefined}
+      _hover={
+        isClickable
+          ? {
+              borderColor: "neutral.300",
+              bg: "surface.subtle",
+              shadow: "sm",
+              transform: "translateY(-1px)",
+            }
+          : undefined
+      }
+      transition="border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease"
     >
-      <Box position="relative" w="100%" aspectRatio={1}>
+      <Box
+        position="relative"
+        w="100%"
+        aspectRatio={1}
+        rounded="lg"
+        overflow="hidden"
+        borderWidth="1px"
+        borderColor="surface.border"
+        bg="surface.elevated"
+      >
         {Boolean(productId) && (
           <Box position="absolute" top="2" right="2" zIndex="1">
             {/* Wishlist toggle (top-right). Selectable boxed heart icon (shown for all variants). */}
@@ -188,7 +209,7 @@ const ProductCard = ({
               display="inline-flex"
               alignItems="center"
               justifyContent="center"
-              rounded="md"
+              rounded="full"
               borderWidth="1px"
               borderColor={isInWishlist ? "red.500" : "surface.border"}
               bg={isInWishlist ? "red.50" : "whiteAlpha.900"}
@@ -230,34 +251,36 @@ const ProductCard = ({
           w="100%"
           h="100%"
           objectFit="cover"
-          rounded="md"
           draggable={false}
         />
       </Box>
-      <Text fontWeight="semibold" fontSize="sm" noOfLines={2}>
-        {title}
-      </Text>
-      <Text fontSize="xs" color="text.muted" noOfLines={1}>
-        {brand} • {category}
-      </Text>
-      <HStack justify="space-between" align="center">
-        <Text fontWeight="medium" fontSize="sm">
-          ${price}
+      <Stack gap={2} flex="1" minH={0}>
+        <Text fontWeight="700" fontSize="sm" lineHeight="1.4" noOfLines={2} minH="2.8em">
+          {title}
         </Text>
-        {rating != null && (
-          <HStack gap="1">
-            <Icon color="orange.400">
-              <FaStar size={ICON_SIZE} />
-            </Icon>
-            <Text fontWeight="medium" fontSize="sm">
-              {rating}
-            </Text>
-          </HStack>
-        )}
-      </HStack>
-
-      {variant === "cart" ? (
+        <Text fontSize="xs" color="text.muted" noOfLines={1}>
+          {brand} • {category}
+        </Text>
         <HStack justify="space-between" align="center">
+          <Text fontWeight="800" fontSize="sm">
+            ${price}
+          </Text>
+          {rating != null && (
+            <HStack gap="1" align="center">
+              <Icon color="orange.400">
+                <FaStar size={ICON_SIZE} />
+              </Icon>
+              <Text fontWeight="600" fontSize="sm">
+                {rating}
+              </Text>
+            </HStack>
+          )}
+        </HStack>
+      </Stack>
+
+      <Box pt={2} borderTopWidth="1px" borderColor="surface.border">
+      {variant === "cart" ? (
+        <HStack justify="space-between" align="center" minH="28px">
           <IconButton
             size="xs"
             variant="outline"
@@ -287,7 +310,7 @@ const ProductCard = ({
           </IconButton>
         </HStack>
       ) : variant === "return" ? (
-        <HStack justify="space-between" align="center">
+        <HStack justify="space-between" align="center" minH="28px">
           <IconButton
             size="xs"
             variant="outline"
@@ -315,7 +338,7 @@ const ProductCard = ({
           </IconButton>
         </HStack>
       ) : variant === "order" ? (
-        <Stack gap={0}>
+        <Stack gap={0} minH="28px" justify="center">
           <Text fontSize="xs" fontWeight="700">
             Qty: {quantity}
           </Text>
@@ -324,10 +347,10 @@ const ProductCard = ({
           </Text>
         </Stack>
       ) : (
-        <HStack>
+        <HStack align="stretch">
           {/* Stop propagation so clicking these buttons doesn't trigger card navigation. */}
           {cartQuantity > 0 ? (
-            <HStack flex="1" justify="space-between" align="center">
+            <HStack flex="1" justify="space-between" align="center" minH="28px">
               <IconButton
                 size="xs"
                 variant="outline"
@@ -369,6 +392,7 @@ const ProductCard = ({
           </Button>
         </HStack>
       )}
+      </Box>
     </Stack>
   )
 }
