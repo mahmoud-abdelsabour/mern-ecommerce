@@ -1,4 +1,4 @@
-import { Badge, Box, Button, EmptyState, Flex, Separator, HStack, Skeleton, Stack, Text, Timeline, VStack } from "@chakra-ui/react"
+import { Badge, Box, Button, CloseButton, Dialog, EmptyState, Flex, Separator, HStack, Portal, Skeleton, Stack, Text, Timeline, VStack } from "@chakra-ui/react"
 import { FaClock } from "react-icons/fa"
 import { MdCancel, MdLocalShipping, MdOutlineDoneOutline } from "react-icons/md"
 import { RiRefund2Line } from "react-icons/ri"
@@ -36,6 +36,7 @@ const Order = () => {
   const { data: order, isLoading, isError, error } = useOrderById(orderId)
 
   const cancelMutation = useCancelOrder()
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false)
 
   const [checkoutFlash] = useState(() => consumeFlash())
 
@@ -175,7 +176,9 @@ const Order = () => {
     if (!canCancel) return
     const id = order?.id ?? order?._id
     if (!id) return
-    cancelMutation.mutate(id)
+    cancelMutation.mutate(id, {
+      onSuccess: () => setCancelConfirmOpen(false),
+    })
   }
 
   const orderRouteId = order?.id ?? order?._id
@@ -228,7 +231,7 @@ const Order = () => {
                 flex="1"
                 colorPalette="red"
                 disabled={!canCancel || cancelMutation.isPending}
-                onClick={onCancelOrder}
+                onClick={() => setCancelConfirmOpen(true)}
               >
                 Cancel Order
               </Button>
@@ -250,6 +253,50 @@ const Order = () => {
             )}
           </Stack>
         </Box>
+
+        <Dialog.Root
+          role="alertdialog"
+          open={cancelConfirmOpen}
+          size="sm"
+          onOpenChange={(e) => setCancelConfirmOpen(e.open)}
+          placement="center"
+        >
+          <Portal>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.CloseTrigger asChild>
+                  <CloseButton />
+                </Dialog.CloseTrigger>
+                <Dialog.Header>
+                  <Dialog.Title>Cancel this order?</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <Text fontSize="sm" color="text.secondary">
+                    This action cannot be undone. The order will be marked as cancelled immediately.
+                  </Text>
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Button
+                    variant="outline"
+                    colorPalette="neutral"
+                    onClick={() => setCancelConfirmOpen(false)}
+                    disabled={cancelMutation.isPending}
+                  >
+                    Keep order
+                  </Button>
+                  <Button
+                    colorPalette="red"
+                    onClick={onCancelOrder}
+                    disabled={cancelMutation.isPending || !canCancel}
+                  >
+                    {cancelMutation.isPending ? "Cancelling..." : "Yes, cancel order"}
+                  </Button>
+                </Dialog.Footer>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog.Root>
       </Stack>
     </Box>
   )
