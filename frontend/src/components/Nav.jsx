@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import logo from "../assets/logo.svg"
 import {
   Avatar,
@@ -19,7 +19,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react"
-import { Link as RouterLink, useNavigate } from "react-router-dom"
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom"
 import {
   LuChevronDown,
   LuMoon,
@@ -44,6 +44,7 @@ import { useColorMode } from "../theme/use-color-mode"
 
 const Nav = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchDraft, setSearchDraft] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -66,6 +67,17 @@ const Nav = () => {
       : storedUser?.username ?? "Guest"
 
   const closeMobileMenu = () => setMobileMenuOpen(false)
+
+  useEffect(() => {
+    if (location.pathname !== "/catalog") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSearchDraft("")
+      return
+    }
+
+    const params = new URLSearchParams(location.search)
+    setSearchDraft(params.get("search") ?? "")
+  }, [location.pathname, location.search])
 
   const submitCatalogSearch = (e) => {
     e.preventDefault()
