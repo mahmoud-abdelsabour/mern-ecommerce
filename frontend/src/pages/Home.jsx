@@ -136,7 +136,7 @@ const ProductRail = ({ title, subtitle, seeAllTo, railKey, items, isLoading }) =
     return (
       <Box>
         <SectionHeader title={title} subtitle={subtitle} seeAllTo={seeAllTo} />
-        <SimpleGrid columns={{ base: 2, md: 4, lg: 6 }} gap={4}>
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 4, lg: 6 }} gap={4}>
           {Array.from({ length: 6 }).map((_, idx) => (
             <ProductCardSkeleton key={`${railKey}-skel-${idx}`} />
           ))}
@@ -159,7 +159,30 @@ const ProductRail = ({ title, subtitle, seeAllTo, railKey, items, isLoading }) =
   return (
     <Box>
       <SectionHeader title={title} subtitle={subtitle} seeAllTo={seeAllTo} />
-      <Carousel.Root slideCount={items.length} slidesPerPage={6} gap="0">
+      <Box
+        display={{ base: "block", lg: "none" }}
+        overflowX="auto"
+        overflowY="hidden"
+        scrollSnapType="x mandatory"
+        scrollBehavior="smooth"
+        pb={2}
+      >
+        <HStack align="stretch" gap={4} minW="max-content" pr={1}>
+          {items.map((property, index) => (
+            <Box
+              key={`${railKey}-${property.id}-${index}`}
+              flex="0 0 auto"
+              minW="200px"
+              maxW="200px"
+              scrollSnapAlign="start"
+            >
+              <ProductCard data={property} />
+            </Box>
+          ))}
+        </HStack>
+      </Box>
+
+      <Carousel.Root display={{ base: "none", lg: "block" }} slideCount={items.length} slidesPerPage={6} gap="0">
         <HStack justify="flex-end" mb={3}>
           <Carousel.PrevTrigger asChild>
             <IconButton size="sm" variant="outline" borderColor="gray.200" aria-label="Previous products">
