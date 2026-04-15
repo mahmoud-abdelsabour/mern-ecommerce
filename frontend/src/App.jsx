@@ -22,6 +22,7 @@ import ChangePassword from './pages/ChangePassword'
 import ChangeEmail from './pages/ChangeEmail'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuthAutoLogout } from './hooks/useAuthAutoLogout'
+import ScrollToTop from './components/ScrollToTop'
 
 const App = () => {
   // Keeps client auth state in sync with backend (auto-logout on token expiry / 401).
@@ -29,6 +30,7 @@ const App = () => {
   return(
     <Flex direction="column" minH="100vh">
       <Nav />
+      <ScrollToTop />
       <Routes>
         <Route path='/' element={<Home/>} />
         <Route path='/login' element={<Login />} />
