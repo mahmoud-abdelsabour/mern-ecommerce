@@ -10,5 +10,9 @@ if (!global.TextDecoder) {
 }
 
 if (!global.structuredClone) {
-	global.structuredClone = (value) => JSON.parse(JSON.stringify(value))
+	global.structuredClone = (value) => {
+		if (value === undefined || value === null) return value
+		if (typeof value !== 'object') return value
+		return JSON.parse(JSON.stringify(value))
+	}
 }
