@@ -26,3 +26,8 @@ dist-ssr
 
 # Local planning docs (do not commit)
 testing-plans/
+
+# Playwright artifacts
+playwright-report/
+test-results/
+
