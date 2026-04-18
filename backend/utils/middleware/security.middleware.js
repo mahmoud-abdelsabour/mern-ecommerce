@@ -28,7 +28,7 @@ const corsOptions = {
 const securityMiddleware = app => {
     app.use(helmet())
     app.use(cors(corsOptions))
-    if (process.env.NODE_ENV !== 'test') {
+    if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'development') {
         app.use('/api', limiter)
         app.use('/api/auth/login', authLimiter)
     }

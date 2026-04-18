@@ -490,7 +490,7 @@ const Product = () => {
       </Box>
 
       {/* description */}
-      <Collapsible.Root collapsedHeight="100px">
+      <Collapsible.Root collapsedHeight="100px" mt={{ base: 5, md: 6 }}>
         <Collapsible.Content
           _closed={{
             shadow: "inset 0 -12px 12px -12px var(--shadow-color)",

@@ -5,6 +5,12 @@ const Review = require('../models/review.model')
 const Order = require('../models/order.model')
 const { pickAllowedFields } = require('../utils/request/pick-fields.util')
 
+const normalizeRatingScore = value => {
+    const n = Number(value)
+    if (!Number.isFinite(n) || n < 0) return 0
+    return Math.round(n * 10) / 10
+}
+
 // Parse list-like query params into an array of slugs.
 // Supports:
 // - "apple,samsung"
@@ -176,7 +182,7 @@ const getProductById = async data => {
         ])
 
         const reviewsCount = Number(stats?.[0]?.voters ?? 0)
-        const reviewScore = Number(stats?.[0]?.avgRating ?? 0)
+        const reviewScore = normalizeRatingScore(stats?.[0]?.avgRating ?? 0)
 
         // Build product payload from live review stats to avoid stale denormalized counters.
         const productPayload = product.toJSON()
@@ -226,7 +232,7 @@ const updateProductRating = async data => {
             productId,
             {
                 rating: {
-                    score: stats[0].avgRating,
+                    score: normalizeRatingScore(stats[0].avgRating),
                     voters: stats[0].voters,
                 },
             },

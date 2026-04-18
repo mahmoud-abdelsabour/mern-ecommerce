@@ -9,6 +9,27 @@ import { useCartDrawer } from "../hooks/useCartDrawer"
 import { getToken } from "../APIs/http"
 import { useAddToWishlist, useRemoveFromWishlist, useWishlist } from "../hooks/useWishlist"
 
+const asLabel = (value) => {
+  if (value == null) return "—"
+  if (typeof value === "string") {
+    const trimmed = value.trim()
+    return trimmed || "—"
+  }
+  if (typeof value === "object") {
+    const candidate = value?.name ?? value?.label ?? value?.slug
+    if (candidate == null) return "—"
+    const normalized = String(candidate).trim()
+    return normalized || "—"
+  }
+  return String(value)
+}
+
+const normalizeRating = (value) => {
+  const n = Number(value)
+  if (!Number.isFinite(n) || n < 0) return null
+  return Math.round(n * 10) / 10
+}
+
 const ProductCard = ({
   data,
   variant = "default",
@@ -137,9 +158,9 @@ const ProductCard = ({
   }
 
   const title = data?.title ?? data?.name ?? "Product"
-  const brand = data?.brand ?? "—"
-  const category = data?.category ?? "—"
-  const rating = data?.rating
+  const brand = asLabel(data?.brand)
+  const category = asLabel(data?.category)
+  const rating = normalizeRating(data?.rating)
   const price = Number(data?.price ?? data?.priceAtPurchase ?? 0)
   const quantity = Number(data?.quantity ?? 1)
   const image = data?.image ?? data?.photos?.[0]
@@ -265,16 +286,14 @@ const ProductCard = ({
           <Text fontWeight="800" fontSize="sm">
             ${price}
           </Text>
-          {rating != null && (
-            <HStack gap="1" align="center">
-              <Icon color="orange.400">
-                <FaStar size={ICON_SIZE} />
-              </Icon>
-              <Text fontWeight="600" fontSize="sm">
-                {rating}
-              </Text>
-            </HStack>
-          )}
+          <HStack gap="1" align="center">
+            <Icon color="orange.400">
+              <FaStar size={ICON_SIZE} />
+            </Icon>
+            <Text fontWeight="600" fontSize="sm">
+              {rating == null ? "—" : rating.toFixed(1)}
+            </Text>
+          </HStack>
         </HStack>
       </Stack>
 

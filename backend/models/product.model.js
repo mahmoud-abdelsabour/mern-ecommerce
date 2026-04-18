@@ -1,5 +1,11 @@
 const mongoose = require('mongoose')
 
+const normalizeRatingScore = value => {
+    const n = Number(value)
+    if (!Number.isFinite(n) || n < 0) return 0
+    return Math.round(n * 10) / 10
+}
+
 const productSchema = mongoose.Schema(
     {
         name: {
@@ -37,6 +43,7 @@ const productSchema = mongoose.Schema(
             score: {
                 type: Number,
                 default: 0,
+                set: normalizeRatingScore,
             },
             voters: {
                 type: Number,
