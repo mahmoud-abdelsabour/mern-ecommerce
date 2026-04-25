@@ -5,6 +5,7 @@ const Review = require('../models/review.model')
 const Order = require('../models/order.model')
 const { pickAllowedFields } = require('../utils/request/pick-fields.util')
 const { NotFoundError, BadRequestError, ConflictError } = require('../utils/errors')
+const { PAGINATION, REVIEWS } = require('../utils/constants')
 
 const normalizeRatingScore = value => {
     const n = Number(value)
@@ -38,8 +39,8 @@ const getProducts = async data => {
             includeDeleted,
             onlyDeleted,
             search,
-            page = 1,
-            limit = 12,
+            page = PAGINATION.DEFAULT_PAGE,
+            limit = PAGINATION.PRODUCTS_LIMIT,
             sort = { createdAt: -1 },
         } = data
 
@@ -111,8 +112,11 @@ const getProducts = async data => {
             filter.$text = { $search: search }
         }
 
-        const pageNumber = Math.max(Number(page) || 1, 1)
-        const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
+        const pageNumber = Math.max(Number(page) || PAGINATION.DEFAULT_PAGE, 1)
+        const pageSize = Math.min(
+            Math.max(Number(limit) || PAGINATION.DEFAULT_LIMIT, 1),
+            PAGINATION.MAX_LIMIT
+        )
         const skip = (pageNumber - 1) * pageSize
 
         const sortObj = typeof sort === 'string' ? JSON.parse(sort) : sort
@@ -150,7 +154,7 @@ const getProducts = async data => {
 const getProductById = async data => {
     try {
         const { productId, user } = data
-        const reviewsPreviewLimit = 5
+        const reviewsPreviewLimit = REVIEWS.PREVIEW_LIMIT
 
         let skipDeletedFilter = false
 

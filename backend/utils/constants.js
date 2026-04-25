@@ -1,0 +1,31 @@
+const PAGINATION = {
+    DEFAULT_PAGE: 1,
+    DEFAULT_LIMIT: 10,
+    MAX_LIMIT: 100,
+    PRODUCTS_LIMIT: 12,
+    ORDERS_LIMIT: 10,
+}
+
+const REVIEWS = {
+    PREVIEW_LIMIT: 5,
+    DEFAULT_LIMIT: 10,
+}
+
+const ORDER = {
+    DEFAULT_COD_FEES: 10,
+    RETURN_WINDOW_DAYS: 14,
+}
+
+const VALIDATION = {
+    MIN_PASSWORD_LENGTH: 8,
+    MIN_USERNAME_LENGTH: 3,
+    MAX_USERNAME_LENGTH: 30,
+    MIN_PHONE_LENGTH: 11,
+}
+
+module.exports = {
+    PAGINATION,
+    REVIEWS,
+    ORDER,
+    VALIDATION,
+}
