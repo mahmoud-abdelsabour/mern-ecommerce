@@ -15,8 +15,15 @@ const limiter = rateLimit({
 })
 
 const authLimiter = rateLimit({
-    windowMs: 10 * 60 * 1000,
+    windowMs: 15 * 60 * 1000,
     max: 5,
+    message: { error: 'Too many login attempts, please try again later.' },
+})
+
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 10,
+    message: { error: 'Too many accounts created, please try again later.' },
 })
 
 const corsOptions = {
@@ -31,6 +38,7 @@ const securityMiddleware = app => {
     if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'development') {
         app.use('/api', limiter)
         app.use('/api/auth/login', authLimiter)
+        app.use('/api/auth/register', registerLimiter)
     }
     app.use((req, res, next) => {
         Object.defineProperty(req, 'query', {
