@@ -2,13 +2,22 @@ const mongoose = require('mongoose')
 const Review = require('../models/review.model')
 const Order = require('../models/order.model')
 const { updateProductRating } = require('./product.service')
+const { PAGINATION, REVIEWS } = require('../utils/constants')
 
 const getAllReviews = async data => {
     try {
-        const { productId, page = 1, limit = 10, sort = { createdAt: -1 } } = data
+        const {
+            productId,
+            page = PAGINATION.DEFAULT_PAGE,
+            limit = REVIEWS.DEFAULT_LIMIT,
+            sort = { createdAt: -1 },
+        } = data
 
-        const pageNumber = Math.max(Number(page) || 1, 1)
-        const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
+        const pageNumber = Math.max(Number(page) || PAGINATION.DEFAULT_PAGE, 1)
+        const pageSize = Math.min(
+            Math.max(Number(limit) || REVIEWS.DEFAULT_LIMIT, 1),
+            PAGINATION.MAX_LIMIT
+        )
         const skip = (pageNumber - 1) * pageSize
 
         const [reviews, totalReviews] = await Promise.all([
