@@ -2,6 +2,7 @@ const slugify = require('slugify')
 const Brand = require('../models/brand.model')
 const Product = require('../models/product.model')
 const { pickAllowedFields } = require('../utils/request/pick-fields.util')
+const { PAGINATION } = require('../utils/constants')
 
 const getAllBrands = async data => {
     try {

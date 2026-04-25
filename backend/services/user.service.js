@@ -1,5 +1,6 @@
 const User = require('../models/user.model')
 const { pickAllowedFields } = require('../utils/request/pick-fields.util')
+const { PAGINATION } = require('../utils/constants')
 
 const userProfileAllowedFields = [
     'firstName',
@@ -125,8 +126,8 @@ const getUser = async data => {
 const getAllUsers = async data => {
     try {
         const {
-            page = 1,
-            limit = 10,
+            page = PAGINATION.DEFAULT_PAGE,
+            limit = PAGINATION.DEFAULT_LIMIT,
             role,
             includeDeleted,
             onlyDeleted,
@@ -139,8 +140,11 @@ const getAllUsers = async data => {
             sortOrders, // 'high' | 'low' (optional)
         } = data
 
-        const pageNumber = Math.max(Number(page) || 1, 1)
-        const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
+        const pageNumber = Math.max(Number(page) || PAGINATION.DEFAULT_PAGE, 1)
+        const pageSize = Math.min(
+            Math.max(Number(limit) || PAGINATION.DEFAULT_LIMIT, 1),
+            PAGINATION.MAX_LIMIT
+        )
         const skip = (pageNumber - 1) * pageSize
 
         const match = {}

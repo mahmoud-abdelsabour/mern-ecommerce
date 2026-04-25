@@ -2,6 +2,7 @@
 const slugify = require('slugify')
 const Category = require('../models/category.model')
 const Product = require('../models/product.model')
+const { PAGINATION } = require('../utils/constants')
 
 const createCategory = async data => {
     try {
@@ -61,10 +62,18 @@ const deleteCategory = async ({ categoryId }) => {
 
 const getAllCategories = async data => {
     try {
-        const { page = 1, limit = 10, search, hasProducts } = data
+        const {
+            page = PAGINATION.DEFAULT_PAGE,
+            limit = PAGINATION.DEFAULT_LIMIT,
+            search,
+            hasProducts,
+        } = data
 
-        const pageNumber = Math.max(Number(page) || 1, 1)
-        const pageSize = Math.min(Math.max(Number(limit) || 10, 1), 100)
+        const pageNumber = Math.max(Number(page) || PAGINATION.DEFAULT_PAGE, 1)
+        const pageSize = Math.min(
+            Math.max(Number(limit) || PAGINATION.DEFAULT_LIMIT, 1),
+            PAGINATION.MAX_LIMIT
+        )
         const skip = (pageNumber - 1) * pageSize
 
         const match = {}
