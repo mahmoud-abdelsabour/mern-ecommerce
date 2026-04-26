@@ -433,7 +433,7 @@ const Home = () => {
                   <Box
                     position="absolute"
                     inset={0}
-                    bgGradient="linear(to-t, blackAlpha.700, blackAlpha.100)"
+                    bg="blackAlpha.600"
                   />
                   <Text
                     position="absolute"
