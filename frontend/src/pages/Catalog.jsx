@@ -175,7 +175,7 @@ const Catalog = () => {
         <Text fontSize="lg" fontWeight="900">
           Filters
         </Text>
-        <Button size="xs" variant="outline" colorPalette="neutral" onClick={resetFilters}>
+        <Button size="xs" variant="outline" colorPalette="brand" onClick={resetFilters}>
           Clear
         </Button>
       </HStack>
@@ -395,7 +395,7 @@ const Catalog = () => {
           <Collapsible.Trigger asChild>
             <Button
               variant="outline"
-              colorPalette="neutral"
+              colorPalette="brand"
               justifyContent="space-between"
               w="100%"
               aria-label="Toggle catalog filters"

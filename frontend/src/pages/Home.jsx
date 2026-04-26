@@ -517,7 +517,7 @@ const Home = () => {
               We curate every collection with care—fewer compromises, clearer value, and support when you need it.
             </Text>
             <Box>
-              <Button as={RouterLink} to="/catalog" variant="outline" colorPalette="neutral">
+              <Button as={RouterLink} to="/catalog" variant="outline" colorPalette="brand">
                 Browse the catalog
               </Button>
             </Box>
@@ -570,12 +570,9 @@ const Home = () => {
               </Field.Root>
               <Button
                 type="submit"
-                bg="surface.panel"
-                color="text.primary"
+                colorPalette="brand"
                 h="44px"
                 px={6}
-                _hover={{ bg: "surface.subtle" }}
-                _active={{ bg: "neutral.200" }}
               >
                 Subscribe
               </Button>
