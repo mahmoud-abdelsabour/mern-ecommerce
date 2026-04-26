@@ -325,7 +325,7 @@ const Home = () => {
             </Carousel.Control>
           </Carousel.Root>
           <Flex justify="center" mt={4}>
-            <Button as={RouterLink} to="/catalog" colorPalette="brand" variant="solid">
+            <Button as={RouterLink} to="/catalog" bg="brand.600" color="white" _hover={{ bg: "brand.700" }}>
               Shop Now
             </Button>
           </Flex>
