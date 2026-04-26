@@ -1,6 +1,7 @@
 import { Box, Button, Field, Fieldset, Flex, Input, Stack, Text } from "@chakra-ui/react"
 import { useReducer, useState } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
+import { LuEye, LuEyeOff } from "react-icons/lu"
 import GlobalNotification from "../../components/GlobalNotification"
 import { useLogin } from "../../hooks/useAuth"
 import { initialLoginFormState, loginFormReducer } from "../../utils/forms/loginFormState"
@@ -15,6 +16,7 @@ const Login = () => {
   const { values, fieldErrors, formError } = state
 
   const [flash] = useState(() => consumeFlash())
+  const [showPassword, setShowPassword] = useState(false)
 
   const loginMutation = useLogin({
     onSuccess: (result) => {
@@ -97,15 +99,35 @@ const Login = () => {
 
             <Field.Root invalid={Boolean(fieldErrors.password)}>
               <Field.Label>Password</Field.Label>
-              <Input
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={values.password}
-                onChange={(e) =>
-                  dispatch({ type: "set_field", field: "password", value: e.target.value })
-                }
-              />
+              <Box position="relative" w="100%">
+                <Input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={values.password}
+                  onChange={(e) =>
+                    dispatch({ type: "set_field", field: "password", value: e.target.value })
+                  }
+                  pr="2.5rem"
+                  w="100%"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  aria-label={showPassword ? "Hide value" : "Show value"}
+                  position="absolute"
+                  right="0.35rem"
+                  top="50%"
+                  transform="translateY(-50%)"
+                  minW="auto"
+                  h="1.75rem"
+                  px="0.35rem"
+                  onClick={() => setShowPassword((v) => !v)}
+                >
+                  {showPassword ? <LuEyeOff /> : <LuEye />}
+                </Button>
+              </Box>
               {fieldErrors.password && (
                 <Text fontSize="xs" color="state.error">
                   {fieldErrors.password}

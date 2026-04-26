@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { useReducer } from "react"
+import { LuEye, LuEyeOff } from "react-icons/lu"
 import { useRegister } from "../../hooks/useAuth"
 import GlobalNotification from "../../components/GlobalNotification"
 import { notify } from "../../utils/notify"
@@ -22,6 +23,8 @@ const Register = () => {
 
   const [state, dispatch] = useReducer(registerFormReducer, initialRegisterFormState)
   const { values, fieldErrors, formError } = state
+  const [showPassword, setShowPassword] = useReducer((v) => !v, false)
+  const [showConfirmPassword, setShowConfirmPassword] = useReducer((v) => !v, false)
 
   // Keep the mutation logic in a hook, but keep UI errors local to this page.
   const registerMutation = useRegister({
@@ -144,15 +147,35 @@ const Register = () => {
 
             <Field.Root invalid={Boolean(fieldErrors.password)}>
               <Field.Label>Password</Field.Label>
-              <Input
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                value={values.password}
-                onChange={(e) =>
-                  dispatch({ type: "set_field", field: "password", value: e.target.value })
-                }
-              />
+              <Box position="relative" w="100%">
+                <Input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={values.password}
+                  onChange={(e) =>
+                    dispatch({ type: "set_field", field: "password", value: e.target.value })
+                  }
+                  pr="2.5rem"
+                  w="100%"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  aria-label={showPassword ? "Hide value" : "Show value"}
+                  position="absolute"
+                  right="0.35rem"
+                  top="50%"
+                  transform="translateY(-50%)"
+                  minW="auto"
+                  h="1.75rem"
+                  px="0.35rem"
+                  onClick={setShowPassword}
+                >
+                  {showPassword ? <LuEyeOff /> : <LuEye />}
+                </Button>
+              </Box>
               {fieldErrors.password && (
                 <Text fontSize="xs" color="state.error">
                   {fieldErrors.password}
@@ -162,19 +185,39 @@ const Register = () => {
 
             <Field.Root invalid={Boolean(fieldErrors.confirmPassword)}>
               <Field.Label>Confirm password</Field.Label>
-              <Input
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                value={values.confirmPassword}
-                onChange={(e) =>
-                  dispatch({
-                    type: "set_field",
-                    field: "confirmPassword",
-                    value: e.target.value,
-                  })
-                }
-              />
+              <Box position="relative" w="100%">
+                <Input
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={values.confirmPassword}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "set_field",
+                      field: "confirmPassword",
+                      value: e.target.value,
+                    })
+                  }
+                  pr="2.5rem"
+                  w="100%"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  aria-label={showConfirmPassword ? "Hide value" : "Show value"}
+                  position="absolute"
+                  right="0.35rem"
+                  top="50%"
+                  transform="translateY(-50%)"
+                  minW="auto"
+                  h="1.75rem"
+                  px="0.35rem"
+                  onClick={setShowConfirmPassword}
+                >
+                  {showConfirmPassword ? <LuEyeOff /> : <LuEye />}
+                </Button>
+              </Box>
               {fieldErrors.confirmPassword && (
                 <Text fontSize="xs" color="state.error">
                   {fieldErrors.confirmPassword}
