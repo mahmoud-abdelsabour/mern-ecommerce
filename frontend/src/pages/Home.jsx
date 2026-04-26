@@ -529,9 +529,8 @@ const Home = () => {
           py={{ base: 8, md: 10 }}
           px={{ base: 6, md: 12 }}
           rounded="2xl"
-          bg="brand.50"
-          borderWidth="1px"
-          borderColor="brand.200"
+          bg={{ base: "neutral.900", _dark: "neutral.800" }}
+          color="white"
           mb={4}
         >
           <Stack
@@ -541,11 +540,11 @@ const Home = () => {
             justify="space-between"
           >
             <Stack gap={2} maxW="lg">
-              <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="800" letterSpacing="-0.02em" color="text.primary">
+              <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="800" letterSpacing="-0.02em">
                 Stay in the loop
               </Text>
-              <Text fontSize="sm" color="text.secondary">
-                New drops and offers. Unsubscribe anytime.
+              <Text fontSize="sm" color="whiteAlpha.800">
+                New drops and offers—no spam. Unsubscribe anytime.
               </Text>
             </Stack>
             <Flex
@@ -561,19 +560,22 @@ const Home = () => {
                 <Input
                   type="email"
                   placeholder="you@example.com"
-                  bg="white"
-                  borderColor="brand.200"
-                  color="text.primary"
-                  _placeholder={{ color: "text.muted" }}
+                  bg="whiteAlpha.200"
+                  borderColor="whiteAlpha.400"
+                  color="white"
+                  _placeholder={{ color: "whiteAlpha.600" }}
                   h="44px"
                   rounded="lg"
                 />
               </Field.Root>
               <Button
                 type="submit"
-                colorPalette="brand"
+                bg="surface.panel"
+                color="text.primary"
                 h="44px"
                 px={6}
+                _hover={{ bg: "surface.subtle" }}
+                _active={{ bg: "neutral.200" }}
               >
                 Subscribe
               </Button>
