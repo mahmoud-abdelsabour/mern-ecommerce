@@ -341,7 +341,6 @@ const Home = () => {
           rounded="xl"
           borderWidth="1px"
           borderColor="surface.border"
-          shadow="sm"
           mb={{ base: 14, md: 20 }}
         >
           {VALUE_PROPS.map(({ icon, label, description }) => (
@@ -493,7 +492,6 @@ const Home = () => {
           borderWidth="1px"
           borderColor="surface.border"
           bg="surface.panel"
-          shadow="sm"
         >
           <Box
             flex="1"
